@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+const API_URL = window.location.hostname === "localhost" 
+  ? "http://localhost:5001/api" 
+  : "https://moneyanalyze-backend.onrender.com/api";
+
 const api = axios.create({
-  baseURL: 'http://localhost:5001/api', // Backend adresin
+  baseURL: API_URL, // Backend adresin
 });
 
 // Her istekte token'ı otomatik ekle
