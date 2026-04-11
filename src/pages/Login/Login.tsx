@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 // Tüm stilleri S objesi olarak içeri alıyoruz
 import * as S from './Login.styles'; 
@@ -60,10 +60,6 @@ const Login = () => {
             {loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
           </S.LoginButton>
         </S.Form>
-
-        <S.FooterText>
-          Hesabın yok mu? <Link to="/register">Kayıt Ol</Link>
-        </S.FooterText>
       </S.LoginBox>
     </S.Container>
   );
