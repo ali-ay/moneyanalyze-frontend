@@ -1,21 +1,65 @@
 import styled from 'styled-components';
 
-export const SidebarContainer = styled.div`
+export const SidebarContainer = styled.div<{ $isOpen: boolean }>`
   width: 260px;
-  background: #1e293b;
-  border-right: 1px solid #334155;
+  height: 100vh;
+  background-color: #0f172a;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
-  padding: 30px 20px;
-  height: 100vh;
   position: sticky;
   top: 0;
+  transition: all 0.3s ease;
 
   @media (max-width: 768px) {
+    position: fixed;
+    top: 60px; // MobileHeader yüksekliği
+    left: 0;
     width: 100%;
-    height: auto;
-    position: relative;
-    padding: 15px;
+    height: ${props => props.$isOpen ? 'calc(100vh - 60px)' : '0'};
+    overflow: hidden;
+    z-index: 999;
+    /* Masaüstü logosunu mobilde gizleyebilirsin */
+    .desktop-logo { display: none; }
+  }`
+;
+
+export const MobileHeader = styled.div`
+  display: none; // Masaüstünde gizli
+  
+  @media (max-width: 768px) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    width: 100%;
+    background-color: #0f172a;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1001;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+`;
+
+export const HamburgerButton = styled.button`
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+`;
+
+export const NavList = styled.ul`
+  list-style: none;
+  padding: 20px;
+  margin-top: 0;
+
+  @media (max-width: 768px) {
+    margin-top: 60px; // MobileHeader'ın altında kalması için
+    padding: 10px 20px 30px;
   }
 `;
 
@@ -35,6 +79,7 @@ export const Nav = styled.nav`
 `;
 
 // Sidebar.styles.ts
+
 
 // Buradaki tanımı <{ $active?: boolean }> olarak güncelle
 export const NavItem = styled.div<{ $active?: boolean }>`
@@ -86,11 +131,12 @@ export const SubMenu = styled.div<{ $isOpen: boolean }>`
   margin-bottom: 8px;
 `;
 
-export const SubNavItem = styled.div`
+export const SubNavItem = styled.div<{ $active?: boolean }>`
   padding: 10px 16px;
   cursor: pointer;
   font-size: 14px;
-  color: #94a3b8;
+  color: ${props => props.$active ? '#fff' : '#888'};
+  background: ${props => props.$active ? 'rgba(255, 255, 255, 0.05)' : 'transparent'};
   display: flex;
   align-items: center;
   gap: 8px;

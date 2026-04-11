@@ -1,60 +1,91 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import api from '../../api/axios';
-import { walletApi } from '../../api/wallet'; // 1. API importu eklendi
+import { walletApi } from '../../api/wallet';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import VIPPanels from '../../components/AnalyticCard/VIPPanels';
 import ScannerTable from '../../components/ScannerTable/ScannerTable';
-import BuyModal from '../../components/BuyModal/BuyModal'; // 2. Modal importu eklendi
+import BuyModal from '../../components/BuyModal/BuyModal';
+import { io } from 'socket.io-client';
 import * as S from './Dashboard.styles';
 
+const SOCKET_URL = "https://moneyanalyze-backend-eu.onrender.com";
+
+interface MarketCoin {
+  symbol: string;
+  price: number;
+  signal?: string;
+  totalScore?: number;
+}
+
 const Dashboard = () => {
-  const [marketData, setMarketData] = useState([]);
+  const [marketData, setMarketData] = useState<MarketCoin[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCoin, setSelectedCoin] = useState<any>(null);
+  
+  // Botun aynı döngüde çakışmaması için ref kullanıyoruz
+  const isProcessing = useRef(false);
 
-// İşlem yapılan coinleri ve son sinyallerini tutmak için state
-// Örn: { "BTCUSDT": "AL", "ETHUSDT": "SAT" }
-const [processedSignals, setProcessedSignals] = useState<Record<string, string>>({});
+  // 1. WebSocket: Canlı Fiyat Takibi
+  useEffect(() => {
+    const socket = io(SOCKET_URL, { withCredentials: true });
 
-useEffect(() => {
+    socket.on('tickerUpdate', (data) => {
+      setMarketData(prevData => 
+        prevData.map(coin => {
+          if (coin.symbol === data.symbol) {
+            return { ...coin, price: parseFloat(data.price) };
+          }
+          return coin;
+        })
+      );
+    });
+
+    return () => { socket.disconnect(); };
+  }, []);
+
+  // 2. Bot Mantığı & Market Verisi Çekme
   const fetchData = async () => {
+    if (isProcessing.current) return;
+    isProcessing.current = true;
+
     try {
-      const res = await api.get('/watchlist/market');
-      const newData = res.data;
+      // Market ve Cüzdan verisini eş zamanlı çekiyoruz
+      const [marketRes, walletRes] = await Promise.all([
+        api.get('/watchlist/market'),
+        walletApi.getPortfolio()
+      ]);
+
+      const newData = marketRes.data;
+      const myPortfolio = walletRes.data.portfolio || [];
 
       for (const coin of newData) {
-        const lastSignal = processedSignals[coin.symbol];
+        // Sepet Kontrolü: Bu coin zaten cüzdanımda var mı?
+        const isAlreadyInPortfolio = myPortfolio.some(
+          (item: any) => item.symbol === coin.symbol
+        );
 
-        // 1. ALIM KOŞULU: Sinyal "AL" ise VE daha önce bu coin için "AL" işlemi yapmadıysak
-        if (coin.signal === 'AL' && lastSignal !== 'AL') {
+        // ALIM KOŞULU: Sinyal AL ise VE sepetimde yoksa
+        if (coin.signal === 'AL' && !isAlreadyInPortfolio) {
           try {
             await api.post('/wallet/buy', {
               symbol: coin.symbol,
-              amount: 1000 / coin.price,
-              price: coin.price
+              amount: 1000 / parseFloat(coin.price), // 1000 USDT'lik alım örneği
+              price: parseFloat(coin.price)
             });
-            
-            // İşlemi hafızaya al: "Bu coin için AL yapıldı"
-            setProcessedSignals(prev => ({ ...prev, [coin.symbol]: 'AL' }));
-            console.log(`[BOT] ${coin.symbol} için ilk alım yapıldı. Sinyal değişene kadar tekrar alınmayacak.`);
+            console.log(`[BOT] ${coin.symbol} ilk kez keşfedildi ve alındı.`);
           } catch (err) {
             console.error("[BOT] Alım hatası:", err);
           }
         }
-
-        // 2. SATIŞ KOŞULU: Sinyal "SAT" ise VE daha önce bu coin için "SAT" işlemi yapmadıysak
-        else if (coin.signal === 'SAT' && lastSignal !== 'SAT') {
+        
+        // SATIŞ KOŞULU: Sinyal SAT ise VE sepetimde varsa sat
+        else if (coin.signal === 'SAT' && isAlreadyInPortfolio) {
           try {
-            // Hafızada 'AL' kaydı varsa veya portföyde bu coin varsa sat
             await api.post('/wallet/sell', {
               symbol: coin.symbol,
-              price: coin.price
-              // Not: Backend tümünü satacak şekilde ayarlı değilse miktar eklenmeli
+              price: parseFloat(coin.price)
             });
-
-            // İşlemi hafızaya al: "Bu coin için SAT yapıldı"
-            setProcessedSignals(prev => ({ ...prev, [coin.symbol]: 'SAT' }));
-            console.log(`[BOT] ${coin.symbol} için satış yapıldı. Yeni AL sinyali gelene kadar bekleniyor.`);
+            console.log(`[BOT] ${coin.symbol} SAT sinyaliyle elden çıkarıldı.`);
           } catch (err) {
             console.error("[BOT] Satış hatası:", err);
           }
@@ -63,20 +94,22 @@ useEffect(() => {
 
       setMarketData(newData);
     } catch (err) {
-      console.error("Market verisi çekilemedi:", err);
+      console.error("Veri çekme hatası:", err);
     } finally {
       setLoading(false);
+      isProcessing.current = false;
     }
   };
 
-  fetchData();
-  const interval = setInterval(fetchData, 30000);
-  return () => clearInterval(interval);
-}, [processedSignals]); // processedSignals değişimini takip etmeli
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 30000); // 30 saniyede bir analiz
+    return () => clearInterval(interval);
+  }, []);
 
+  // Manuel alım onayı
   const handleBuyConfirm = async (amount: number) => {
     if (!selectedCoin) return;
-    
     try {
       await walletApi.buyCoin({
         symbol: selectedCoin.symbol,
@@ -85,14 +118,13 @@ useEffect(() => {
       });
       alert(`${amount} adet ${selectedCoin.symbol} başarıyla alındı!`);
       setSelectedCoin(null);
+      fetchData(); // Listeyi güncelle
     } catch (err) {
-      alert("Alım işlemi sırasında bir hata oluştu. Bakiyenizi kontrol edin.");
+      alert("İşlem başarısız.");
     }
   };
 
-  const handleFollow = (symbol: string) => {
-    console.log(`Following: ${symbol}`);
-  };
+  const handleFollow = (symbol: string) => console.log(`Following: ${symbol}`);
 
   return (
     <S.Layout>
@@ -106,7 +138,7 @@ useEffect(() => {
           <>
             <VIPPanels data={marketData} />
             <ScannerTable 
-              data={marketData} // 3. 'filteredData' yerine 'marketData' kullanıldı
+              data={marketData} 
               onFollow={handleFollow} 
               onBuy={(coin) => setSelectedCoin(coin)} 
             />
@@ -114,7 +146,6 @@ useEffect(() => {
         )}
       </S.MainContent>
 
-      {/* 4. Modal return bloğunun içine, Layout'un sonuna eklendi */}
       {selectedCoin && (
         <BuyModal 
           coin={selectedCoin} 

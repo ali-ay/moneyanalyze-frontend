@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Home from './pages/Home/Home';
 import Wallet from './pages/Wallet/Wallet';
 import Deposit from "./pages/Wallet/Deposit/Deposit";
+import TransactionHistory from './pages/Wallet/History/History';
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/wallet" element={<Wallet />} />
         <Route path="/wallet/deposit" element={<Deposit />} /> {/* Yeni eklenen route */}
+        <Route path="/wallet/history" element={<TransactionHistory />} />
         {/* Varsayılan olarak login'e yönlendir */}
         <Route path="/" element={<Home />} />
       </Routes>

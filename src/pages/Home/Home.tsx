@@ -10,8 +10,13 @@ const Home = () => {
       <S.Navbar>
         <S.Logo onClick={() => navigate('/')}>MoneyAnalyze</S.Logo>
         <S.NavButtons>
-          <S.CTAButton onClick={() => navigate('/login')}>Giriş Yap</S.CTAButton>
-          <S.CTAButton $primary onClick={() => navigate('/register')}>Ücretsiz Başla</S.CTAButton>
+          {/* $small prop'unu burada ekliyoruz */}
+          <S.CTAButton $small onClick={() => navigate('/login')}>
+            Giriş Yap
+          </S.CTAButton>
+          <S.CTAButton $small $primary onClick={() => navigate('/register')}>
+            Ücretsiz Başla
+          </S.CTAButton>
         </S.NavButtons>
       </S.Navbar>
 
@@ -22,6 +27,7 @@ const Home = () => {
           ve yatırım stratejini Binance verileriyle güçlendir.
         </S.Description>
         
+        {/* Buradaki butonlar büyük kalmaya devam eder ($small yok) */}
         <div style={{ display: 'flex', gap: '15px' }}>
           <S.CTAButton $primary onClick={() => navigate('/register')}>
             Hemen Analize Başla

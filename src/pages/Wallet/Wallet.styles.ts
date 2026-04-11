@@ -5,12 +5,23 @@ export const Layout = styled.div`
   min-height: 100vh;
   background-color: #0f172a;
   color: #f8fafc;
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 export const MainContent = styled.main`
   flex: 1;
   padding: 40px;
   overflow-y: auto;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  
+  @media (max-width: 768px) {
+    padding: 16px;
+    padding-top: 80px; // MobileHeader yüksekliği
+  }
 
   h1 {
     font-size: 28px;
@@ -36,26 +47,32 @@ export const BalanceCard = styled.div`
   max-width: 500px;
 
   h3 {
-    font-size: 16px;
+    font-size: 14px;
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 1px;
+    color: #38bdf8; // Başlığı biraz daha belirgin yaptık
   }
 
   h2 {
     font-size: 36px;
     font-weight: 800;
-    color: #10b981; // Kripto yeşili
+    color: #10b981;
     margin: 0;
   }
 `;
 
+// --- MASAÜSTÜ TABLO ---
 export const PortfolioTable = styled.table`
   width: 100%;
   border-collapse: collapse;
   background: #1e293b;
   border-radius: 12px;
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    display: none; // Mobilde tabloyu gizle
+  }
 `;
 
 export const Th = styled.th`
@@ -78,13 +95,67 @@ export const Td = styled.td`
   }
 `;
 
-export const ProfitBadge = styled.span<{ isPositive: boolean }>`
-  background: ${props => props.isPositive ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
-  color: ${props => props.isPositive ? '#10b981' : '#ef4444'};
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 13px;
+// --- MOBİL KART YAPISI ---
+export const MobileCardContainer = styled.div`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+`;
+
+export const AssetCard = styled.div`
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #334155;
+`;
+
+export const CardRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+
+  &:last-child {
+    margin-bottom: 0;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+`;
+
+export const SymbolInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  strong {
+    font-size: 18px;
+    color: #38bdf8;
+  }
+
+  span {
+    color: #94a3b8;
+    font-size: 13px;
+  }
+`;
+
+export const PriceInfo = styled.div<{ $isProfit?: boolean }>`
+  text-align: right;
+
+  .price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f8fafc;
+  }
+
+  .profit {
+    font-size: 14px;
+    font-weight: 600;
+    color: ${props => props.$isProfit ? '#10b981' : '#ef4444'};
+  }
 `;
 
 export const EmptyState = styled.div`
