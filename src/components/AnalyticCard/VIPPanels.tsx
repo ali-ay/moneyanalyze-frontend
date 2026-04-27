@@ -1,4 +1,4 @@
-import * as S from './VIPPanles.styles';
+import * as S from './VIPPanels.styles';
 
 interface Props {
   data: any[];
