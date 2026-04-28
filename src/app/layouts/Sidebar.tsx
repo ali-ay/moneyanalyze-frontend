@@ -11,7 +11,8 @@ import {
   ShieldCheck,
   BarChart3,
   X,
-  History
+  History,
+  Eye
 } from 'lucide-react';
 import { useAuth } from '../../core/providers/AuthContext';
 
@@ -195,8 +196,11 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, o
         <NavItem $active={location.pathname === '/dashboard'} onClick={() => handleNav('/dashboard')}>
           <LayoutDashboard size={20} /> Analiz Paneli
         </NavItem>
+        <NavItem $active={location.pathname === '/dashboard/wallet'} onClick={() => handleNav('/dashboard/wallet')}>
+          <Wallet size={20} /> Portföyüm (Cüzdan)
+        </NavItem>
         <NavItem $active={location.pathname === '/watchlist'} onClick={() => handleNav('/watchlist')}>
-          <Wallet size={20} /> Cüzdan Takibi
+          <Eye size={20} /> İzleme Listesi
         </NavItem>
         <NavItem $active={location.pathname === '/dashboard/tracking'} onClick={() => handleNav('/dashboard/tracking')}>
           <History size={20} /> Hisse Hareket Kaydı
