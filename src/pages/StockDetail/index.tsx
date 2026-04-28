@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useStockDetailLogic } from './logic';
 import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState } from '../../components/ui/Layout.styles';
 import { MetricsGrid, MetricCard, CardHeader, CardTitle, CardIcon, CardValue } from '../../components/ui/Card.styles';
-import { ArrowLeft, TrendingUp, Calendar, Star } from 'lucide-react';
+import { TrendingUp, Calendar, Star } from 'lucide-react';
 import {
   Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, ComposedChart, Cell, Line, ReferenceLine
@@ -76,14 +76,6 @@ const OptionTitle = styled.span`
 const OptionDesc = styled.span`
   font-size: 11px;
   color: #5F6368;
-`;
-
-const BackButton = styled(Button)`
-  margin-bottom: 20px;
-  padding: 8px 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 `;
 
 const ChartContainer = styled(Card)`
@@ -224,13 +216,12 @@ const RangeIndicator = styled.div<{ $pos: number }>`
 
 const StockDetail: React.FC = () => {
   const { symbol } = useParams<{ symbol: string }>();
-  const navigate = useNavigate();
-  const { 
-    history, loading, price, changePercent, change, 
+  const {
+    history, loading, price, changePercent, change,
     lastUpdated, timeframe, setTimeframe, technicalSummary,
-    fundamentals 
+    fundamentals
   } = useStockDetailLogic(symbol);
-  
+
   const [activeViews, setActiveViews] = useState<string[]>(['area', 'candle']);
 
   if (loading && history.length === 0) return <LoadingState>{symbol} detayları yükleniyor...</LoadingState>;
@@ -303,7 +294,7 @@ const StockDetail: React.FC = () => {
         </defs>
         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
         <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9AA0A6' }} minTickGap={20} />
-        
+
         {/* Y-Axes for different scales */}
         <YAxis yAxisId="price" domain={['auto', 'auto']} hide />
         <YAxis yAxisId="rsi" domain={[0, 100]} hide />
@@ -347,19 +338,19 @@ const StockDetail: React.FC = () => {
             return null;
           }}
         />
-        
+
         {showBB && (
-          <Area 
-            yAxisId="price" 
-            dataKey="bb.upper" 
+          <Area
+            yAxisId="price"
+            dataKey="bb.upper"
             stroke="none"
             fill="#E91E63"
             fillOpacity={0.05}
           />
         )}
-        
+
         {showArea && <Area yAxisId="price" type="monotone" dataKey="price" stroke="#1A73E8" strokeWidth={0} fillOpacity={1} fill="url(#colorPrice)" />}
-        
+
         {(showCandle || showHeikin) && (
           <>
             <Bar yAxisId="price" dataKey="low" fill="none" stackId="wick" />
@@ -375,7 +366,7 @@ const StockDetail: React.FC = () => {
         )}
 
         {showLine && <Line yAxisId="price" type="monotone" dataKey="price" stroke="#1A73E8" strokeWidth={2} dot={false} />}
-        
+
         {showIndex && (
           <>
             <Line yAxisId="percent" type="monotone" dataKey="stockChange" stroke="#1A73E8" strokeWidth={2} dot={false} />
@@ -385,7 +376,7 @@ const StockDetail: React.FC = () => {
 
         {showMA20 && <Line yAxisId="price" type="monotone" dataKey="ma20" stroke="#F4B400" strokeWidth={1.5} dot={false} strokeDasharray="3 3" />}
         {showMA50 && <Line yAxisId="price" type="monotone" dataKey="ma50" stroke="#4285F4" strokeWidth={1.5} dot={false} strokeDasharray="5 5" />}
-        
+
         {showPivots && technicalSummary?.pivots && (
           <>
             <ReferenceLine yAxisId="price" y={technicalSummary.pivots.r2} stroke="#DB4437" strokeDasharray="3 3" opacity={0.5} label={{ position: 'right', value: 'R2', fontSize: 9, fill: '#DB4437' }} />
@@ -395,16 +386,16 @@ const StockDetail: React.FC = () => {
             <ReferenceLine yAxisId="price" y={technicalSummary.pivots.s2} stroke="#0F9D58" strokeDasharray="3 3" opacity={0.5} label={{ position: 'right', value: 'S2', fontSize: 9, fill: '#0F9D58' }} />
           </>
         )}
-        
+
         {showBB && (
           <>
             <Line yAxisId="price" type="monotone" dataKey="bb.upper" stroke="#E91E63" strokeWidth={1} dot={false} opacity={0.3} />
             <Line yAxisId="price" type="monotone" dataKey="bb.lower" stroke="#E91E63" strokeWidth={1} dot={false} opacity={0.3} />
           </>
         )}
-        
+
         {showRSI && <Line yAxisId="rsi" type="monotone" dataKey="rsi" stroke="#9C27B0" strokeWidth={1} dot={false} opacity={0.6} />}
-        
+
         {showMACD && (
           <>
             <Bar yAxisId="macd" dataKey="macd.histogram" barSize={4} opacity={0.3}>
@@ -421,10 +412,6 @@ const StockDetail: React.FC = () => {
 
   return (
     <PageContainer>
-      <BackButton $variant="secondary" onClick={() => navigate('/dashboard')}>
-        <ArrowLeft size={16} /> Dashboard'a Dön
-      </BackButton>
-
       <ResponsiveHeader>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
@@ -512,7 +499,7 @@ const StockDetail: React.FC = () => {
             </div>
           )}
         </div>
-        
+
         {/* Hacim Grafiği */}
         {history.length > 0 && (
           <div style={{ height: '60px', marginTop: '10px', opacity: 0.7, overflow: 'hidden' }}>
@@ -542,9 +529,9 @@ const StockDetail: React.FC = () => {
             { id: 'rsi', title: 'RSI', desc: 'Aşırı Alım/Satım' },
             { id: 'macd', title: 'MACD', desc: 'Trend gücü' }
           ].map(opt => (
-            <ChartOptionItem 
-              key={opt.id} 
-              $active={activeViews.includes(opt.id)} 
+            <ChartOptionItem
+              key={opt.id}
+              $active={activeViews.includes(opt.id)}
               onClick={() => toggleView(opt.id)}
             >
               <Checkbox $active={activeViews.includes(opt.id)} />
@@ -609,7 +596,7 @@ const TradeControlCard: React.FC<{ symbol: string, currentPrice: number }> = ({ 
         api.get(`/bots/my?symbol=${symbol}`),
         api.get('/transactions/my-portfolio')
       ]);
-      
+
       const bots = botRes.data.data || [];
       const lb = bots.find((b: any) => b.strategy === 'LIMIT_ORDER');
       setLimitBot(lb);
@@ -681,7 +668,7 @@ const TradeControlCard: React.FC<{ symbol: string, currentPrice: number }> = ({ 
     try {
       await api.put(`/bots/${limitBot.id}/toggle`);
       fetchData();
-    } catch (err) {}
+    } catch (err) { }
   };
 
   return (
@@ -697,7 +684,7 @@ const TradeControlCard: React.FC<{ symbol: string, currentPrice: number }> = ({ 
           {limitBot && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f8f9fa', padding: '6px 12px', borderRadius: '20px', border: '1px solid #eee' }}>
               <span style={{ fontSize: '11px', fontWeight: 700 }}>Bot: {limitBot.isActive ? 'AKTİF' : 'PASİF'}</span>
-              <div 
+              <div
                 onClick={toggleBot}
                 style={{ width: '32px', height: '16px', borderRadius: '8px', background: limitBot.isActive ? '#0F9D58' : '#ccc', position: 'relative', cursor: 'pointer' }}
               >
@@ -713,17 +700,17 @@ const TradeControlCard: React.FC<{ symbol: string, currentPrice: number }> = ({ 
         <div style={{ padding: '20px', borderRadius: '16px', background: '#f8f9fa', border: '1px solid #eee' }}>
           <div style={{ fontWeight: 800, fontSize: '14px', marginBottom: '16px', color: '#3C4043' }}>Manuel İşlem (1 Lot)</div>
           <div style={{ display: 'flex', gap: '12px' }}>
-            <Button 
-              $variant="primary" 
-              style={{ flex: 1, background: '#0F9D58', borderColor: '#0F9D58' }} 
+            <Button
+              $variant="primary"
+              style={{ flex: 1, background: '#0F9D58', borderColor: '#0F9D58' }}
               onClick={() => handleManualTrade('BUY')}
               disabled={actionLoading || ownedAmount >= 1}
             >
               Satın Al (₺{currentPrice})
             </Button>
-            <Button 
-              $variant="danger" 
-              style={{ flex: 1 }} 
+            <Button
+              $variant="danger"
+              style={{ flex: 1 }}
               onClick={() => handleManualTrade('SELL')}
               disabled={actionLoading || ownedAmount < 1}
             >
@@ -741,8 +728,8 @@ const TradeControlCard: React.FC<{ symbol: string, currentPrice: number }> = ({ 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
             <div>
               <label style={{ fontSize: '11px', fontWeight: 700, color: '#5F6368', display: 'block', marginBottom: '4px' }}>Alım Limiti (₺)</label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 value={buyLimit}
                 onChange={e => setBuyLimit(e.target.value)}
                 placeholder="Örn: 13"
@@ -751,8 +738,8 @@ const TradeControlCard: React.FC<{ symbol: string, currentPrice: number }> = ({ 
             </div>
             <div>
               <label style={{ fontSize: '11px', fontWeight: 700, color: '#5F6368', display: 'block', marginBottom: '4px' }}>Satım Limiti (₺)</label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 value={sellLimit}
                 onChange={e => setSellLimit(e.target.value)}
                 placeholder="Örn: 18"
@@ -760,9 +747,9 @@ const TradeControlCard: React.FC<{ symbol: string, currentPrice: number }> = ({ 
               />
             </div>
           </div>
-          <Button 
-            $variant="primary" 
-            style={{ width: '100%' }} 
+          <Button
+            $variant="primary"
+            style={{ width: '100%' }}
             onClick={saveLimits}
             disabled={actionLoading || !limitBot}
           >

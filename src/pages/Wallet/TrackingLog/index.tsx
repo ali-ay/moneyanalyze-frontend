@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTrackingLogLogic } from './logic';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState, EmptyState } from '../../../components/ui/Layout.styles';
 import { TableContainer, Table, Th, Td, TableRow, Badge } from '../../../components/ui/Table.styles';
 import { ArrowUpRight, ArrowDownRight, History, Clock } from 'lucide-react';
@@ -32,6 +31,7 @@ const TrackingLog: React.FC = () => {
                 <Th>Tarih / Saat</Th>
                 <Th>İşlem</Th>
                 <Th>Hisse</Th>
+                <Th>İşlem Tipi</Th>
                 <Th>İşlem Fiyatı</Th>
                 <Th>Anlık Fiyat</Th>
                 <Th>Değişim (%)</Th>
@@ -47,8 +47,8 @@ const TrackingLog: React.FC = () => {
                 const isPositive = changePercent !== null && changePercent >= 0;
 
                 return (
-                  <TableRow 
-                    key={tx.id} 
+                  <TableRow
+                    key={tx.id}
                     onClick={() => navigate(`/dashboard/stock/${cleanSym}`)}
                     style={{ cursor: 'pointer' }}
                   >
@@ -70,6 +70,11 @@ const TrackingLog: React.FC = () => {
                       )}
                     </Td>
                     <Td style={{ fontWeight: 'bold', color: '#1A73E8' }}>{cleanSym}</Td>
+                    <Td>
+                      <Badge type={tx.type === 'BUY' || tx.entryType === 'AI_SIGNAL' ? 'BUY' : 'SELL'}>
+                        {tx.type === 'BUY' || tx.entryType === 'AI_SIGNAL' ? 'ALIM' : 'SATIM'}
+                      </Badge>
+                    </Td>
                     <Td>₺{tx.price.toLocaleString('tr-TR')}</Td>
                     <Td>
                       {currentPrice
