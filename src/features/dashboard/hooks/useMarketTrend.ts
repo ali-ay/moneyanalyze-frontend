@@ -13,10 +13,10 @@ export const useMarketTrend = (symbol: string) => {
       
       if (isStock) {
         const cleanSym = symbol.replace('.IS', '');
-        url = `http://localhost:5001/api/stock/history/${cleanSym}?period=1d`;
+        url = `/api/stock/history/${cleanSym}?period=1d`;
       } else {
         const cleanSymbol = symbol.replace('/', '');
-        url = `http://localhost:5001/api/market/history/${cleanSymbol}?interval=1h&limit=24`;
+        url = `/api/market/history/${cleanSymbol}?interval=1h&limit=24`;
       }
 
       const response = await axios.get(url);

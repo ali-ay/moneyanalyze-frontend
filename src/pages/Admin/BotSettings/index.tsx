@@ -5,7 +5,7 @@ import { useAuth } from '../../../core/providers/AuthContext';
 import { AddBotModal } from '../../../components/modals/AddBotModal';
 
 // WebSocket bağlantısı - dinamik URL kullanımı (Canlı ortamda VITE_API_URL kullanılacak)
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+const SOCKET_URL = import.meta.env.VITE_API_URL || '';
 const socket = io(SOCKET_URL, {
   transports: ['websocket', 'polling'],
   withCredentials: true

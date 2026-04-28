@@ -67,9 +67,9 @@ export const PortfolioSummary: React.FC = () => {
     const fetchAiPerformance = async () => {
       try {
         const [w, m, t] = await Promise.all([
-          axios.get('http://localhost:5001/api/stock/opportunities?period=weekly'),
-          axios.get('http://localhost:5001/api/stock/opportunities?period=monthly'),
-          axios.get('http://localhost:5001/api/stock/opportunities?period=3mo')
+          axios.get('/api/stock/opportunities?period=weekly'),
+          axios.get('/api/stock/opportunities?period=monthly'),
+          axios.get('/api/stock/opportunities?period=3mo')
         ]);
         
         const calcAvg = (data: any[]) => data.length > 0 

@@ -3,7 +3,7 @@ import { getHistory } from '../../../services/wallet.api';
 import { io } from 'socket.io-client';
 import { useAuth } from '../../../core/providers/AuthContext';
 
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+const SOCKET_URL = import.meta.env.VITE_API_URL || '';
 
 export const useTransactionsLogic = () => {
   const { user } = useAuth();

@@ -99,7 +99,7 @@ export const MarketTrendSection: React.FC = () => {
   React.useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const res = await axios.get('http://localhost:5001/api/stock/bulk-info?symbols=XU100,XU050,XU030');
+        const res = await axios.get('/api/stock/bulk-info?symbols=XU100,XU050,XU030');
         setIndexPrices(res.data.quotes || []);
       } catch (e) {}
     };

@@ -13,8 +13,8 @@ export const useDashboardData = () => {
     try {
       setLoading(true);
       const endpoint = mode === 'stock'
-        ? 'http://localhost:5001/api/stock/list'
-        : 'http://localhost:5001/api/market/top-volume';
+        ? '/api/stock/list'
+        : '/api/market/top-volume';
       const response = await axios.get(endpoint);
 
       if (response.data?.status === 'error') {

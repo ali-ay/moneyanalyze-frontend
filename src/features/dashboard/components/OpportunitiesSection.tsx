@@ -80,7 +80,7 @@ export const OpportunitiesSection: React.FC = () => {
   useEffect(() => {
     const fetchOpportunities = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/api/stock/opportunities');
+        const response = await axios.get('/api/stock/opportunities');
         setOpportunities(response.data);
       } catch (error) {
         console.error('Error fetching opportunities:', error);

@@ -7,7 +7,7 @@ const Settings: React.FC = () => {
 
   // Sayfa açıldığında mevcut ayarı backend'den çekebilirsin
   useEffect(() => {
-    fetch('http://localhost:5001/api/user/1') // Kullanıcı bilgilerini getiren endpoint
+    fetch('/api/user/1') // Kullanıcı bilgilerini getiren endpoint
       .then(res => res.json())
       .then(data => {
         if (data.defaultOrderAmount) {
@@ -22,7 +22,7 @@ const Settings: React.FC = () => {
     if (window.confirm("DİKKAT! Tüm işlem geçmişi, portföy ve cüzdan hareketleri silinecek. Emin misiniz?")) {
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:5001/api/settings/reset', { 
+        const response = await fetch('/api/settings/reset', { 
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: 1 }) 
@@ -43,7 +43,7 @@ const Settings: React.FC = () => {
   // 2. Alım Tutarını Kaydetme
   const handleSaveAmount = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/settings/update-amount', {
+      const response = await fetch('/api/settings/update-amount', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: 1, amount: orderAmount })
