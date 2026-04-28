@@ -225,6 +225,7 @@ const Watchlist: React.FC = () => {
               <Th>Varlık</Th>
               <Th>{isAuto ? 'Sinyal Fiyatı' : 'Eklenme Fiyatı'}</Th>
               <Th>Anlık Fiyat</Th>
+              <Th>Sinyal Tarihi</Th>
               <Th>Kâr / Zarar (%)</Th>
               <Th>Son Güncelleme</Th>
               <Th style={{ textAlign: 'right' }}>İşlemler</Th>
@@ -274,6 +275,14 @@ const Watchlist: React.FC = () => {
                       <S.LiveDot />
                       {currency}{currentPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                     </S.LivePrice>
+                  </Td>
+                  <Td style={{ fontSize: '12px', color: '#5F6368' }}>
+                    {meta?.addedAt ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <History size={12} />
+                        {new Date(meta.addedAt).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                    ) : '-'}
                   </Td>
                   <Td>
                     {addedPrice > 0 ? (
