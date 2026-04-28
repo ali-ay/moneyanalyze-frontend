@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import api from '../../services/apiClient';
 import { useNotification } from '../../core/providers/NotificationContext';
 import { useMarketMode } from '../../context/MarketModeContext';
@@ -28,29 +28,41 @@ export const useBotManagement = () => {
   const [buyAmount, setBuyAmount] = useState<number>(10);
   const [settingsLoading, setSettingsLoading] = useState(false);
 
+  const abortRef = useRef<AbortController | null>(null);
   const fetchBots = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setLoading(true);
       // Mode'a göre symbol belirle: crypto -> ALL, stock -> ALL_STOCK
       const targetSymbol = mode === 'crypto' ? 'ALL' : 'ALL_STOCK';
-      
+
       const [botsRes, settingsRes] = await Promise.all([
-        api.get(`/bots/my?symbol=${targetSymbol}`),
-        api.get('/settings')
+        api.get(`/bots/my?symbol=${targetSymbol}`, { signal: controller.signal }),
+        api.get('/settings', { signal: controller.signal })
       ]);
+      if (controller.signal.aborted) return;
       setBots(botsRes.data.data || []);
       setBuyAmount(settingsRes.data.data?.buyAmount || 10);
       setPendingChanges(false);
       setError(null);
     } catch (err: any) {
+      if (err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED') return;
+      // 401 → apiClient logout tetikledi; ekstra hata gösterme
+      if (err?.response?.status === 401) return;
       setError(err.response?.data?.message || 'Botlar yüklenemedi.');
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
   }, [mode]);
 
   useEffect(() => {
     fetchBots();
+    return () => {
+      abortRef.current?.abort();
+    };
   }, [fetchBots]);
 
   // Sadece yerel durumu değiştirir

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { CheckCircle, AlertCircle, X } from 'lucide-react';
 
@@ -16,22 +16,43 @@ interface NotificationContextType {
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
+let notifIdCounter = 0;
+const generateId = () => {
+  notifIdCounter += 1;
+  return `notif_${Date.now()}_${notifIdCounter}`;
+};
+
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
-  const showNotification = useCallback((message: string, type: NotificationType = 'success') => {
-    const id = Math.random().toString(36).substr(2, 9);
-    setNotifications((prev) => [...prev, { id, message, type }]);
-
-    // 3 saniye sonra otomatik kaldır
-    setTimeout(() => {
-      setNotifications((prev) => prev.filter((n) => n.id !== id));
-    }, 3000);
+  const removeNotification = useCallback((id: string) => {
+    const timer = timersRef.current.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      timersRef.current.delete(id);
+    }
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
-  const removeNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
+  const showNotification = useCallback((message: string, type: NotificationType = 'success') => {
+    const id = generateId();
+    setNotifications((prev) => [...prev, { id, message, type }]);
+    const timer = setTimeout(() => {
+      timersRef.current.delete(id);
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+    }, 3000);
+    timersRef.current.set(id, timer);
+  }, []);
+
+  // Provider unmount olursa tüm timer'ları temizle
+  useEffect(() => {
+    const timers = timersRef.current;
+    return () => {
+      timers.forEach((t) => clearTimeout(t));
+      timers.clear();
+    };
+  }, []);
 
   return (
     <NotificationContext.Provider value={{ showNotification }}>

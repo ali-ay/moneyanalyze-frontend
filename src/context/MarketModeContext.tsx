@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import type { ReactNode } from 'react';
 
 type MarketMode = 'crypto' | 'stock';
 
@@ -9,22 +10,33 @@ interface MarketModeContextType {
 
 const MarketModeContext = createContext<MarketModeContextType | undefined>(undefined);
 
+const isValidMode = (val: string | null): val is MarketMode => val === 'crypto' || val === 'stock';
+
 export const MarketModeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [mode, setModeState] = useState<MarketMode>(() => {
-    const saved = localStorage.getItem('marketMode');
-    return (saved as MarketMode) || 'crypto';
+    try {
+      const saved = localStorage.getItem('marketMode');
+      return isValidMode(saved) ? saved : 'crypto';
+    } catch {
+      return 'crypto';
+    }
   });
 
   useEffect(() => {
-    localStorage.setItem('marketMode', mode);
+    try {
+      localStorage.setItem('marketMode', mode);
+    } catch { /* ignore */ }
   }, [mode]);
 
-  const setMode = (newMode: MarketMode) => {
+  const setMode = useCallback((newMode: MarketMode) => {
     setModeState(newMode);
-  };
+  }, []);
+
+  // Tüketicilerde gereksiz re-render'ı önle
+  const value = useMemo(() => ({ mode, setMode }), [mode, setMode]);
 
   return (
-    <MarketModeContext.Provider value={{ mode, setMode }}>
+    <MarketModeContext.Provider value={value}>
       {children}
     </MarketModeContext.Provider>
   );

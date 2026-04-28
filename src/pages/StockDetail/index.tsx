@@ -5,8 +5,8 @@ import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState } from
 import { MetricsGrid, MetricCard, CardHeader, CardTitle, CardIcon, CardValue } from '../../components/ui/Card.styles';
 import { ArrowLeft, TrendingUp, Calendar, Star } from 'lucide-react';
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, ComposedChart, Cell, Line, ReferenceLine, Label
+  Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar, ComposedChart, Cell, Line, ReferenceLine
 } from 'recharts';
 import styled from 'styled-components';
 
@@ -254,7 +254,7 @@ const StockDetail: React.FC = () => {
     let prevOpen = data[0]?.open;
     let prevClose = data[0]?.price;
 
-    data.forEach((d, i) => {
+    data.forEach((d) => {
       const haClose = (d.open + d.high + d.low + d.price) / 4;
       const haOpen = (prevOpen + prevClose) / 2;
       const haHigh = Math.max(d.high, haOpen, haClose);
@@ -352,10 +352,9 @@ const StockDetail: React.FC = () => {
           <Area 
             yAxisId="price" 
             dataKey="bb.upper" 
-            stroke="none" 
-            fill="#E91E63" 
-            fillOpacity={0.05} 
-            baseValue="bb.lower" 
+            stroke="none"
+            fill="#E91E63"
+            fillOpacity={0.05}
           />
         )}
         
@@ -599,7 +598,7 @@ const TradeControlCard: React.FC<{ symbol: string, currentPrice: number }> = ({ 
   const [limitBot, setLimitBot] = useState<any>(null);
   const [buyLimit, setBuyLimit] = useState<string>('');
   const [sellLimit, setSellLimit] = useState<string>('');
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [ownedAmount, setOwnedAmount] = useState(0);
 

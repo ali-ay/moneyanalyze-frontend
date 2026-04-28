@@ -1,14 +1,9 @@
 import axiosInstance from './apiClient';
 
+// Token, apiClient interceptor'ı tarafından otomatik ekleniyor — manuel header gerekmiyor.
+
 // Tüm kullanıcıları getir (Onaylı/Onaysız ayrımı yapmadan)
-export const getAllUsers = () => {
-  const token = localStorage.getItem('token');
-  return axiosInstance.get('/admin/users', {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
-};
+export const getAllUsers = () => axiosInstance.get('/admin/users');
 
 // Sadece onay bekleyenleri getir (Eski yapıyı desteklemek istersen)
 export const getPendingUsers = () => axiosInstance.get('/admin/pending');
@@ -18,11 +13,11 @@ export const getPendingUsers = () => axiosInstance.get('/admin/pending');
  * @param userId - Güncellenecek kullanıcının ID'si
  * @param data - { role: 'ADMIN', isApproved: true } gibi güncellenecek alanlar
  */
-export const updateUser = (userId: string, data: { role?: string; isApproved?: boolean }) => 
+export const updateUser = (userId: string, data: { role?: string; isApproved?: boolean }) =>
   axiosInstance.put(`/admin/users/${userId}`, data);
 
 // Kullanıcı sil (URL yapısını backend'e göre temizledik)
-export const deleteUser = (userId: string) => 
+export const deleteUser = (userId: string) =>
   axiosInstance.delete(`/admin/users/${userId}`);
 
 // Kullanıcı detaylarını getir (Bakiye, Botlar, İşlemler vb.)

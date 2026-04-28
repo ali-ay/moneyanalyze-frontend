@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import api from '../../../services/apiClient';
 
 interface ProfileData {
@@ -28,10 +28,16 @@ export const useProfileLogic = () => {
   const [binanceSecretKey, setBinanceSecretKey] = useState('');
   const [tradingMode, setTradingMode] = useState<'SIMULATION' | 'LIVE'>('SIMULATION');
 
+  const abortRef = useRef<AbortController | null>(null);
   const fetchProfile = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setLoading(true);
-      const res = await api.get('/users/profile');
+      const res = await api.get('/users/profile', { signal: controller.signal });
+      if (controller.signal.aborted) return;
       const data = res.data.data;
       setProfile(data);
       setFirstName(data.firstName || '');
@@ -41,15 +47,18 @@ export const useProfileLogic = () => {
       setBinanceSecretKey('');
       setError(null);
     } catch (err: any) {
+      if (err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED') return;
+      if (err?.response?.status === 401) return; // apiClient logout tetikledi
       console.error("Profil yüklenemedi:", err);
       setError(err.response?.data?.message || "Profil bilgileri alınamadı.");
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     fetchProfile();
+    return () => abortRef.current?.abort();
   }, [fetchProfile]);
 
   const updateProfile = async () => {

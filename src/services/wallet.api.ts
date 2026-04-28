@@ -1,5 +1,6 @@
 // api/walletApi.ts
 import api from './apiClient';
+import type { AxiosRequestConfig } from 'axios';
 
 // Tipleri tanımlayalım (Hata payını sıfıra indirir)
 export interface BuyCoinData {
@@ -16,7 +17,7 @@ export interface SellCoinData {
 /**
  * Portföy Özeti
  */
-export const getPortfolio = () => api.get('/wallet/my-portfolio');
+export const getPortfolio = (config?: AxiosRequestConfig) => api.get('/wallet/my-portfolio', config);
 
 /**
  * Coin Alım
@@ -31,7 +32,7 @@ export const sellCoin = (data: SellCoinData) => api.post('/wallet/sell', data);
 /**
  * İşlem Geçmişi
  */
-export const getHistory = () => api.get('/transactions/history');
+export const getHistory = (config?: AxiosRequestConfig) => api.get('/transactions/history', config);
 
 /**
  * Bakiye Yükleme

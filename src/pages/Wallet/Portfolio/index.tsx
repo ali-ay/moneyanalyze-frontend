@@ -5,16 +5,14 @@ import { MetricCard, CardHeader, CardTitle, CardIcon, CardValue } from '../../..
 import { TableContainer, Table, Th, Td, TableRow } from '../../../components/ui/Table.styles';
 import { Briefcase, TrendingUp, TrendingDown, PieChart as PieChartIcon } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { SellModal } from '../../../components/modals/SellModal';
-
 const COLORS = ['#1a73e8', '#0f9d58', '#f4b400', '#db4437', '#673ab7', '#00bcd4', '#ff9800', '#795548'];
 
 const MyPortfolio = () => {
-  const { 
-    assets, livePrices, lastUpdates, loading, stats, 
-    balanceUSD, balanceTRY, 
-    assetOnlyUSD, assetOnlyTRY, 
-    handleFastSell, fetchPortfolio 
+  const {
+    assets, livePrices, lastUpdates, loading, stats,
+    balanceUSD,
+    assetOnlyUSD, assetOnlyTRY,
+    handleFastSell
   } = useWalletLogic();
 
   if (loading && assets.length === 0) return <LoadingState>Portföy Yükleniyor...</LoadingState>;

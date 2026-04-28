@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { getWatchlist, removeFromWatchlist } from '../../services/watchlist.api';
 import type { WatchlistItem } from '../../services/watchlist.api';
 import api from '../../services/apiClient';
@@ -8,18 +8,24 @@ import { useMarketMode } from '../../context/MarketModeContext';
 export const useWatchlistLogic = () => {
   const { showNotification } = useNotification();
   const { mode } = useMarketMode();
-  const [watchlistMeta, setWatchlistMeta] = useState<WatchlistItem[]>(getWatchlist(mode));
+  // Lazy init: getWatchlist her render'da çalışmasın, sadece mount'ta okusun
+  const [watchlistMeta, setWatchlistMeta] = useState<WatchlistItem[]>(() => getWatchlist(mode));
   const [marketData, setMarketData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdates, setLastUpdates] = useState<{ [key: string]: string }>({});
   const [period, setPeriod] = useState<string>('weekly');
+  const abortRef = useRef<AbortController | null>(null);
 
   const fetchData = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       const manualMeta = getWatchlist(mode);
       
-      const oppRes = mode === 'stock' 
-        ? await api.get(`/stock/opportunities?period=${period}`)
+      const oppRes = mode === 'stock'
+        ? await api.get(`/stock/opportunities?period=${period}`, { signal: controller.signal })
         : { data: [] };
 
       const opportunityMeta: WatchlistItem[] = (oppRes.data || []).map((opp: any) => ({
@@ -53,7 +59,7 @@ export const useWatchlistLogic = () => {
 
       if (mode === 'stock') {
         const cleanSymbols = symbols.map(s => s.replace('.IS', '').toUpperCase());
-        const res = await api.get(`/stock/bulk-info?symbols=${cleanSymbols.join(',')}`);
+        const res = await api.get(`/stock/bulk-info?symbols=${cleanSymbols.join(',')}`, { signal: controller.signal });
         const quotes = res.data.quotes || [];
         
         filtered = quotes.map((q: any) => {
@@ -70,8 +76,7 @@ export const useWatchlistLogic = () => {
         // Kripto için tekil ticker'lar veya mevcut endpoint
         const detailedData = await Promise.all(symbols.map(async (symbol) => {
           try {
-            const res = await api.get(`/market/ticker/${symbol}USDT`);
-            const meta = combinedMeta.find(m => m.symbol === symbol);
+            const res = await api.get(`/market/ticker/${symbol}USDT`, { signal: controller.signal });
             updates[symbol] = new Date().toISOString();
             return {
               symbol,
@@ -79,24 +84,32 @@ export const useWatchlistLogic = () => {
               priceChangePercent: res.data.priceChangePercent,
               isOpportunity: false
             };
-          } catch (e) { return null; }
+          } catch (e: any) {
+            if (e?.name === 'CanceledError' || e?.code === 'ERR_CANCELED') return null;
+            return null;
+          }
         }));
         filtered = detailedData.filter(d => d !== null);
       }
 
+      if (controller.signal.aborted) return;
       setMarketData(filtered);
       setLastUpdates(prev => ({ ...prev, ...updates }));
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED') return;
       console.error('Watchlist verisi çekilemedi:', err);
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
   }, [mode, period]);
 
   useEffect(() => {
     fetchData();
     const interval = setInterval(fetchData, 60000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      abortRef.current?.abort();
+    };
   }, [fetchData]);
 
   const handleRemove = (symbol: string) => {

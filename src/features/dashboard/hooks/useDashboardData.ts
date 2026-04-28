@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import api from '../../../services/apiClient';
 import { useMarketMode } from '../../../context/MarketModeContext';
 
 export const useDashboardData = () => {
@@ -8,48 +9,60 @@ export const useDashboardData = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
-
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const endpoint = mode === 'stock'
-        ? '/api/stock/list'
-        : '/api/market/top-volume';
-      const response = await axios.get(endpoint);
-
-      if (response.data?.status === 'error') {
-        setError(response.data.message);
-        setLoading(false);
-        return;
-      }
-
-      const dataArray = Array.isArray(response.data)
-        ? response.data
-        : (response.data?.data && Array.isArray(response.data.data) ? response.data.data : []);
-
-      if (dataArray.length > 0) {
-        // Store the full list (top 40) for searching
-        setMarketData(dataArray);
-        setError(null);
-      }
-      setLastUpdated(new Date().toLocaleTimeString());
-    } catch (error: any) {
-      console.error('Data fetch error:', error);
-      if (error.response?.status === 429) {
-        setError('Hız sınırlamasına takıldınız (Rate Limit). Lütfen biraz bekleyin.');
-      } else {
-        setError('Piyasa verileri alınamadı.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [mode]);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
+    const fetchData = async () => {
+      // Önceki in-flight isteği iptal et — race condition önler
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      try {
+        if (!cancelled) setLoading(true);
+        const endpoint = mode === 'stock' ? '/stock/list' : '/market/top-volume';
+        const response = await api.get(endpoint, { signal: controller.signal });
+
+        if (cancelled) return;
+
+        if (response.data?.status === 'error') {
+          setError(response.data.message);
+          return;
+        }
+
+        const dataArray = Array.isArray(response.data)
+          ? response.data
+          : (Array.isArray(response.data?.data) ? response.data.data : []);
+
+        if (dataArray.length > 0) {
+          setMarketData(dataArray);
+          setError(null);
+        }
+        setLastUpdated(new Date().toLocaleTimeString());
+      } catch (err: any) {
+        if (axios.isCancel(err) || err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED') return;
+        if (cancelled) return;
+        if (err.response?.status === 429) {
+          setError('Hız sınırlamasına takıldınız (Rate Limit). Lütfen biraz bekleyin.');
+        } else {
+          setError('Piyasa verileri alınamadı.');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
     fetchData();
     const interval = setInterval(fetchData, 60000);
-    return () => clearInterval(interval);
-  }, [fetchData]);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      abortRef.current?.abort();
+    };
+  }, [mode]);
 
   return { marketData, lastUpdated, loading, error };
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCoinDetailLogic } from './logic';
 import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState } from '../../components/ui/Layout.styles';
@@ -12,7 +12,6 @@ import styled from 'styled-components';
 // UI Components
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { Input, InputGroup, Label } from '../../components/ui/Input';
 import { Switch } from '../../components/ui/Switch';
 import { Badge } from '../../components/ui/Badge';
 
@@ -225,7 +224,7 @@ const CoinDetail: React.FC = () => {
   const { symbol } = useParams<{ symbol: string }>();
   const navigate = useNavigate();
   const {
-    bots, loading, pendingChanges, hasChanges, applyChanges, updatingBot, activeBotCount, toggleBotLocal, updateBotConfig, history, price, isBBActive, isEMACrossActive, isVWAPActive, isIchimokuActive, isRSIActive, isMACDActive, isStochActive, isADXActive, timeframe, setTimeframe
+    bots, loading, pendingChanges, hasChanges, applyChanges, updatingBot, activeBotCount, toggleBotLocal, updateBotConfig, history, price, isBBActive, isEMACrossActive, isVWAPActive, isIchimokuActive, isRSIActive, isMACDActive, timeframe, setTimeframe
   } = useCoinDetailLogic(symbol);
 
   const [showBBInfo, setShowBBInfo] = useState(false);
@@ -405,7 +404,7 @@ const CoinDetail: React.FC = () => {
               <Activity size={18} color="#1A73E8" /> Osilatörler {isRSIActive && '(RSI)'} {isMACDActive && '(MACD)'}
             </ChartTitle>
           </ChartHeader>
-          <ResponsiveContainer width="100%" height="150px">
+          <ResponsiveContainer width="100%" height={150}>
             <AreaChart data={history}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
               <XAxis dataKey="time" hide />

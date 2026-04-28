@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
-import { Zap, TrendingUp, BarChart2, ChevronRight, Loader2 } from 'lucide-react';
+import { Zap, ChevronRight, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../../../components/ui/Card';
+import api from '../../../services/apiClient';
 
 const OpportunitiesGrid = styled.div`
   display: grid;
@@ -78,18 +78,25 @@ export const OpportunitiesSection: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const controller = new AbortController();
+    let cancelled = false;
     const fetchOpportunities = async () => {
       try {
-        const response = await axios.get('/api/stock/opportunities');
-        setOpportunities(response.data);
-      } catch (error) {
+        const response = await api.get('/stock/opportunities', { signal: controller.signal });
+        if (!cancelled) setOpportunities(response.data);
+      } catch (error: any) {
+        if (error?.name === 'CanceledError' || error?.code === 'ERR_CANCELED') return;
         console.error('Error fetching opportunities:', error);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchOpportunities();
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
   }, []);
 
   if (loading) {

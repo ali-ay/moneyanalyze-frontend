@@ -225,7 +225,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, o
         </div>
       </AccountBadge>
       
-      <LogoutButton onClick={logout}>
+      <LogoutButton onClick={() => logout()}>
         <LogOut size={20} /> Güvenli Çıkış
       </LogoutButton>
       </SidebarAside>

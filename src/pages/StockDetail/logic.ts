@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import apiClient from '../../services/apiClient';
 
 export interface StockHistoryItem {
@@ -52,8 +52,8 @@ const getEMA = (prices: number[], period: number) => {
   return emaArr;
 };
 
-const getRSI = (prices: number[], period: number = 14) => {
-  if (prices.length <= period) return 50;
+const getRSI = (prices: number[], period: number = 14): number[] => {
+  if (prices.length <= period) return [];
   const rsis: number[] = [];
   let avgGain = 0;
   let avgLoss = 0;
@@ -89,15 +89,19 @@ export const useStockDetailLogic = (symbol?: string) => {
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [timeframe, setTimeframe] = useState<'1d' | '5d' | '1mo' | '3mo' | '1y' | '5y' | 'all'>('1mo');
   const [fundamentals, setFundamentals] = useState<any>(null);
-  const [indexHistory, setIndexHistory] = useState<any[]>([]);
+  const abortRef = useRef<AbortController | null>(null);
 
   const fetchHistory = async () => {
     if (!symbol) return;
 
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setLoading(true);
     try {
       const cleanSymbol = symbol.replace('.IS', '');
-      const infoRes = await apiClient.get(`/stock/info/${cleanSymbol}`);
+      const infoRes = await apiClient.get(`/stock/info/${cleanSymbol}`, { signal: controller.signal });
       const quote = infoRes.data.quote;
 
       setFundamentals({
@@ -110,15 +114,16 @@ export const useStockDetailLogic = (symbol?: string) => {
       });
 
       // Hisse geçmişi
-      const response = await apiClient.get(`/stock/history/${cleanSymbol}?period=${timeframe}`);
+      const response = await apiClient.get(`/stock/history/${cleanSymbol}?period=${timeframe}`, { signal: controller.signal });
       const data = response.data || [];
-      
+
       // Endeks geçmişi (Karşılaştırma için)
       let indexData: any[] = [];
       try {
-        const indexRes = await apiClient.get(`/stock/history/XU100?period=${timeframe}`);
+        const indexRes = await apiClient.get(`/stock/history/XU100?period=${timeframe}`, { signal: controller.signal });
         indexData = indexRes.data || [];
-      } catch (e) {
+      } catch (e: any) {
+        if (e?.name === 'CanceledError' || e?.code === 'ERR_CANCELED') return;
         console.warn('Index data fetch failed');
       }
 
@@ -131,7 +136,6 @@ export const useStockDetailLogic = (symbol?: string) => {
         const indexStart = indexData[0]?.price || 1;
 
         // TA Hesaplamaları... (same as before)
-        const ma20Arr: (number|null)[] = data.map((_:any, i:number) => getSMA(prices.slice(0, i+1), 20));
         const ma50Arr: (number|null)[] = data.map((_:any, i:number) => getSMA(prices.slice(0, i+1), 50));
         const rsiArr = getRSI(prices, 14);
         
@@ -144,7 +148,7 @@ export const useStockDetailLogic = (symbol?: string) => {
         const macdSignal = getEMA(macdLine, 9);
 
         const mappedData = data.map((item: any, i: number) => {
-          const rsiVal = i >= 14 ? rsiArr[i - 14] : 50;
+          const rsiVal = (i >= 14 && rsiArr[i - 14] !== undefined) ? rsiArr[i - 14] : 50;
           const mLine = macdLine[i] || 0;
           const mSignal = i >= 9 ? macdSignal[i - (macdLine.length - macdSignal.length)] : 0;
           
@@ -215,18 +219,22 @@ export const useStockDetailLogic = (symbol?: string) => {
         setChangePercent(parseFloat(quote.change.toFixed(2)));
         setLastUpdated(infoRes.data.lastUpdated);
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.name === 'CanceledError' || error?.code === 'ERR_CANCELED') return;
       console.error('Error fetching stock history:', error);
       setHistory([]);
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchHistory();
     const interval = setInterval(fetchHistory, 30000); // 30 saniyede bir güncelle
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      abortRef.current?.abort();
+    };
   }, [symbol, timeframe]);
 
   const getTechnicalSummary = (last: StockHistoryItem) => {

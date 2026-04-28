@@ -8,7 +8,6 @@ import styled from 'styled-components';
 
 // UI Components
 import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
 import { Input, InputGroup, Label } from '../../components/ui/Input';
 import { BotCard } from '../../components/shared/BotCard';
 

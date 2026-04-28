@@ -11,7 +11,7 @@ export const AuthContainer = styled.div`
 export const AuthBox = styled.div`
   background: ${props => props.theme?.colors?.surface || '#0f172a'};
   padding: 2.5rem;
-  border-radius: ${props => props.theme?.borderRadius?.lg || '16px'};
+  border-radius: ${props => props.theme?.radius?.lg || '16px'};
   width: 100%;
   max-width: 400px;
   box-shadow: ${props => props.theme?.shadows?.lg || '0 10px 25px rgba(0,0,0,0.3)'};
@@ -53,7 +53,7 @@ export const InputGroup = styled.div`
     padding: 0.85rem;
     background: transparent;
     border: 1px solid ${props => props.theme?.colors?.border || '#2D2D2D'};
-    border-radius: ${props => props.theme?.borderRadius?.md || '12px'};
+    border-radius: ${props => props.theme?.radius?.md || '12px'};
     color: ${props => props.theme?.colors?.textMain || '#FFFFFF'};
     font-size: 1rem;
     transition: ${props => props.theme?.transitions?.fast || '0.2s'};
@@ -81,7 +81,7 @@ export const SubmitButton = styled.button`
   color: #fff;
   padding: 0.9rem;
   border: none;
-  border-radius: ${props => props.theme?.borderRadius?.md || '12px'};
+  border-radius: ${props => props.theme?.radius?.md || '12px'};
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -107,7 +107,7 @@ export const ErrorMessage = styled.div`
   color: ${props => props.theme?.colors?.danger || '#FF4D4D'};
   background: rgba(255, 77, 77, 0.1);
   padding: 0.8rem;
-  border-radius: ${props => props.theme?.borderRadius?.md || '12px'};
+  border-radius: ${props => props.theme?.radius?.md || '12px'};
   font-size: 0.9rem;
   text-align: center;
   border: 1px solid rgba(255, 77, 77, 0.2);
@@ -118,7 +118,7 @@ export const SuccessMessage = styled.div`
   color: ${props => props.theme?.colors?.success || '#00C853'};
   background: rgba(0, 200, 83, 0.1);
   padding: 0.8rem;
-  border-radius: ${props => props.theme?.borderRadius?.md || '12px'};
+  border-radius: ${props => props.theme?.radius?.md || '12px'};
   font-size: 0.9rem;
   text-align: center;
   border: 1px solid rgba(0, 200, 83, 0.2);

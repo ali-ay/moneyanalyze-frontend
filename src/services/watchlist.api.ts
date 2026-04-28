@@ -7,7 +7,6 @@
 
 const CRYPTO_STORAGE_KEY = 'moneyanalyze_watchlist_crypto';
 const STOCK_STORAGE_KEY = 'moneyanalyze_watchlist_stock';
-const STORAGE_KEY = 'moneyanalyze_watchlist'; // Eski format uyumu
 
 export interface WatchlistItem {
   symbol: string;

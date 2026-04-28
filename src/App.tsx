@@ -11,6 +11,7 @@ import { NotificationProvider } from './core/providers/NotificationContext';
 import { MarketModeProvider } from './context/MarketModeContext';
 import { HelmetProvider, Helmet } from 'react-helmet-async';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Layouts
 const MainLayout = lazy(() => import('./app/layouts/MainLayout'));
@@ -46,8 +47,23 @@ const AppContent = () => {
   // Use a stable fallback key to prevent reCAPTCHA initialization errors
   const reCaptchaKey = settings?.recaptchaSiteKey || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
 
+  // Settings hâlâ yükleniyor VE elimizde hiç settings yoksa bekleyelim.
+  // (SettingsContext error halinde DEFAULT_SETTINGS atadığı için bu durumda
+  // settings dolu gelir ve uygulama açılır.)
   if (loading && !settings) {
-    return <div style={{ background: '#080c14', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF', fontFamily: 'sans-serif' }}>MoneyAnalyze Yükleniyor...</div>;
+    return (
+      <div style={{
+        background: '#080c14',
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#FFFFFF',
+        fontFamily: 'sans-serif'
+      }}>
+        MoneyAnalyze Yükleniyor...
+      </div>
+    );
   }
 
   return (
@@ -102,17 +118,19 @@ const AppContent = () => {
 
 const App = () => {
   return (
-    <HelmetProvider>
-      <SettingsProvider>
-        <AuthProvider>
-          <NotificationProvider>
-            <MarketModeProvider>
-              <AppContent />
-            </MarketModeProvider>
-          </NotificationProvider>
-        </AuthProvider>
-      </SettingsProvider>
-    </HelmetProvider>
+    <ErrorBoundary>
+      <HelmetProvider>
+        <SettingsProvider>
+          <AuthProvider>
+            <NotificationProvider>
+              <MarketModeProvider>
+                <AppContent />
+              </MarketModeProvider>
+            </NotificationProvider>
+          </AuthProvider>
+        </SettingsProvider>
+      </HelmetProvider>
+    </ErrorBoundary>
   );
 };
 

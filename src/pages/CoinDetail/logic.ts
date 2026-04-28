@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import api from '../../services/apiClient';
 import { useNotification } from '../../core/providers/NotificationContext';
 
@@ -73,19 +73,28 @@ export const useCoinDetailLogic = (symbol: string | undefined) => {
     return (bot.id in pendingChanges) ? pendingChanges[bot.id] : bot.isActive;
   }, [bots, pendingChanges]);
 
-  // Botları getir (Sadece bu sembol için)
+  // Botları getir (Sadece bu sembol için) — abort destekli
+  const fetchBotsAbortRef = useRef<AbortController | null>(null);
   const fetchBots = useCallback(async () => {
     const currentSymbol = symbol?.trim();
     if (!currentSymbol) return;
 
+    fetchBotsAbortRef.current?.abort();
+    const controller = new AbortController();
+    fetchBotsAbortRef.current = controller;
+
     try {
       setLoading(true);
-      const response = await api.get(`/bots/my?symbol=${currentSymbol}`);
+      const response = await api.get(`/bots/my?symbol=${currentSymbol}`, { signal: controller.signal });
       if (response.data.success) {
         setBots(response.data.data);
       }
     } catch (error: any) {
-      showNotification('Botlar yüklenirken bir hata oluştu.', 'error');
+      if (error?.name === 'CanceledError' || error?.code === 'ERR_CANCELED') return;
+      // 401 zaten apiClient tarafından ele alınıyor; user feedback'i sadece gerçek hatalar için göster
+      if (error?.response?.status !== 401) {
+        showNotification('Botlar yüklenirken bir hata oluştu.', 'error');
+      }
     } finally {
       setLoading(false);
     }
@@ -100,15 +109,21 @@ export const useCoinDetailLogic = (symbol: string | undefined) => {
     '5Y': { interval: '1M', limit: 130, displayCount: 60 }
   };
 
-  // Geçmiş verileri getir
+  // Geçmiş verileri getir — abort destekli
+  const fetchHistoryAbortRef = useRef<AbortController | null>(null);
   const fetchHistory = useCallback(async () => {
     const currentSymbol = symbol?.trim();
     if (!currentSymbol) return;
 
     const config = TIMEFRAME_CONFIGS[timeframe];
 
+    fetchHistoryAbortRef.current?.abort();
+    const controller = new AbortController();
+    fetchHistoryAbortRef.current = controller;
+
     try {
       const response = await api.get(`/market/history/${currentSymbol}`, {
+        signal: controller.signal,
         params: {
           interval: config.interval,
           limit: config.limit
@@ -206,6 +221,7 @@ export const useCoinDetailLogic = (symbol: string | undefined) => {
         setHistory(finalData.slice(-config.displayCount));
       }
     } catch (error: any) {
+      if (error?.name === 'CanceledError' || error?.code === 'ERR_CANCELED') return;
       console.error('Geçmiş verisi yüklenemedi:', error);
     }
   }, [symbol, timeframe]);
@@ -213,22 +229,58 @@ export const useCoinDetailLogic = (symbol: string | undefined) => {
   useEffect(() => {
     fetchBots();
     fetchHistory();
+    return () => {
+      fetchBotsAbortRef.current?.abort();
+      fetchHistoryAbortRef.current?.abort();
+    };
   }, [fetchBots, fetchHistory]);
 
-  // Binance WebSocket ile Fiyatları Canlı Güncelle
+  // Binance WebSocket ile Fiyatları Canlı Güncelle (otomatik reconnect ile)
   useEffect(() => {
     if (!symbol) return;
 
-    const streamSymbol = symbol.toLowerCase().endsWith('usdt') ? symbol.toLowerCase() : `${symbol.toLowerCase()}usdt`;
-    const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${streamSymbol}@ticker`);
+    let cancelled = false;
+    let ws: WebSocket | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let attempts = 0;
 
-    ws.onmessage = (event) => {
-      const incomingData = JSON.parse(event.data);
-      const newPrice = parseFloat(incomingData.c);
-      setPrice(newPrice.toLocaleString('en-US', { minimumFractionDigits: 2 }));
+    const connect = () => {
+      if (cancelled) return;
+      const streamSymbol = symbol.toLowerCase().endsWith('usdt')
+        ? symbol.toLowerCase()
+        : `${symbol.toLowerCase()}usdt`;
+      ws = new WebSocket(`wss://stream.binance.com:9443/ws/${streamSymbol}@ticker`);
+
+      ws.onopen = () => { attempts = 0; };
+
+      ws.onmessage = (event) => {
+        try {
+          const incomingData = JSON.parse(event.data);
+          const newPrice = parseFloat(incomingData.c);
+          if (Number.isFinite(newPrice)) {
+            setPrice(newPrice.toLocaleString('en-US', { minimumFractionDigits: 2 }));
+          }
+        } catch { /* parse hatası - sessizce yut */ }
+      };
+
+      ws.onclose = () => {
+        if (cancelled) return;
+        const delay = Math.min(30000, 1000 * Math.pow(2, attempts));
+        attempts += 1;
+        reconnectTimer = setTimeout(connect, delay);
+      };
     };
 
-    return () => ws.close();
+    connect();
+
+    return () => {
+      cancelled = true;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (ws) {
+        ws.onclose = null;
+        ws.close();
+      }
+    };
   }, [symbol]);
 
   // Bot durumunu yerel olarak değiştir (Taslak olarak tut)

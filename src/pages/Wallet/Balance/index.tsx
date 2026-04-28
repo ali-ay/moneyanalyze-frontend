@@ -8,7 +8,7 @@ import { TableContainer, Table, Th, Td, TableRow, Badge } from '../../../compone
 import { walletApi } from '../../../services/wallet.api';
 
 const WalletBalance = () => {
-  const { balance, balanceTRY, usdtTryRate, assets, transactions, tradingMode, loading, error, isRealData, debug, handleDepositSubmit, fetchWalletData } = useWallet();
+  const { balance, balanceTRY, usdtTryRate, assets, transactions, tradingMode, loading, error, isRealData, handleDepositSubmit, fetchWalletData } = useWallet();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tradeLoading, setTradeLoading] = useState(false);
 

@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { Card } from '../../../components/ui/Card';
 import { useMarketTrend } from '../hooks/useMarketTrend';
+import api from '../../../services/apiClient';
 
 const IndexList = styled.div`
   display: flex;
@@ -97,15 +98,24 @@ export const MarketTrendSection: React.FC = () => {
   const [indexPrices, setIndexPrices] = React.useState<any[]>([]);
 
   React.useEffect(() => {
+    const controller = new AbortController();
+    let cancelled = false;
     const fetchPrices = async () => {
       try {
-        const res = await axios.get('/api/stock/bulk-info?symbols=XU100,XU050,XU030');
-        setIndexPrices(res.data.quotes || []);
-      } catch (e) {}
+        const res = await api.get('/stock/bulk-info?symbols=XU100,XU050,XU030', { signal: controller.signal });
+        if (!cancelled) setIndexPrices(res.data.quotes || []);
+      } catch (e: any) {
+        if (e?.name === 'CanceledError' || e?.code === 'ERR_CANCELED') return;
+        // sessizce yut — bu özellik kritik değil
+      }
     };
     fetchPrices();
     const inv = setInterval(fetchPrices, 60000);
-    return () => clearInterval(inv);
+    return () => {
+      cancelled = true;
+      clearInterval(inv);
+      controller.abort();
+    };
   }, []);
 
   const latestPrice = trendData.length > 0 ? trendData[trendData.length - 1].price : 0;

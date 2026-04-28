@@ -16,27 +16,35 @@ export const useWalletLogic = () => {
 
   const [backendStats, setBackendStats] = useState<any>(null);
 
+  const portfolioAbortRef = useRef<AbortController | null>(null);
   const fetchPortfolio = useCallback(async () => {
+    portfolioAbortRef.current?.abort();
+    const controller = new AbortController();
+    portfolioAbortRef.current = controller;
+
     try {
       setLoading(true);
-      const res = await getPortfolio();
-      const data = res.data.data;
+      const res = await getPortfolio({ signal: controller.signal } as any);
+      if (controller.signal.aborted) return;
+      const data = res.data?.data || {};
 
       setRawAssets(data.assets || []);
       setBalanceUSD(data.balance || 0);
       setBalanceTRY(data.balanceTRY || 0);
       setTradingMode(data.tradingMode || 'SIMULATION');
       setBackendStats(data.stats); // Backend'den gelen hazır istatistikler
-
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED') return;
+      if (err?.response?.status === 401) return;
       console.error("Veri çekme hatası:", err);
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     fetchPortfolio();
+    return () => portfolioAbortRef.current?.abort();
   }, [fetchPortfolio]);
 
   // Backend'den gelen asset verilerini formatla
@@ -58,44 +66,63 @@ export const useWalletLogic = () => {
     return assets.map(a => a.symbol).sort().join(',');
   }, [assets]);
 
-  // WebSocket Bağlantısı ve İlk Fiyat Çekimi
+  // WebSocket Bağlantısı ve İlk Fiyat Çekimi (otomatik reconnect ile)
   useEffect(() => {
     if (!symbolList) return;
 
-    // 2. Ardından canlı veri akışı için WebSocket'i başlat
-    const streams = assets.map(a => `${a.symbol.toLowerCase()}usdt@ticker`).join('/');
-    const wsUrl = `wss://stream.binance.com:9443/stream?streams=${streams}`;
+    let cancelled = false;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let reconnectAttempts = 0;
 
-    const ws = new WebSocket(wsUrl);
-    wsRef.current = ws;
+    const connect = () => {
+      if (cancelled) return;
 
-    ws.onopen = () => {
-      console.log('📡 Portföy fiyat akışı bağlandı');
+      const streams = assets.map(a => `${a.symbol.toLowerCase()}usdt@ticker`).join('/');
+      const wsUrl = `wss://stream.binance.com:9443/stream?streams=${streams}`;
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        reconnectAttempts = 0;
+        console.log('📡 Portföy fiyat akışı bağlandı');
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          const data = message.data;
+          if (data?.s && data?.c) {
+            const cleanSymbol = data.s.replace('USDT', '');
+            const newPrice = parseFloat(data.c);
+            setLivePrices(prev => {
+              if (prev[cleanSymbol] === newPrice) return prev;
+              return { ...prev, [cleanSymbol]: newPrice };
+            });
+          }
+        } catch { /* parse hatası - sessizce yut */ }
+      };
+
+      ws.onerror = (err) => {
+        console.error('WebSocket hatası:', err);
+      };
+
+      ws.onclose = () => {
+        if (cancelled) return;
+        // Exponential backoff: 1s, 2s, 4s, ... max 30s
+        const delay = Math.min(30000, 1000 * Math.pow(2, reconnectAttempts));
+        reconnectAttempts += 1;
+        reconnectTimer = setTimeout(connect, delay);
+      };
     };
 
-    ws.onmessage = (event) => {
-      try {
-        const message = JSON.parse(event.data);
-        const data = message.data;
-
-        if (data?.s && data?.c) {
-          const cleanSymbol = data.s.replace('USDT', '');
-          const newPrice = parseFloat(data.c);
-
-          setLivePrices(prev => {
-            if (prev[cleanSymbol] === newPrice) return prev;
-            return { ...prev, [cleanSymbol]: newPrice };
-          });
-        }
-      } catch (err) { }
-    };
-
-    ws.onerror = (err) => {
-      console.error('WebSocket hatası:', err);
-    };
+    connect();
 
     return () => {
-      if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+      cancelled = true;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      const ws = wsRef.current;
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+        ws.onclose = null; // close event'inin reconnect tetiklemesini engelle
         ws.close();
       }
       wsRef.current = null;
@@ -135,8 +162,9 @@ export const useWalletLogic = () => {
 
     try {
       setLoading(true);
+      // userId'yi frontend'den GÖNDERMİYORUZ — backend req.user.id (JWT)
+      // üzerinden alıyor. Bu güvenlik için kritik.
       const payload = {
-        userId: localStorage.getItem('id'),
         symbol: asset.originalSymbol || asset.symbol,
         sellAmount: sellAmount,
         sellPrice: price,
@@ -158,6 +186,9 @@ export const useWalletLogic = () => {
     const stockAssets = assets.filter(a => a.originalSymbol.includes('.IS') || !a.originalSymbol.endsWith('USDT'));
     if (stockAssets.length === 0) return;
 
+    let cancelled = false;
+    const controller = new AbortController();
+
     const fetchStockPrices = async () => {
       try {
         const prices: { [key: string]: number } = {};
@@ -165,27 +196,33 @@ export const useWalletLogic = () => {
 
         await Promise.all(stockAssets.map(async (asset) => {
           try {
-            const res = await api.get(`/stock/info/${asset.symbol}`);
+            const res = await api.get(`/stock/info/${asset.symbol}`, { signal: controller.signal });
             if (res.data.quote) {
               prices[asset.symbol] = res.data.quote.price;
               updates[asset.symbol] = res.data.lastUpdated || new Date().toISOString();
             }
-          } catch (e) {
-            // Hata durumunda asset'in kendi updatedAt değerini kullan
+          } catch (e: any) {
+            if (e?.name === 'CanceledError' || e?.code === 'ERR_CANCELED') return;
             updates[asset.symbol] = asset.updatedAt;
           }
         }));
 
+        if (cancelled) return;
         setLivePrices(prev => ({ ...prev, ...prices }));
         setLastUpdates(prev => ({ ...prev, ...updates }));
-      } catch (err) {
+      } catch (err: any) {
+        if (err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED') return;
         console.error("Hisse fiyatları çekilemedi:", err);
       }
     };
 
     fetchStockPrices();
-    const interval = setInterval(fetchStockPrices, 60000); // 1 dakikada bir güncelle
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchStockPrices, 60000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      controller.abort();
+    };
   }, [assets]);
 
   return {

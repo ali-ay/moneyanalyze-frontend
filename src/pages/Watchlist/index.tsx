@@ -319,13 +319,23 @@ const Watchlist: React.FC = () => {
         <SectionTitle>
           <Eye size={20} color="#1A73E8" /> Kişisel Takip Listem
         </SectionTitle>
-        <Button $variant="primary" onClick={() => {
+        <Button $variant="primary" onClick={async () => {
           const sym = prompt('Eklemek istediğiniz hisse sembolünü girin (Örn: THYAO):');
-          if (sym) {
-            import('../../services/watchlist.api').then(m => {
-              m.addToWatchlist(sym.toUpperCase(), 'stock');
-              fetchData();
-            });
+          if (!sym) return;
+          const cleanSym = sym.toUpperCase();
+          try {
+            // Eklemeden önce mevcut fiyatı çekelim — addToWatchlist 0/negatif fiyatları filtreliyor
+            const apiClient = (await import('../../services/apiClient')).default;
+            const res = await apiClient.get(`/stock/info/${cleanSym}`);
+            const price = Number(res.data?.quote?.price) || 1;
+            const m = await import('../../services/watchlist.api');
+            m.addToWatchlist(cleanSym, price, 'stock');
+            fetchData();
+          } catch {
+            const m = await import('../../services/watchlist.api');
+            // Fiyat alınamasa bile takip listesine ekleyebilelim — placeholder 1
+            m.addToWatchlist(cleanSym, 1, 'stock');
+            fetchData();
           }
         }}>
           + Hisse Ekle
@@ -336,7 +346,6 @@ const Watchlist: React.FC = () => {
 
       {isModalOpen && selectedCoin && (
         <BuyModal
-          isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           coin={selectedCoin}
           onSuccess={fetchData}

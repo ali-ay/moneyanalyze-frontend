@@ -6,7 +6,6 @@ import { useDashboardData } from '../../features/dashboard/hooks/useDashboardDat
 import { PortfolioSummary } from '../../features/dashboard/components/PortfolioSummary';
 import { MarketTrendSection } from '../../features/dashboard/components/MarketTrendSection';
 import { AssetsTableSection } from '../../features/dashboard/components/AssetsTableSection';
-import { BotControlSection } from '../../features/dashboard/components/BotControlSection';
 import { OpportunitiesSection } from '../../features/dashboard/components/OpportunitiesSection';
 import { DashboardFooter } from '../../features/dashboard/components/DashboardFooter';
 
