@@ -7,7 +7,14 @@ import { ArrowUpRight, ArrowDownRight, History, Clock } from 'lucide-react';
 
 const TrackingLog: React.FC = () => {
   const navigate = useNavigate();
-  const { transactions, livePrices, loading } = useTrackingLogLogic();
+  const { transactions, livePrices, loading, sortConfig, requestSort } = useTrackingLogLogic();
+
+  const getSortIndicator = (key: string) => {
+    if (sortConfig?.key === key) {
+      return sortConfig.direction === 'asc' ? ' ▲' : ' ▼';
+    }
+    return '';
+  };
 
   return (
     <PageContainer>
@@ -28,13 +35,13 @@ const TrackingLog: React.FC = () => {
           <Table>
             <thead>
               <tr>
-                <Th>Tarih / Saat</Th>
+                <Th onClick={() => requestSort('createdAt')} style={{ cursor: 'pointer' }}>Tarih / Saat{getSortIndicator('createdAt')}</Th>
                 <Th>İşlem</Th>
-                <Th>Hisse</Th>
+                <Th onClick={() => requestSort('symbol')} style={{ cursor: 'pointer' }}>Hisse{getSortIndicator('symbol')}</Th>
                 <Th>İşlem Tipi</Th>
-                <Th>İşlem Fiyatı</Th>
-                <Th>Anlık Fiyat</Th>
-                <Th>Değişim (%)</Th>
+                <Th onClick={() => requestSort('price')} style={{ cursor: 'pointer' }}>İşlem Fiyatı{getSortIndicator('price')}</Th>
+                <Th onClick={() => requestSort('currentPrice')} style={{ cursor: 'pointer' }}>Anlık Fiyat{getSortIndicator('currentPrice')}</Th>
+                <Th onClick={() => requestSort('profit')} style={{ cursor: 'pointer' }}>Değişim (%){getSortIndicator('profit')}</Th>
               </tr>
             </thead>
             <tbody>

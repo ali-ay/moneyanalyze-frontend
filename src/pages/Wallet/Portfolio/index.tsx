@@ -12,8 +12,15 @@ const MyPortfolio = () => {
     assets, livePrices, lastUpdates, loading, stats,
     balanceUSD,
     assetOnlyUSD, assetOnlyTRY,
-    handleFastSell
+    handleFastSell, sortConfig, requestSort
   } = useWalletLogic();
+
+  const getSortIndicator = (key: string) => {
+    if (sortConfig?.key === key) {
+      return sortConfig.direction === 'asc' ? ' ▲' : ' ▼';
+    }
+    return '';
+  };
 
   if (loading && assets.length === 0) return <LoadingState>Portföy Yükleniyor...</LoadingState>;
 
@@ -120,11 +127,11 @@ const MyPortfolio = () => {
           <Table>
             <thead>
               <tr>
-                <Th>Varlık</Th>
-                <Th>Miktar</Th>
-                <Th>Ort. Maliyet</Th>
-                <Th>Güncel Fiyat</Th>
-                <Th>Kâr / Zarar (%)</Th>
+                <Th onClick={() => requestSort('symbol')} style={{ cursor: 'pointer' }}>Varlık{getSortIndicator('symbol')}</Th>
+                <Th onClick={() => requestSort('amount')} style={{ cursor: 'pointer' }}>Miktar{getSortIndicator('amount')}</Th>
+                <Th onClick={() => requestSort('averagePrice')} style={{ cursor: 'pointer' }}>Ort. Maliyet{getSortIndicator('averagePrice')}</Th>
+                <Th onClick={() => requestSort('currentPrice')} style={{ cursor: 'pointer' }}>Güncel Fiyat{getSortIndicator('currentPrice')}</Th>
+                <Th onClick={() => requestSort('profit')} style={{ cursor: 'pointer' }}>Kâr / Zarar (%){getSortIndicator('profit')}</Th>
                 <Th>Son Güncelleme</Th>
                 <Th style={{ textAlign: 'right' }}>İşlem</Th>
               </tr>

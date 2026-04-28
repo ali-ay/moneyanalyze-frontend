@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { getWatchlist, removeFromWatchlist } from '../../services/watchlist.api';
 import type { WatchlistItem } from '../../services/watchlist.api';
 import api from '../../services/apiClient';
@@ -149,12 +149,73 @@ export const useWatchlistLogic = () => {
     showNotification(`${symbol} takip listesinden kaldırıldı.`, 'info');
   };
 
-  const getMeta = (symbol: string): WatchlistItem | undefined => {
+  const getMeta = useCallback((symbol: string): WatchlistItem | undefined => {
     return watchlistMeta.find(item => item.symbol === symbol);
+  }, [watchlistMeta]);
+
+  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>(null);
+
+  const requestSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
   };
 
+  const sortedData = useMemo(() => {
+    let sortableItems = [...marketData];
+    if (sortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        let aValue: any;
+        let bValue: any;
+        const aMeta = getMeta(a.symbol);
+        const bMeta = getMeta(b.symbol);
+
+        switch (sortConfig.key) {
+          case 'symbol':
+            aValue = a.symbol;
+            bValue = b.symbol;
+            break;
+          case 'price':
+            aValue = Number(a.price);
+            bValue = Number(b.price);
+            break;
+          case 'addedPrice':
+            aValue = aMeta?.addedPrice || 0;
+            bValue = bMeta?.addedPrice || 0;
+            break;
+          case 'profit':
+            const ap = Number(a.price);
+            const bp = Number(b.price);
+            const aa = aMeta?.addedPrice || 0;
+            const ba = bMeta?.addedPrice || 0;
+            aValue = aa > 0 ? (ap - aa) / aa : -999;
+            bValue = ba > 0 ? (bp - ba) / ba : -999;
+            break;
+          case 'strengthScore':
+            aValue = a.strengthScore || 0;
+            bValue = b.strengthScore || 0;
+            break;
+          case 'addedAt':
+            aValue = aMeta?.addedAt ? new Date(aMeta.addedAt).getTime() : 0;
+            bValue = bMeta?.addedAt ? new Date(bMeta.addedAt).getTime() : 0;
+            break;
+          default:
+            aValue = a[sortConfig.key];
+            bValue = b[sortConfig.key];
+        }
+
+        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [marketData, sortConfig, getMeta]);
+
   return { 
-    marketData, 
+    marketData: sortedData, 
     watchlistMeta, 
     loading, 
     lastUpdates, 
@@ -164,6 +225,8 @@ export const useWatchlistLogic = () => {
     setPeriod, 
     fetchData,
     analysisSettings,
-    updateSettings
+    updateSettings,
+    sortConfig,
+    requestSort
   };
 };

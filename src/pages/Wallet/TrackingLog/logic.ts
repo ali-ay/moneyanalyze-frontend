@@ -87,5 +87,58 @@ export const useTrackingLogLogic = () => {
     };
   }, [fetchTransactions, transactions.length]);
 
-  return { transactions, livePrices, loading, refresh: fetchTransactions };
+  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>({ key: 'createdAt', direction: 'desc' });
+
+  const requestSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedTransactions = useMemo(() => {
+    let sortableItems = [...transactions];
+    if (sortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        let aValue: any;
+        let bValue: any;
+
+        switch (sortConfig.key) {
+          case 'createdAt':
+            aValue = new Date(a.createdAt).getTime();
+            bValue = new Date(b.createdAt).getTime();
+            break;
+          case 'symbol':
+            aValue = a.symbol;
+            bValue = b.symbol;
+            break;
+          case 'price':
+            aValue = a.price;
+            bValue = b.price;
+            break;
+          case 'currentPrice':
+            aValue = livePrices[a.symbol.replace('.IS', '')] || 0;
+            bValue = livePrices[b.symbol.replace('.IS', '')] || 0;
+            break;
+          case 'profit':
+            const ap = livePrices[a.symbol.replace('.IS', '')] || a.price;
+            const bp = livePrices[b.symbol.replace('.IS', '')] || b.price;
+            aValue = (ap - a.price) / a.price;
+            bValue = (bp - b.price) / b.price;
+            break;
+          default:
+            aValue = a[sortConfig.key];
+            bValue = b[sortConfig.key];
+        }
+
+        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [transactions, sortConfig, livePrices]);
+
+  return { transactions: sortedTransactions, livePrices, loading, refresh: fetchTransactions, sortConfig, requestSort };
 };

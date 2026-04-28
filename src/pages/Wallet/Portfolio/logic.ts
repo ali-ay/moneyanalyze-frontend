@@ -225,10 +225,64 @@ export const useWalletLogic = () => {
     };
   }, [assets]);
 
+  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>(null);
+
+  const requestSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedAssets = useMemo(() => {
+    let sortableItems = [...assets];
+    if (sortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        let aValue: any;
+        let bValue: any;
+
+        switch (sortConfig.key) {
+          case 'symbol':
+            aValue = a.symbol;
+            bValue = b.symbol;
+            break;
+          case 'amount':
+            aValue = a.amount;
+            bValue = b.amount;
+            break;
+          case 'averagePrice':
+            aValue = a.averagePrice;
+            bValue = b.averagePrice;
+            break;
+          case 'currentPrice':
+            aValue = livePrices[a.symbol] || a.averagePrice;
+            bValue = livePrices[b.symbol] || b.averagePrice;
+            break;
+          case 'profit':
+            const aPrice = livePrices[a.symbol] || a.averagePrice;
+            const bPrice = livePrices[b.symbol] || b.averagePrice;
+            aValue = ((aPrice - a.averagePrice) / a.averagePrice);
+            bValue = ((bPrice - b.averagePrice) / b.averagePrice);
+            break;
+          default:
+            aValue = a[sortConfig.key];
+            bValue = b[sortConfig.key];
+        }
+
+        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [assets, sortConfig, livePrices]);
+
   return {
-    assets, livePrices, lastUpdates, loading, stats,
+    assets: sortedAssets, livePrices, lastUpdates, loading, stats,
     balanceUSD, balanceTRY,
     assetOnlyUSD, assetOnlyTRY,
-    handleFastSell, fetchPortfolio
+    handleFastSell, fetchPortfolio,
+    sortConfig, requestSort
   };
 };

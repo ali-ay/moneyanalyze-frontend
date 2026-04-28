@@ -139,13 +139,20 @@ const SettingItem = styled.div`
 const Watchlist: React.FC = () => {
   const { mode } = useMarketMode();
   const navigate = useNavigate();
-  const { marketData, watchlistMeta, loading, lastUpdates, handleRemove, getMeta, period, setPeriod, fetchData, analysisSettings, updateSettings } = useWatchlistLogic();
+  const { marketData, watchlistMeta, loading, lastUpdates, handleRemove, getMeta, period, setPeriod, fetchData, analysisSettings, updateSettings, sortConfig, requestSort } = useWatchlistLogic();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCoin, setSelectedCoin] = useState<any>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [editedSettings, setEditedSettings] = useState<any>(null);
   const { showNotification } = useNotification();
+
+  const getSortIndicator = (key: string) => {
+    if (sortConfig?.key === key) {
+      return sortConfig.direction === 'asc' ? ' ▲' : ' ▼';
+    }
+    return '';
+  };
 
   useEffect(() => {
     if (analysisSettings) setEditedSettings(analysisSettings);
@@ -222,11 +229,11 @@ const Watchlist: React.FC = () => {
           <thead>
             <tr>
               <Th>Durum</Th>
-              <Th>Varlık</Th>
-              <Th>{isAuto ? 'Sinyal Fiyatı' : 'Eklenme Fiyatı'}</Th>
-              <Th>Anlık Fiyat</Th>
-              <Th>Sinyal Tarihi</Th>
-              <Th>Kâr / Zarar (%)</Th>
+              <Th onClick={() => requestSort('symbol')} style={{ cursor: 'pointer' }}>Varlık{getSortIndicator('symbol')}</Th>
+              <Th onClick={() => requestSort('addedPrice')} style={{ cursor: 'pointer' }}>{isAuto ? 'Sinyal Fiyatı' : 'Eklenme Fiyatı'}{getSortIndicator('addedPrice')}</Th>
+              <Th onClick={() => requestSort('price')} style={{ cursor: 'pointer' }}>Anlık Fiyat{getSortIndicator('price')}</Th>
+              <Th onClick={() => requestSort('addedAt')} style={{ cursor: 'pointer' }}>Sinyal Tarihi{getSortIndicator('addedAt')}</Th>
+              <Th onClick={() => requestSort('profit')} style={{ cursor: 'pointer' }}>Kâr / Zarar (%){getSortIndicator('profit')}</Th>
               <Th>Son Güncelleme</Th>
               <Th style={{ textAlign: 'right' }}>İşlemler</Th>
             </tr>
