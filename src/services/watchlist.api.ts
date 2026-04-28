@@ -12,6 +12,9 @@ export interface WatchlistItem {
   symbol: string;
   addedPrice: number;
   addedAt: string; // ISO date string
+  isOpportunity?: boolean;
+  strengthScore?: number;
+  signalType?: string;
 }
 
 const getStorageKey = (marketMode: 'crypto' | 'stock' = 'crypto'): string => {

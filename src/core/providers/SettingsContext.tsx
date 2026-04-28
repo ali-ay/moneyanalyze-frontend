@@ -24,8 +24,8 @@ const DEFAULT_SETTINGS: GlobalSettings = {
 };
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [settings, setSettings] = useState<GlobalSettings | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [settings, setSettings] = useState<GlobalSettings | null>(DEFAULT_SETTINGS);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

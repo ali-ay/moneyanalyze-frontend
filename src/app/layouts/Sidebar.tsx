@@ -10,7 +10,8 @@ import {
   Settings,
   ShieldCheck,
   BarChart3,
-  X
+  X,
+  History
 } from 'lucide-react';
 import { useAuth } from '../../core/providers/AuthContext';
 
@@ -196,6 +197,9 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, o
         </NavItem>
         <NavItem $active={location.pathname === '/watchlist'} onClick={() => handleNav('/watchlist')}>
           <Wallet size={20} /> Cüzdan Takibi
+        </NavItem>
+        <NavItem $active={location.pathname === '/dashboard/tracking'} onClick={() => handleNav('/dashboard/tracking')}>
+          <History size={20} /> Hisse Hareket Kaydı
         </NavItem>
         <NavItem $active={location.pathname === '/bots'} onClick={() => handleNav('/bots')}>
           <Bot size={20} /> Bot Yönetimi

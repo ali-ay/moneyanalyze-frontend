@@ -14,7 +14,27 @@ export const useWatchlistLogic = () => {
   const [loading, setLoading] = useState(true);
   const [lastUpdates, setLastUpdates] = useState<{ [key: string]: string }>({});
   const [period, setPeriod] = useState<string>('weekly');
+  const [analysisSettings, setAnalysisSettings] = useState<any>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  const fetchSettings = useCallback(async () => {
+    try {
+      const res = await api.get('/stock/analysis-settings');
+      setAnalysisSettings(res.data);
+    } catch (err) {
+      console.error('Ayarlar yüklenemedi:', err);
+    }
+  }, []);
+
+  const updateSettings = async (newSettings: any) => {
+    try {
+      const res = await api.post('/stock/analysis-settings', newSettings);
+      setAnalysisSettings(res.data);
+      showNotification('Analiz ayarları güncellendi.', 'success');
+    } catch (err) {
+      showNotification('Ayarlar güncellenemedi.', 'error');
+    }
+  };
 
   const fetchData = useCallback(async () => {
     abortRef.current?.abort();
@@ -39,7 +59,16 @@ export const useWatchlistLogic = () => {
 
       const combinedMeta = [...manualMeta];
       opportunityMeta.forEach(opp => {
-        if (!combinedMeta.find(m => m.symbol === opp.symbol)) {
+        const existing = combinedMeta.find(m => m.symbol === opp.symbol);
+        if (existing) {
+          // Eğer zaten varsa, sadece fırsat özelliklerini ekle/güncelle
+          Object.assign(existing, {
+            isOpportunity: true,
+            strengthScore: opp.strengthScore,
+            signalType: opp.signalType,
+            addedPrice: existing.addedPrice || opp.addedPrice // Manuel ekleme fiyatı varsa koru
+          });
+        } else {
           combinedMeta.push(opp);
         }
       });
@@ -105,12 +134,13 @@ export const useWatchlistLogic = () => {
 
   useEffect(() => {
     fetchData();
+    fetchSettings();
     const interval = setInterval(fetchData, 60000);
     return () => {
       clearInterval(interval);
       abortRef.current?.abort();
     };
-  }, [fetchData]);
+  }, [fetchData, fetchSettings]);
 
   const handleRemove = (symbol: string) => {
     removeFromWatchlist(symbol, mode);
@@ -123,5 +153,17 @@ export const useWatchlistLogic = () => {
     return watchlistMeta.find(item => item.symbol === symbol);
   };
 
-  return { marketData, watchlistMeta, loading, lastUpdates, handleRemove, getMeta, period, setPeriod, fetchData };
+  return { 
+    marketData, 
+    watchlistMeta, 
+    loading, 
+    lastUpdates, 
+    handleRemove, 
+    getMeta, 
+    period, 
+    setPeriod, 
+    fetchData,
+    analysisSettings,
+    updateSettings
+  };
 };

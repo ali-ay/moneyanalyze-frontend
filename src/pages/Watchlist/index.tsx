@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWatchlistLogic } from './logic';
 import * as S from './styles';
 import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState, EmptyState } from '../../components/ui/Layout.styles';
 import { MetricCard, CardHeader, CardTitle, CardIcon, CardValue } from '../../components/ui/Card.styles';
 import { TableContainer, Table, Th, Td, TableRow } from '../../components/ui/Table.styles';
-import { Star, TrendingUp, TrendingDown, Eye, Trash2 } from 'lucide-react';
+import { Star, TrendingUp, TrendingDown, Eye, Trash2, History } from 'lucide-react';
 import { BuyModal } from '../../components/modals/BuyModal';
 import { useMarketMode } from '../../context/MarketModeContext';
 import { useNotification } from '../../core/providers/NotificationContext';
@@ -101,14 +101,55 @@ const SectionTitle = styled.h2`
   color: ${props => props.theme.colors.textMain};
 `;
 
+const SettingsPanel = styled.div`
+  background: #fff;
+  border: 1px solid #e8eaed;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+`;
+
+const SettingsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+`;
+
+const SettingItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #5F6368;
+  }
+  input {
+    padding: 10px;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    &:focus { border-color: #1a73e8; outline: none; }
+  }
+`;
+
 const Watchlist: React.FC = () => {
   const { mode } = useMarketMode();
   const navigate = useNavigate();
-  const { marketData, loading, lastUpdates, handleRemove, getMeta, period, setPeriod, fetchData } = useWatchlistLogic();
+  const { marketData, watchlistMeta, loading, lastUpdates, handleRemove, getMeta, period, setPeriod, fetchData, analysisSettings, updateSettings } = useWatchlistLogic();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCoin, setSelectedCoin] = useState<any>(null);
   const [isScanning, setIsScanning] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [editedSettings, setEditedSettings] = useState<any>(null);
   const { showNotification } = useNotification();
+
+  useEffect(() => {
+    if (analysisSettings) setEditedSettings(analysisSettings);
+  }, [analysisSettings]);
 
   const handleBuy = (coin: any) => {
     setSelectedCoin(coin);
@@ -118,11 +159,35 @@ const Watchlist: React.FC = () => {
   const handleScanAll = async () => {
     try {
       setIsScanning(true);
-      await api.post('/stock/analyze-all');
-      showNotification('Tüm periyotlar için derin tarama başlatıldı. Tamamlandığında veriler güncellenecek.', 'success');
-      setTimeout(() => setIsScanning(false), 5000);
+      
+      // İzleme listesinde olanları taramaya dahil etmemek için sembolleri topla
+      const excludeSymbols = watchlistMeta.map(item => item.symbol);
+      
+      const res = await api.post('/stock/analyze-all', { 
+        period,
+        excludeSymbols 
+      });
+      
+      const foundCount = res.data.signalsFound || 0;
+      const signals = res.data.signals || [];
+      
+      if (foundCount > 0) {
+        // Bulunanları kalıcı listeye ekle
+        const { addToWatchlist } = await import('../../services/watchlist.api');
+        signals.forEach((s: any) => {
+          addToWatchlist(s.symbol, s.price, 'stock');
+        });
+
+        showNotification(`${period} periyodu için tarama tamamlandı. ${foundCount} yeni hisse izleme listenize eklendi.`, 'success');
+      } else {
+        showNotification(`${period} periyodu için tarama tamamlandı, kriterlere uygun yeni hisse bulunamadı.`, 'info');
+      }
+      
+      await fetchData();
+      setIsScanning(false);
     } catch (err) {
-      showNotification('Tarama başlatılamadı.', 'error');
+      console.error('Tarama hatası:', err);
+      showNotification('Tarama sırasında bir hata oluştu.', 'error');
       setIsScanning(false);
     }
   };
@@ -250,6 +315,22 @@ const Watchlist: React.FC = () => {
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <Button
                 $variant="secondary"
+                onClick={() => navigate('/dashboard/tracking')}
+                style={{ fontSize: '12px', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                <History size={14} /> Hareket Kaydı
+              </Button>
+
+              <Button
+                $variant="secondary"
+                onClick={() => setShowSettings(!showSettings)}
+                style={{ fontSize: '12px', padding: '8px 16px' }}
+              >
+                {showSettings ? '⚙️ Ayarları Kapat' : '⚙️ Analiz Ayarları'}
+              </Button>
+
+              <Button
+                $variant="primary"
                 onClick={handleScanAll}
                 disabled={isScanning}
                 style={{ fontSize: '12px', padding: '8px 16px' }}
@@ -283,6 +364,81 @@ const Watchlist: React.FC = () => {
           )}
         </div>
       </PageHeader>
+
+      {showSettings && editedSettings && (
+        <SettingsPanel>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h3 style={{ margin: 0 }}>📊 Tarama Kriterleri & Ağırlıklar</h3>
+            <span style={{ fontSize: '12px', color: '#5F6368' }}>Bu ayarlar tüm tarama sonuçlarını etkiler.</span>
+          </div>
+          
+          <SettingsGrid>
+            <SettingItem>
+              <label>Trend Puanı (SMA20 {'>'} SMA50)</label>
+              <input 
+                type="number" 
+                value={editedSettings.uptrendWeight} 
+                onChange={e => setEditedSettings({ ...editedSettings, uptrendWeight: parseInt(e.target.value) })}
+              />
+            </SettingItem>
+            <SettingItem>
+              <label>Golden Cross Puanı</label>
+              <input 
+                type="number" 
+                value={editedSettings.goldenCrossWeight} 
+                onChange={e => setEditedSettings({ ...editedSettings, goldenCrossWeight: parseInt(e.target.value) })}
+              />
+            </SettingItem>
+            <SettingItem>
+              <label>Minimum RSI</label>
+              <input 
+                type="number" 
+                value={editedSettings.rsiMin} 
+                onChange={e => setEditedSettings({ ...editedSettings, rsiMin: parseInt(e.target.value) })}
+              />
+            </SettingItem>
+            <SettingItem>
+              <label>Maximum RSI</label>
+              <input 
+                type="number" 
+                value={editedSettings.rsiMax} 
+                onChange={e => setEditedSettings({ ...editedSettings, rsiMax: parseInt(e.target.value) })}
+              />
+            </SettingItem>
+            <SettingItem>
+              <label>Hacim Çarpanı (x Ort.)</label>
+              <input 
+                type="number" 
+                step="0.1"
+                value={editedSettings.volumeMultiplier} 
+                onChange={e => setEditedSettings({ ...editedSettings, volumeMultiplier: parseFloat(e.target.value) })}
+              />
+            </SettingItem>
+            <SettingItem>
+              <label>Fiyat Kırılımı (% Artış)</label>
+              <input 
+                type="number" 
+                step="0.01"
+                value={(editedSettings.priceBreakout - 1) * 100} 
+                onChange={e => setEditedSettings({ ...editedSettings, priceBreakout: 1 + (parseFloat(e.target.value) / 100) })}
+              />
+            </SettingItem>
+            <SettingItem>
+              <label>Min. Toplam Skor (Sinyal İçin)</label>
+              <input 
+                type="number" 
+                value={editedSettings.minScore} 
+                onChange={e => setEditedSettings({ ...editedSettings, minScore: parseInt(e.target.value) })}
+              />
+            </SettingItem>
+          </SettingsGrid>
+          
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <Button $variant="primary" onClick={() => updateSettings(editedSettings)}>Ayarları Kaydet</Button>
+            <Button $variant="secondary" onClick={() => setEditedSettings(analysisSettings)}>Sıfırla</Button>
+          </div>
+        </SettingsPanel>
+      )}
 
       <MetricsGrid>
         <MetricCard>
