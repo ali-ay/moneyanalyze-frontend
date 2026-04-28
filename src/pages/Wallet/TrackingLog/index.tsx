@@ -1,11 +1,13 @@
 import React from 'react';
 import { useTrackingLogLogic } from './logic';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState, EmptyState } from '../../../components/ui/Layout.styles';
 import { TableContainer, Table, Th, Td, TableRow, Badge } from '../../../components/ui/Table.styles';
 import { ArrowUpRight, ArrowDownRight, History, Clock } from 'lucide-react';
 
 const TrackingLog: React.FC = () => {
+  const navigate = useNavigate();
   const { transactions, livePrices, loading } = useTrackingLogLogic();
 
   return (
@@ -33,21 +35,23 @@ const TrackingLog: React.FC = () => {
                 <Th>İşlem Fiyatı</Th>
                 <Th>Anlık Fiyat</Th>
                 <Th>Değişim (%)</Th>
-                <Th>Miktar</Th>
-                <Th>Toplam</Th>
               </tr>
             </thead>
             <tbody>
               {transactions.map((tx) => {
                 const cleanSym = tx.symbol.replace('.IS', '');
                 const currentPrice = livePrices[cleanSym];
-                const changePercent = currentPrice 
+                const changePercent = currentPrice
                   ? ((currentPrice - tx.price) / tx.price * 100)
                   : null;
                 const isPositive = changePercent !== null && changePercent >= 0;
 
                 return (
-                  <TableRow key={tx.id}>
+                  <TableRow 
+                    key={tx.id} 
+                    onClick={() => navigate(`/dashboard/stock/${cleanSym}`)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <Td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Clock size={14} color="#9AA0A6" />
@@ -55,23 +59,29 @@ const TrackingLog: React.FC = () => {
                       </div>
                     </Td>
                     <Td>
-                      <Badge type={tx.type === 'BUY' ? 'BUY' : 'SELL'}>
-                        {tx.type === 'BUY' ? 'EKLENDİ (ALIM)' : 'ÇIKARILDI (SATIM)'}
-                      </Badge>
+                      {tx.entryType === 'AI_SIGNAL' ? (
+                        <Badge type="info" style={{ background: '#e8f0fe', color: '#1a73e8', border: '1px solid #1a73e8' }}>
+                          YAPAY ZEKA ({tx.period === 'weekly' ? 'Haftalık' : tx.period === 'monthly' ? 'Aylık' : tx.period})
+                        </Badge>
+                      ) : (
+                        <Badge type={tx.type === 'BUY' ? 'BUY' : 'SELL'}>
+                          {tx.type === 'BUY' ? 'EKLENDİ (ALIM)' : 'ÇIKARILDI (SATIM)'}
+                        </Badge>
+                      )}
                     </Td>
-                    <Td style={{ fontWeight: 'bold', color: '#1A73E8' }}>{tx.symbol}</Td>
+                    <Td style={{ fontWeight: 'bold', color: '#1A73E8' }}>{cleanSym}</Td>
                     <Td>₺{tx.price.toLocaleString('tr-TR')}</Td>
                     <Td>
-                      {currentPrice 
-                        ? `₺${currentPrice.toLocaleString('tr-TR')}` 
+                      {currentPrice
+                        ? `₺${currentPrice.toLocaleString('tr-TR')}`
                         : <span style={{ color: '#9AA0A6' }}>Yükleniyor...</span>
                       }
                     </Td>
                     <Td>
                       {changePercent !== null ? (
-                        <div style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
                           gap: '4px',
                           color: isPositive ? '#0F9D58' : '#DB4437',
                           fontWeight: 'bold'
@@ -81,14 +91,12 @@ const TrackingLog: React.FC = () => {
                         </div>
                       ) : '-'}
                     </Td>
-                    <Td>{tx.amount}</Td>
-                    <Td style={{ fontWeight: '600' }}>₺{tx.total.toLocaleString('tr-TR')}</Td>
                   </TableRow>
                 );
               })}
             </tbody>
           </Table>
-          
+
           {transactions.length === 0 && (
             <EmptyState>Henüz bir hisse hareketi bulunmuyor.</EmptyState>
           )}

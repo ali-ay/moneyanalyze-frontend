@@ -15,20 +15,43 @@ export const useTrackingLogLogic = () => {
 
     try {
       setLoading(true);
-      const res = await getHistory({ signal: controller.signal } as any);
-      const rawData = res.data?.transactions || res.data?.data || res.data;
+      
+      // 1. İşlemleri Çek
+      const resTxs = await getHistory({ signal: controller.signal } as any);
+      const rawTxs = resTxs.data?.transactions || resTxs.data?.data || resTxs.data;
+      
+      // 2. YZ Sinyallerini Çek
+      const resSignals = await api.get('/stock/signals', { signal: controller.signal });
+      const rawSignals = Array.isArray(resSignals.data) ? resSignals.data : [];
 
-      if (Array.isArray(rawData)) {
-        // Sadece BIST hisselerini filtrele (Sembol sonunda .IS olanlar veya manual listemizdekiler)
-        const stockTxs = rawData.filter(tx => 
+      let combined: any[] = [];
+
+      if (Array.isArray(rawTxs)) {
+        combined = [...combined, ...rawTxs.filter((tx: any) => 
           tx.symbol.includes('.IS') || tx.symbol.length <= 6
-        );
-        setTransactions(stockTxs);
-
-        // Benzersiz sembolleri topla ve fiyatlarını çek
-        const uniqueSymbols = Array.from(new Set(stockTxs.map(t => t.symbol.replace('.IS', ''))));
-        fetchPrices(uniqueSymbols);
+        ).map((tx: any) => ({ ...tx, entryType: 'TRANSACTION' }))];
       }
+
+      combined = [...combined, ...rawSignals.map((sig: any) => ({
+        id: `sig_${sig.id}`,
+        symbol: sig.symbol,
+        type: 'SIGNAL',
+        price: sig.entryPrice,
+        amount: '-',
+        total: '-',
+        createdAt: sig.createdAt,
+        period: sig.period,
+        entryType: 'AI_SIGNAL'
+      }))];
+
+      // Tarihe göre sırala
+      combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      
+      setTransactions(combined);
+
+      // Benzersiz sembolleri topla ve fiyatlarını çek
+      const uniqueSymbols = Array.from(new Set(combined.map(t => t.symbol.replace('.IS', ''))));
+      fetchPrices(uniqueSymbols);
     } catch (err) {
       console.error("Yükleme hatası:", err);
     } finally {
