@@ -117,9 +117,9 @@ const StockActivityPage: React.FC = () => {
   return (
     <PageContainer>
       <PageHeader>
-        <VStack $gap={4}>
+        <VStack $gap="4px">
           <PageTitle>
-            <HStack $gap={12} $align="center">
+            <HStack $gap="12px" $align="center">
               <History size={32} color="#1A73E8" />
               AI Hisse İşlem Dekontları
             </HStack>
@@ -154,8 +154,8 @@ const StockActivityPage: React.FC = () => {
                 return (
                   <Tr key={log.id}>
                     <Td>
-                      <VStack $gap={4}>
-                        <HStack $gap={6} $align="center" style={{ color: '#202124', fontWeight: 600 }}>
+                      <VStack $gap="4px">
+                        <HStack $gap="6px" $align="center" style={{ color: '#202124', fontWeight: 600 }}>
                           <Clock size={14} color="#1A73E8" />
                           {new Date(log.createdAt).toLocaleDateString('tr-TR')}
                         </HStack>
@@ -165,7 +165,7 @@ const StockActivityPage: React.FC = () => {
                       </VStack>
                     </Td>
                     <Td>
-                      <VStack $gap={4}>
+                      <VStack $gap="4px">
                         <span style={{ fontWeight: 900, color: '#1A73E8', fontSize: '1.05rem' }}>{log.symbol.replace('.IS', '')}</span>
                         <div style={{ 
                           fontSize: '0.65rem', 
@@ -189,7 +189,7 @@ const StockActivityPage: React.FC = () => {
                       </ActionBadge>
                     </Td>
                     <Td>
-                      <HStack $gap={20}>
+                      <HStack $gap="20px">
                         <VStack>
                           <Label>{isAdd ? 'Giriş Fiyatı' : 'Alış Fiyatı'}</Label>
                           <PriceText>₺{log.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</PriceText>
@@ -204,7 +204,7 @@ const StockActivityPage: React.FC = () => {
                       </HStack>
                     </Td>
                     <Td>
-                      <VStack $gap={4}>
+                      <VStack $gap="4px">
                         <Label>{isAdd ? 'Anlık Kar/Zarar' : 'Net Kar/Zarar'}</Label>
                         {profitValue !== null && profitValue !== undefined ? (
                           <ProfitBadge $positive={isPositive} style={{ fontSize: '1rem' }}>
@@ -216,7 +216,7 @@ const StockActivityPage: React.FC = () => {
                       </VStack>
                     </Td>
                     <Td>
-                      <HStack $gap={8} $align="flex-start" style={{ maxWidth: '280px' }}>
+                      <HStack $gap="8px" $align="flex-start" style={{ maxWidth: '280px' }}>
                         <Info size={16} color="#9AA0A6" style={{ marginTop: '2px', flexShrink: 0 }} />
                         <span style={{ color: '#5F6368', fontSize: '0.8125rem', lineHeight: '1.4' }}>
                           {log.description}
