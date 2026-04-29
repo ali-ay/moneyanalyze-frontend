@@ -190,9 +190,18 @@ export const OpportunitiesSection: React.FC = () => {
                   </MetricValue>
                 </MetricRow>
                 <MetricRow>
-                  <span>Getiri:</span>
-                  <MetricValue style={{ color: isPositive ? '#0F9D58' : '#DB4437' }}>
-                    {isPositive ? '+' : ''}{dynamicProfit}%
+                  <span>Sinyal Başarısı:</span>
+                  <MetricValue style={{ color: (opp.winRate || 0) > 70 ? '#0F9D58' : '#1A73E8', fontWeight: 800 }}>
+                    %{opp.winRate || '0'} 
+                    <span style={{ fontSize: '0.625rem', marginLeft: 4, fontWeight: 400, color: '#5F6368' }}>
+                      ({opp.period === 'weekly' ? 'Haftalık' : 'Aylık'})
+                    </span>
+                  </MetricValue>
+                </MetricRow>
+                <MetricRow>
+                  <span>Ort. Getiri:</span>
+                  <MetricValue style={{ color: (opp.avgProfit || 0) > 0 ? '#0F9D58' : '#DB4437' }}>
+                    %{opp.avgProfit?.toFixed(2) || '0.00'}
                   </MetricValue>
                 </MetricRow>
                 <MetricRow>

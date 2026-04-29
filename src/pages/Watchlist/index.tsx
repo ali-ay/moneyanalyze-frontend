@@ -131,40 +131,55 @@ const Watchlist: React.FC = () => {
                   <Th $sortable onClick={() => requestSort('symbol')}>
                     Sembol{getSortIndicator('symbol')}
                   </Th>
-                  <Th $sortable onClick={() => requestSort('price')}>
-                    Anlık Fiyat{getSortIndicator('price')}
+                  <Th>Periyot</Th>
+                  <Th $sortable onClick={() => requestSort('entryPrice')}>
+                    Sinyal Fiyatı{getSortIndicator('entryPrice')}
                   </Th>
-                  <Th $sortable onClick={() => requestSort('addedPrice')}>
-                    Eklenme Fiyatı{getSortIndicator('addedPrice')}
+                  <Th $sortable onClick={() => requestSort('currentPrice')}>
+                    Anlık Fiyat{getSortIndicator('currentPrice')}
+                  </Th>
+                  <Th $sortable onClick={() => requestSort('profitPercent')}>
+                    Sinyal K/Z (%){getSortIndicator('profitPercent')}
                   </Th>
                   <Th $sortable onClick={() => requestSort('priceChangePercent')}>
-                    Değişim (24s){getSortIndicator('priceChangePercent')}
+                    Değişim (Günlük){getSortIndicator('priceChangePercent')}
                   </Th>
                   <Th style={{ textAlign: 'right' }}>İşlem</Th>
                 </tr>
               </thead>
               <tbody>
                 {watchlist.map(item => {
-                  const change = item.priceChangePercent || 0;
-                  const isPositive = change >= 0;
+                  const dailyChange = item.priceChangePercent || 0;
+                  const profit = item.profitPercent || 0;
+                  const isPositiveDaily = dailyChange >= 0;
+                  const isPositiveProfit = profit >= 0;
 
                   return (
-                    <Tr key={item.symbol}>
+                    <Tr key={item.id}>
                       <Td style={{ fontWeight: 700 }}>{item.symbol}</Td>
-                      <Td>{currency}{item.price?.toLocaleString() || '-'}</Td>
                       <Td>
-                        {item.addedPrice
-                          ? `${currency}${item.addedPrice.toLocaleString()}`
-                          : '-'}
+                        <span style={{ 
+                          fontSize: '0.6875rem', 
+                          fontWeight: 700, 
+                          background: '#F1F3F4', 
+                          padding: '2px 8px', 
+                          borderRadius: '12px',
+                          textTransform: 'uppercase'
+                        }}>
+                          {item.period || 'Manuel'}
+                        </span>
+                      </Td>
+                      <Td>{currency}{item.entryPrice?.toLocaleString() || '-'}</Td>
+                      <Td>{currency}{item.currentPrice?.toLocaleString() || '-'}</Td>
+                      <Td>
+                        <ChangeValue $isPositive={isPositiveProfit} style={{ fontSize: '0.875rem' }}>
+                          {isPositiveProfit ? '+' : ''}{profit.toFixed(2)}%
+                        </ChangeValue>
                       </Td>
                       <Td>
-                        {item.priceChangePercent !== undefined ? (
-                          <ChangeValue $isPositive={isPositive}>
-                            {isPositive ? '▲' : '▼'} %{Math.abs(change).toFixed(2)}
-                          </ChangeValue>
-                        ) : (
-                          '-'
-                        )}
+                        <span style={{ color: isPositiveDaily ? '#0F9D58' : '#DB4437', fontWeight: 600 }}>
+                          {isPositiveDaily ? '▲' : '▼'} %{Math.abs(dailyChange).toFixed(2)}
+                        </span>
                       </Td>
                       <Td style={{ textAlign: 'right' }}>
                         <Button

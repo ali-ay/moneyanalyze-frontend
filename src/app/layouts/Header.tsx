@@ -122,14 +122,6 @@ const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
           <Menu size={24} />
         </MenuButton>
         <HeaderTitle>Pazar Analiz Paneli</HeaderTitle>
-        <ModeToggleContainer>
-          <ModeToggleButton $active={mode === 'crypto'} onClick={() => setMode('crypto')}>
-            Kripto
-          </ModeToggleButton>
-          <ModeToggleButton $active={mode === 'stock'} onClick={() => setMode('stock')}>
-            Borsa
-          </ModeToggleButton>
-        </ModeToggleContainer>
       </div>
 
       <HeaderActions>

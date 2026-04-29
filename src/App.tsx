@@ -35,6 +35,8 @@ const Bots = lazy(() => import('./pages/Bots'));
 const CoinDetail = lazy(() => import('./pages/CoinDetail'));
 const StockDetail = lazy(() => import('./pages/StockDetail'));
 const StockList = lazy(() => import('./pages/StockList'));
+const AIAnalysis = lazy(() => import('./pages/AIAnalysis'));
+const StockActivity = lazy(() => import('./pages/StockActivity'));
 
 // Admin Pages
 const UserList = lazy(() => import('./pages/Admin/UserList/UserList'));
@@ -93,8 +95,10 @@ const AppContent = () => {
                 <Route path="/dashboard/wallet/balance" element={<WalletBalance />} />
                 <Route path="/dashboard/history" element={<WalletHistory />} />
                 <Route path="/dashboard/tracking" element={<TrackingLog />} />
+                <Route path="/dashboard/ai-analysis" element={<AIAnalysis />} />
                 <Route path="/dashboard/coin/:symbol" element={<CoinDetail />} />
                 <Route path="/dashboard/stock/:symbol" element={<StockDetail />} />
+                <Route path="/dashboard/stock-activity" element={<StockActivity />} />
                 <Route path="/stocks" element={<StockList />} />
                 <Route path="/watchlist" element={<Watchlist />} />
                 <Route path="/profile" element={<Profile />} />

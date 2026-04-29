@@ -4,11 +4,15 @@ import { useNotification } from '../../app/providers/NotificationContext';
 import { useMarketMode } from '../../context/MarketModeContext';
 
 export interface WatchlistItem {
+  id: string;
   symbol: string;
-  price: number;
+  period?: string;
+  entryPrice?: number;
+  currentPrice: number;
+  profitPercent: number;
   priceChangePercent?: number;
-  addedPrice?: number;
-  addedAt?: string;
+  name: string;
+  createdAt: string;
 }
 
 export const useWatchlistLogic = () => {
@@ -86,7 +90,7 @@ export const useWatchlistLogic = () => {
         const aVal = a[sortConfig.key as keyof WatchlistItem];
         const bVal = b[sortConfig.key as keyof WatchlistItem];
 
-        if (aVal && bVal) {
+        if (aVal !== undefined && bVal !== undefined) {
           if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
           if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
         }

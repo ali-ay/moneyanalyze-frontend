@@ -1,6 +1,7 @@
 import { useProfileLogic } from './logic';
 import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState } from '../../../components/ui/Layout.styles';
-import { User, Key, Save, CheckCircle, AlertCircle } from 'lucide-react';
+import { User, Key, Save, CheckCircle, AlertCircle, TrendingUp, Zap } from 'lucide-react';
+import { useMarketMode } from '../../../context/MarketModeContext';
 import styled from 'styled-components';
 
 // ─── Styled Components ─────────────────────────────────
@@ -175,7 +176,10 @@ const ProfilePage = () => {
     binanceSecretKey, setBinanceSecretKey,
     tradingMode, setTradingMode,
     updateProfile, resetAccount,
+    runAIScan,
+    progress,
   } = useProfileLogic();
+  const { mode, setMode } = useMarketMode();
 
   if (loading) return <LoadingState>Profil yükleniyor...</LoadingState>;
 
@@ -254,6 +258,66 @@ const ProfilePage = () => {
                   ? new Date(profile.createdAt).toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' })
                   : '--'}
               </InfoValue>
+            </InputGroup>
+
+            <div style={{ margin: '24px 0', borderTop: '1px dashed #DADCE0' }} />
+
+            <SectionHeader style={{ border: 'none', marginBottom: 12 }}>
+              <SectionIcon $color="rgba(15, 157, 88, 0.1)">
+                <TrendingUp size={20} color="#0F9D58" />
+              </SectionIcon>
+              <SectionTitle>Pazar Tercihi</SectionTitle>
+            </SectionHeader>
+
+            <InputGroup>
+              <Label>Varsayılan Pazar</Label>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setMode('stock')}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: '2px solid',
+                    borderColor: mode === 'stock' ? '#1A73E8' : '#DADCE0',
+                    background: mode === 'stock' ? 'rgba(26, 115, 232, 0.05)' : 'transparent',
+                    color: mode === 'stock' ? '#1A73E8' : '#5F6368',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8
+                  }}
+                >
+                  <TrendingUp size={16} /> Borsa (BIST)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode('crypto')}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: '2px solid',
+                    borderColor: mode === 'crypto' ? '#F4B400' : '#DADCE0',
+                    background: mode === 'crypto' ? 'rgba(244, 180, 0, 0.05)' : 'transparent',
+                    color: mode === 'crypto' ? '#F4B400' : '#5F6368',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8
+                  }}
+                >
+                  <Zap size={16} /> Kripto Para
+                </button>
+              </div>
+              <KeyHint>Uygulama açıldığında hangi pazarın verilerini görmek istediğinizi seçin.</KeyHint>
             </InputGroup>
           </Section>
 
@@ -341,18 +405,97 @@ const ProfilePage = () => {
               ⚠️ API Key'leriniz güvenli bir şekilde şifrelenerek saklanır. Sadece yeni bir key girdiğinizde güncellenir.
             </KeyHint>
           </Section>
+
+          {/* Yeni: AI Otomasyon Kontrolü */}
+          <Section style={{ gridColumn: '1 / -1' }}>
+            <SectionHeader>
+              <SectionIcon $color="rgba(167, 107, 245, 0.1)">
+                <Zap size={20} color="#A76BF5" fill="#A76BF5" />
+              </SectionIcon>
+              <SectionTitle>Yapay Zeka Otomasyon Kontrolü</SectionTitle>
+            </SectionHeader>
+            
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#202124', marginBottom: '4px' }}>
+                  Manuel Piyasa Taraması
+                </p>
+                <p style={{ fontSize: '0.8125rem', color: '#5F6368', lineHeight: '1.4' }}>
+                  Tüm BIST hisselerini anlık fiyatlarla tarar. 100+ skor alan hisseleri otomatik olarak İzleme Listenize ekler ve sinyal takibini başlatır.
+                </p>
+              </div>
+              
+              <button
+                type="button"
+                onClick={runAIScan}
+                disabled={saving || (progress?.isRunning ?? false)}
+                style={{
+                  background: (saving || progress?.isRunning) ? '#DADCE0' : '#A76BF5',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '10px',
+                  fontSize: '0.875rem',
+                  fontWeight: '700',
+                  cursor: (saving || progress?.isRunning) ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.2s',
+                  boxShadow: (saving || progress?.isRunning) ? 'none' : '0 4px 10px rgba(167, 107, 245, 0.3)'
+                }}
+              >
+                <Zap size={16} fill="white" />
+                {progress?.isRunning ? 'Tarama Sürüyor...' : 'Şimdi Taramayı Başlat'}
+              </button>
+            </div>
+
+            {progress?.isRunning && (
+              <div style={{ marginTop: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#5F6368', marginBottom: '6px' }}>
+                  <span>{progress.message}</span>
+                  <span>%{Math.round((progress.current / (progress.total || 1)) * 100)}</span>
+                </div>
+                <div style={{ width: '100%', height: '8px', background: '#F1F3F4', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div 
+                    style={{ 
+                      width: `${(progress.current / (progress.total || 1)) * 100}%`, 
+                      height: '100%', 
+                      background: 'linear-gradient(90deg, #A76BF5, #1A73E8)',
+                      transition: 'width 0.4s ease'
+                    }} 
+                  />
+                </div>
+              </div>
+            )}
+            
+            <div style={{ 
+              marginTop: '16px', 
+              padding: '12px', 
+              background: 'rgba(26, 115, 232, 0.05)', 
+              borderRadius: '8px',
+              fontSize: '0.75rem',
+              color: '#1A73E8',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <CheckCircle size={14} />
+              Sistem her saat başı otomatik tarama yapacak şekilde yapılandırıldı.
+            </div>
+          </Section>
         </ProfileGrid>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '24px' }}>
-          <SaveButton type="submit" disabled={saving}>
+          <SaveButton type="submit" disabled={saving || (progress?.isRunning ?? false)}>
             <Save size={18} />
-            {saving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
+            {saving && !progress?.isRunning ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
           </SaveButton>
 
           <button
             type="button"
             onClick={resetAccount}
-            disabled={saving}
+            disabled={saving || (progress?.isRunning ?? false)}
             style={{
               background: 'transparent',
               color: '#DB4437',

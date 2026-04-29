@@ -10,8 +10,9 @@ import { TimeframeButtons, DEFAULT_STOCK_TIMEFRAMES } from '../../components/ui/
 import { TechnicalPanel } from '../../components/panels/TechnicalPanel';
 import { Grid } from '../../components/primitives/Grid';
 import { HStack } from '../../components/primitives/Flex';
-import { ArrowLeft, TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowLeft, TrendingUp, TrendingDown, Zap } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AIBacktestPanel } from './AIBacktestPanel';
 
 const PriceDisplay = styled.div`
   display: flex;
@@ -80,6 +81,12 @@ const StockDetail: React.FC = () => {
     setTimeframe,
     technicalSummary,
     fundamentals,
+    backtestData,
+    backtestLoading,
+    backtestPeriod,
+    setBacktestPeriod,
+    optimizedData,
+    optimizedLoading
   } = useStockDetailLogic(symbol);
 
   if (loading && history.length === 0) {
@@ -206,6 +213,15 @@ const StockDetail: React.FC = () => {
           </Card.Body>
         </Card>
       )}
+
+      <AIBacktestPanel 
+        data={backtestData} 
+        loading={backtestLoading} 
+        period={backtestPeriod}
+        setPeriod={setBacktestPeriod}
+        optimizedData={optimizedData}
+        optimizedLoading={optimizedLoading}
+      />
 
       {technicalSummary && (
         <TechnicalPanel

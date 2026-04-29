@@ -13,7 +13,8 @@ import {
   X,
   History,
   Eye,
-  Briefcase
+  Briefcase,
+  Zap
 } from 'lucide-react';
 import { useAuth } from '../../app/providers/AuthContext';
 
@@ -197,13 +198,16 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, o
           <NavItem $active={location.pathname === '/dashboard'} onClick={() => handleNav('/dashboard')}>
             <LayoutDashboard size={18} /> Analiz Paneli
           </NavItem>
+          <NavItem $active={location.pathname === '/dashboard/ai-analysis'} onClick={() => handleNav('/dashboard/ai-analysis')}>
+            <Zap size={18} color="#F4B400" fill="#F4B400" /> Yapay Zeka Analizi
+          </NavItem>
           <NavItem $active={location.pathname === '/dashboard/wallet'} onClick={() => handleNav('/dashboard/wallet')}>
             <Briefcase size={18} /> Varlıklarım
           </NavItem>
           <NavItem $active={location.pathname === '/watchlist'} onClick={() => handleNav('/watchlist')}>
             <Wallet size={18} /> Cüzdan Takibi
           </NavItem>
-          <NavItem $active={location.pathname === '/dashboard/tracking'} onClick={() => handleNav('/dashboard/tracking')}>
+          <NavItem $active={location.pathname === '/dashboard/stock-activity'} onClick={() => handleNav('/dashboard/stock-activity')}>
             <History size={18} /> Hisse Hareket Kaydı
           </NavItem>
           <NavItem $active={location.pathname === '/bots'} onClick={() => handleNav('/bots')}>

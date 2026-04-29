@@ -108,8 +108,63 @@ export const useProfileLogic = () => {
     }
   };
 
+  const [progress, setProgress] = useState<{ current: number; total: number; isRunning: boolean; message: string } | null>(null);
+
+  const fetchProgress = useCallback(async () => {
+    try {
+      const res = await api.get('/stock/analysis-status');
+      const data = res.data.data;
+      setProgress(data);
+      return data.isRunning;
+    } catch (err) {
+      console.error('Progress fetch error:', err);
+      return false;
+    }
+  }, []);
+
+  // Eğer sayfa açıldığında zaten çalışan bir analiz varsa takip et
+  useEffect(() => {
+    let interval: any;
+    const check = async () => {
+      const isRunning = await fetchProgress();
+      if (isRunning) {
+        interval = setInterval(async () => {
+          const stillRunning = await fetchProgress();
+          if (!stillRunning) clearInterval(interval);
+        }, 1000);
+      }
+    };
+    check();
+    return () => clearInterval(interval);
+  }, [fetchProgress]);
+
+  const runAIScan = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+      setSuccess(null);
+      
+      await api.post('/stock/analyze-all');
+      
+      // Hemen polling başlat
+      const interval = setInterval(async () => {
+        const isRunning = await fetchProgress();
+        if (!isRunning) {
+          clearInterval(interval);
+          setSaving(false);
+          setSuccess('Yapay zeka taraması başarıyla tamamlandı!');
+          setTimeout(() => setSuccess(null), 5000);
+        }
+      }, 1000);
+
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Analiz başlatılamadı.');
+      setSaving(false);
+    }
+  };
+
   return {
-    profile, loading, saving, error, success,
+    profile, loading, saving, error, success, progress,
     firstName, setFirstName,
     lastName, setLastName,
     binanceApiKey, setBinanceApiKey,
@@ -117,5 +172,6 @@ export const useProfileLogic = () => {
     tradingMode, setTradingMode,
     updateProfile,
     resetAccount,
+    runAIScan,
   };
 };

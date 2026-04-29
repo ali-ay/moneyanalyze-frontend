@@ -9,19 +9,6 @@ export interface StockHistoryItem {
   high: number;
   low: number;
   volume: number;
-  ma20?: number;
-  ma50?: number;
-  rsi?: number;
-  bb?: {
-    upper: number;
-    middle: number;
-    lower: number;
-  };
-  macd?: {
-    line: number;
-    signal: number;
-    histogram: number;
-  };
 }
 
 export interface TechnicalSummary {
@@ -48,7 +35,48 @@ export const useStockDetailLogic = (symbol?: string) => {
   const [timeframe, setTimeframe] = useState<'1d' | '5d' | '1mo' | '3mo' | '1y' | '5y' | 'all'>('1mo');
   const [fundamentals, setFundamentals] = useState<any>(null);
   const [technicalSummary, setTechnicalSummary] = useState<TechnicalSummary | null>(null);
+  
+  // Backtest & Optimization States
+  const [backtestData, setBacktestData] = useState<any>(null);
+  const [backtestLoading, setBacktestLoading] = useState(false);
+  const [backtestPeriod, setBacktestPeriod] = useState('weekly');
+  const [optimizedData, setOptimizedData] = useState<any>(null);
+  const [optimizedLoading, setOptimizedLoading] = useState(false);
+
   const abortRef = useRef<AbortController | null>(null);
+
+  const fetchBacktest = useCallback(async (period: string) => {
+    if (!symbol) return;
+    try {
+      setBacktestLoading(true);
+      const cleanSymbol = symbol.replace('.IS', '');
+      const res = await apiClient.get(`/stock/backtest/${cleanSymbol}?period=${period}`);
+      setBacktestData(res.data);
+    } catch (err) {
+      console.error("Backtest error:", err);
+    } finally {
+      setBacktestLoading(false);
+    }
+  }, [symbol]);
+
+  const fetchOptimization = useCallback(async (period: string) => {
+    if (!symbol) return;
+    try {
+      setOptimizedLoading(true);
+      const cleanSymbol = symbol.replace('.IS', '');
+      const res = await apiClient.get(`/stock/optimize/${cleanSymbol}?period=${period}`);
+      setOptimizedData(res.data);
+    } catch (err) {
+      console.error("Optimization error:", err);
+    } finally {
+      setOptimizedLoading(false);
+    }
+  }, [symbol]);
+
+  useEffect(() => {
+    fetchBacktest(backtestPeriod);
+    fetchOptimization(backtestPeriod);
+  }, [backtestPeriod, fetchBacktest, fetchOptimization]);
 
   const fetchHistory = useCallback(async () => {
     if (!symbol) return;
@@ -61,7 +89,6 @@ export const useStockDetailLogic = (symbol?: string) => {
     try {
       const cleanSymbol = symbol.replace('.IS', '');
 
-      // Fetch stock info (fundamentals)
       const infoRes = await apiClient.get(`/stock/info/${cleanSymbol}`, { signal: controller.signal });
       const quote = infoRes.data.quote;
 
@@ -74,7 +101,6 @@ export const useStockDetailLogic = (symbol?: string) => {
         name: quote.name
       });
 
-      // Fetch technical analysis from backend
       const analysisRes = await apiClient.post('/stock/analyze', {
         symbol: `${cleanSymbol}.IS`,
         timeframe,
@@ -83,7 +109,6 @@ export const useStockDetailLogic = (symbol?: string) => {
 
       const analysisData = analysisRes.data.data;
 
-      // Map backend response to frontend format
       const mappedHistory: StockHistoryItem[] = analysisData.history.map((item: any) => ({
         time: item.time || new Date(item.timestamp || Date.now()).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
         date: item.date || item.time || '',
@@ -100,10 +125,9 @@ export const useStockDetailLogic = (symbol?: string) => {
       setChangePercent(quote.changePercent || 0);
       setLastUpdated(infoRes.data.lastUpdated || new Date().toISOString());
 
-      // Create technical summary from backend analysis
       const summary: TechnicalSummary = {
         signal: analysisData.signal || 'NÖTR',
-        score: 50, // Backend would provide this in FAZE 3
+        score: 50,
         color: getSignalColor(analysisData.signal),
         signals: [],
         pivots: analysisData.pivots || { p: 0, r1: 0, r2: 0, s1: 0, s2: 0 }
@@ -113,8 +137,6 @@ export const useStockDetailLogic = (symbol?: string) => {
     } catch (error: any) {
       if (error?.name === 'CanceledError' || error?.code === 'ERR_CANCELED') return;
       console.error('Error fetching stock history:', error);
-      setHistory([]);
-      setTechnicalSummary(null);
     } finally {
       if (!controller.signal.aborted) setLoading(false);
     }
@@ -139,7 +161,18 @@ export const useStockDetailLogic = (symbol?: string) => {
     timeframe,
     setTimeframe,
     technicalSummary,
-    fundamentals
+    fundamentals,
+    backtestData,
+    backtestLoading,
+    backtestPeriod,
+    setBacktestPeriod,
+    optimizedData,
+    optimizedLoading,
+    refreshAll: () => {
+      fetchHistory();
+      fetchBacktest(backtestPeriod);
+      fetchOptimization(backtestPeriod);
+    }
   };
 };
 
