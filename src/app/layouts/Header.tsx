@@ -125,6 +125,21 @@ const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
       </div>
 
       <HeaderActions>
+        <ModeToggleContainer>
+          <ModeToggleButton 
+            $active={mode === 'crypto'} 
+            onClick={() => setMode('crypto')}
+          >
+            Kripto
+          </ModeToggleButton>
+          <ModeToggleButton 
+            $active={mode === 'stock'} 
+            onClick={() => setMode('stock')}
+          >
+            Borsa
+          </ModeToggleButton>
+        </ModeToggleContainer>
+
         <ToolGroup>
           <Bell size={20} />
           <HelpCircle size={20} />

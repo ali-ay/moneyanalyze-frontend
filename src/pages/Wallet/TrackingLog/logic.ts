@@ -15,34 +15,67 @@ export const useTrackingLogLogic = () => {
 
     try {
       setLoading(true);
-      
-      // 1. İşlemleri Çek
-      const resTxs = await getHistory({ signal: controller.signal } as any);
-      const rawTxs = resTxs.data?.transactions || resTxs.data?.data || resTxs.data;
-      
-      // 2. YZ Sinyallerini Çek
-      const resSignals = await api.get('/stock/signals', { signal: controller.signal });
-      const rawSignals = Array.isArray(resSignals.data) ? resSignals.data : [];
+
+      // Üç kaynaktan paralel ve **birbirinden bağımsız** veri çek.
+      // Promise.allSettled — biri patlasa bile diğerleri görünsün.
+      const [txsResult, signalsResult, watchlistResult] = await Promise.allSettled([
+        getHistory({ signal: controller.signal } as any),
+        api.get('/stock/signals', { signal: controller.signal }),
+        api.get('/watchlist?market=stock', { signal: controller.signal }),
+      ]);
 
       let combined: any[] = [];
 
-      if (Array.isArray(rawTxs)) {
-        combined = [...combined, ...rawTxs.filter((tx: any) => 
-          tx.symbol.includes('.IS') || tx.symbol.length <= 6
-        ).map((tx: any) => ({ ...tx, entryType: 'TRANSACTION' }))];
+      // 1. İşlemler
+      if (txsResult.status === 'fulfilled') {
+        const r = txsResult.value;
+        const rawTxs = r.data?.transactions || r.data?.data || r.data;
+        if (Array.isArray(rawTxs)) {
+          combined = [...combined, ...rawTxs.filter((tx: any) =>
+            tx.symbol?.includes('.IS') || (tx.symbol && tx.symbol.length <= 6)
+          ).map((tx: any) => ({ ...tx, entryType: 'TRANSACTION' }))];
+        }
+      } else {
+        console.warn('[TrackingLog] transactions/history başarısız:', txsResult.reason?.message);
       }
 
-      combined = [...combined, ...rawSignals.map((sig: any) => ({
-        id: `sig_${sig.id}`,
-        symbol: sig.symbol,
-        type: 'SIGNAL',
-        price: sig.entryPrice,
-        amount: '-',
-        total: '-',
-        createdAt: sig.updatedAt || sig.createdAt,
-        period: sig.period,
-        entryType: 'AI_SIGNAL'
-      }))];
+      // 2. AI Sinyalleri
+      if (signalsResult.status === 'fulfilled') {
+        const rawSignals = Array.isArray(signalsResult.value.data) ? signalsResult.value.data : [];
+        combined = [...combined, ...rawSignals.map((sig: any) => ({
+          id: `sig_${sig.id}`,
+          symbol: sig.symbol,
+          type: 'SIGNAL',
+          price: sig.entryPrice,
+          amount: '-',
+          total: '-',
+          createdAt: sig.updatedAt || sig.createdAt,
+          period: sig.period,
+          entryType: 'AI_SIGNAL'
+        }))];
+      } else {
+        console.warn('[TrackingLog] /stock/signals başarısız:', signalsResult.reason?.message);
+      }
+
+      // 3. Watchlist (manuel tarama / manuel ekleme)
+      if (watchlistResult.status === 'fulfilled') {
+        const rawWatchlist = Array.isArray(watchlistResult.value.data?.data)
+          ? watchlistResult.value.data.data
+          : [];
+        combined = [...combined, ...rawWatchlist.map((w: any) => ({
+          id: `wl_${w.id}`,
+          symbol: w.symbol,
+          type: 'WATCHLIST',
+          price: w.entryPrice ?? w.currentPrice ?? 0,
+          amount: '-',
+          total: '-',
+          createdAt: w.createdAt,
+          period: w.period,
+          entryType: 'WATCHLIST_MANUAL'
+        }))];
+      } else {
+        console.warn('[TrackingLog] /watchlist başarısız:', watchlistResult.reason?.message);
+      }
 
       // Tarihe göre sırala
       combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

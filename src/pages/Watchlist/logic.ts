@@ -75,6 +75,22 @@ export const useWatchlistLogic = () => {
     }
   }, [showNotification, mode, fetchWatchlist]);
 
+  const handleClearAll = useCallback(async () => {
+    try {
+      const response = await api.delete(`/watchlist/clear?market=${mode}`);
+      const deleted = response.data?.data?.deleted ?? 0;
+      setWatchlist([]);
+      showNotification(
+        deleted > 0
+          ? `${deleted} öğe silindi. Liste temizlendi.`
+          : 'Liste zaten boştu.',
+        'success'
+      );
+    } catch (error: any) {
+      showNotification('Liste temizlenemedi.', 'error');
+    }
+  }, [mode, showNotification]);
+
   const requestSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -107,6 +123,7 @@ export const useWatchlistLogic = () => {
     requestSort,
     handleRemove,
     handleAdd,
+    handleClearAll,
     fetchWatchlist,
     mode,
     currency: (mode === 'stock' ? '₺' : '$') as '$' | '₺'

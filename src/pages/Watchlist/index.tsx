@@ -5,7 +5,7 @@ import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState, Empty
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { HStack } from '../../components/primitives/Flex';
-import { Trash2, Plus, Eye } from 'lucide-react';
+import { Trash2, Plus, Eye, Trash } from 'lucide-react';
 
 const Table = styled.table`
   width: 100%;
@@ -69,6 +69,7 @@ const Watchlist: React.FC = () => {
     requestSort,
     handleRemove,
     handleAdd,
+    handleClearAll,
     mode,
     currency,
   } = useWatchlistLogic();
@@ -96,6 +97,15 @@ const Watchlist: React.FC = () => {
     }
   };
 
+  const handleClearClick = async () => {
+    if (watchlist.length === 0) return;
+    const confirmed = window.confirm(
+      `${mode === 'stock' ? 'BIST' : 'Kripto'} takip listendeki tüm öğeler silinecek. Devam edilsin mi?`
+    );
+    if (!confirmed) return;
+    await handleClearAll();
+  };
+
   if (loading && watchlist.length === 0) {
     return <LoadingState>Yükleniyor...</LoadingState>;
   }
@@ -110,9 +120,18 @@ const Watchlist: React.FC = () => {
               {mode === 'stock' ? 'BIST hisseleri' : 'Kripto varlıklar'} — anlık takip.
             </PageSubtitle>
           </div>
-          <Button $variant="primary" onClick={handleAddClick} disabled={adding}>
-            <Plus size={16} /> Sembol Ekle
-          </Button>
+          <HStack $gap="sm">
+            <Button
+              $variant="danger"
+              onClick={handleClearClick}
+              disabled={watchlist.length === 0 || adding}
+            >
+              <Trash size={16} /> Listeyi Temizle
+            </Button>
+            <Button $variant="primary" onClick={handleAddClick} disabled={adding}>
+              <Plus size={16} /> Sembol Ekle
+            </Button>
+          </HStack>
         </HStack>
       </PageHeader>
 
