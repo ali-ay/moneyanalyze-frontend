@@ -77,6 +77,18 @@ const Label = styled.div`
   margin-bottom: 4px;
 `;
 
+const ProfitBadge = styled.span<{ $positive: boolean }>`
+  color: ${props => props.$positive ? '#0F9D58' : '#DB4437'};
+  background: ${props => props.$positive ? 'rgba(15, 157, 88, 0.1)' : 'rgba(219, 68, 55, 0.1)'};
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9375rem;
+`;
+
 const StockActivityPage: React.FC = () => {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
