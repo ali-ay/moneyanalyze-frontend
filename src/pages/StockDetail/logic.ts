@@ -103,8 +103,7 @@ export const useStockDetailLogic = (symbol?: string) => {
 
       const analysisRes = await apiClient.post('/stock/analyze', {
         symbol: `${cleanSymbol}.IS`,
-        timeframe,
-        limit: 500
+        timeframe
       }, { signal: controller.signal });
 
       const analysisData = analysisRes.data.data;

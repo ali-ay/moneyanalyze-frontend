@@ -254,7 +254,7 @@ const ProfilePage = () => {
             <InputGroup>
               <Label>Kayıt Tarihi</Label>
               <InfoValue>
-                {profile?.createdAt 
+                {profile?.createdAt
                   ? new Date(profile.createdAt).toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' })
                   : '--'}
               </InfoValue>
@@ -371,8 +371,8 @@ const ProfilePage = () => {
                 </button>
               </div>
               <KeyHint style={{ color: tradingMode === 'LIVE' ? '#DB4437' : '#5F6368', fontWeight: tradingMode === 'LIVE' ? '600' : '400' }}>
-                {tradingMode === 'LIVE' 
-                  ? '⚠️ DİKKAT: Live modda işlemler gerçek Binance bakiyeniz ile yapılır!' 
+                {tradingMode === 'LIVE'
+                  ? '⚠️ DİKKAT: Live modda işlemler gerçek Binance bakiyeniz ile yapılır!'
                   : 'ℹ️ Simülasyon modunda sanal bakiyeniz (10.000 USDT) kullanılır.'}
               </KeyHint>
             </InputGroup>
@@ -414,7 +414,7 @@ const ProfilePage = () => {
               </SectionIcon>
               <SectionTitle>Yapay Zeka Otomasyon Kontrolü</SectionTitle>
             </SectionHeader>
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div>
                 <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#202124', marginBottom: '4px' }}>
@@ -424,7 +424,7 @@ const ProfilePage = () => {
                   Tüm BIST hisselerini anlık fiyatlarla tarar. 100+ skor alan hisseleri otomatik olarak İzleme Listenize ekler.
                 </p>
               </div>
-              
+
               <button
                 type="button"
                 onClick={runAIScan}
@@ -457,13 +457,13 @@ const ProfilePage = () => {
                     <span>%{Math.round((progress.current / (progress.total || 1)) * 100)}</span>
                   </div>
                   <div style={{ width: '100%', height: '8px', background: '#F1F3F4', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div 
-                      style={{ 
-                        width: `${(progress.current / (progress.total || 1)) * 100}%`, 
-                        height: '100%', 
+                    <div
+                      style={{
+                        width: `${(progress.current / (progress.total || 1)) * 100}%`,
+                        height: '100%',
                         background: 'linear-gradient(90deg, #A76BF5, #1A73E8)',
                         transition: 'width 0.4s ease'
-                      }} 
+                      }}
                     />
                   </div>
                 </div>
@@ -479,17 +479,17 @@ const ProfilePage = () => {
               </SectionIcon>
               <SectionTitle>Genel Veri Yönetimi</SectionTitle>
             </SectionHeader>
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div>
                 <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#202124', marginBottom: '4px' }}>
-                  Tüm Geçmiş Verileri Eşitle (1990+)
+                  Tüm Geçmiş Verileri Eşitle (1900+)
                 </p>
                 <p style={{ fontSize: '0.8125rem', color: '#5F6368', lineHeight: '1.4' }}>
-                  Tüm BIST hisselerinin tarihsel verilerini 1990 yılından itibaren tarar ve eksikleri veritabanına kaydeder. Bu işlem uzun sürebilir.
+                  Tüm BIST hisselerinin tarihsel verilerini 1900 yılından itibaren tarar ve eksikleri veritabanına kaydeder. Bu işlem uzun sürebilir.
                 </p>
               </div>
-              
+
               <button
                 type="button"
                 onClick={runFullHistorySync}
@@ -522,13 +522,13 @@ const ProfilePage = () => {
                     <span>%{historyProgress.percent}</span>
                   </div>
                   <div style={{ width: '100%', height: '8px', background: '#F1F3F4', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div 
-                      style={{ 
-                        width: `${historyProgress.percent}%`, 
-                        height: '100%', 
+                    <div
+                      style={{
+                        width: `${historyProgress.percent}%`,
+                        height: '100%',
                         background: 'linear-gradient(90deg, #0F9D58, #1A73E8)',
                         transition: 'width 0.4s ease'
-                      }} 
+                      }}
                     />
                   </div>
                 </div>
