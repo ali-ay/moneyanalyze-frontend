@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import type { JSX } from 'react/jsx-dev-runtime';
-import { useAuth } from '../core/providers/AuthContext';
+import { useAuth } from '../app/providers/AuthContext';
 
 /**
  * Auth gerektiren rotaları sarar.

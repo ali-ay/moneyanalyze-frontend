@@ -53,7 +53,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
         }}
       >
         <div style={{ maxWidth: 480, textAlign: 'center' }}>
-          <h1 style={{ fontSize: 22, marginBottom: 12 }}>Bir şeyler ters gitti</h1>
+          <h1 style={{ fontSize: '1.375rem', marginBottom: 12 }}>Bir şeyler ters gitti</h1>
           <p style={{ color: '#9AA0A6', marginBottom: 24, lineHeight: 1.6 }}>
             Beklenmeyen bir hata oluştu. Sayfayı yenilemeyi deneyebilir veya tekrar giriş yapabilirsiniz.
           </p>
@@ -64,7 +64,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
               padding: 12,
               borderRadius: 8,
               color: '#ff8a80',
-              fontSize: 12,
+              fontSize: '0.75rem',
               overflowX: 'auto',
               marginBottom: 16
             }}>

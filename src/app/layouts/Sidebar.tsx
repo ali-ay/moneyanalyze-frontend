@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Wallet, 
-  Bot, 
+import {
+  LayoutDashboard,
+  Wallet,
+  Bot,
   LogOut,
   Users,
   Settings,
@@ -15,10 +15,10 @@ import {
   Eye,
   Briefcase
 } from 'lucide-react';
-import { useAuth } from '../../core/providers/AuthContext';
+import { useAuth } from '../../app/providers/AuthContext';
 
 const SidebarAside = styled.aside<{ $isOpen: boolean }>`
-  width: 260px;
+  width: 208px;
   height: 100vh;
   background: ${props => props.theme?.colors?.white || '#FFFFFF'};
   border-right: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
@@ -82,7 +82,7 @@ const LogoSection = styled.div`
   }
   
   span {
-    font-size: 18px;
+    font-size: 1.125rem;
     font-weight: 700;
     color: ${props => props.theme?.colors?.textMain || '#202124'};
   }
@@ -106,7 +106,7 @@ const NavItem = styled.div<{ $active?: boolean }>`
   font-weight: ${props => props.$active ? '700' : '500'};
   border-right: ${props => props.$active ? `3px solid ${props.theme?.colors?.primary || '#1A73E8'}` : 'none'};
   transition: all 0.2s;
-  font-size: 14px;
+  font-size: 0.875rem;
 
   &:hover {
     background: ${props => props.theme?.colors?.surfaceHover || '#F8F9FA'};
@@ -116,7 +116,7 @@ const NavItem = styled.div<{ $active?: boolean }>`
 
 const NavGroupLabel = styled.div`
   padding: 24px 24px 8px;
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   color: ${props => props.theme?.colors?.textSecondary || '#9AA0A6'};
   text-transform: uppercase;
@@ -131,7 +131,7 @@ const AccountBadge = styled.div`
   border: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
 
   .label {
-    font-size: 9px;
+    font-size: 0.5625rem;
     font-weight: 700;
     color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
     text-transform: uppercase;
@@ -139,7 +139,7 @@ const AccountBadge = styled.div`
   }
 
   .type {
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 700;
     color: ${props => props.theme?.colors?.primary || '#1A73E8'};
     display: flex;
@@ -186,57 +186,57 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, o
       <SidebarAside $isOpen={isOpen}>
         <MobileClose onClick={onClose}><X size={24} /></MobileClose>
         <LogoSection onClick={() => handleNav('/dashboard')}>
-        <div className="logo-icon">
-          <LayoutDashboard size={20} />
-        </div>
-        <span>MoneyAnalyze</span>
-      </LogoSection>
+          <div className="logo-icon">
+            <LayoutDashboard size={18} />
+          </div>
+          <span>MoneyAnalyze</span>
+        </LogoSection>
 
-      <NavList>
-        <NavGroupLabel>Ana Menü</NavGroupLabel>
-        <NavItem $active={location.pathname === '/dashboard'} onClick={() => handleNav('/dashboard')}>
-          <LayoutDashboard size={20} /> Analiz Paneli
-        </NavItem>
-        <NavItem $active={location.pathname === '/dashboard/wallet'} onClick={() => handleNav('/dashboard/wallet')}>
-          <Briefcase size={20} /> Varlıklarım
-        </NavItem>
-        <NavItem $active={location.pathname === '/watchlist'} onClick={() => handleNav('/watchlist')}>
-          <Wallet size={20} /> Cüzdan Takibi
-        </NavItem>
-        <NavItem $active={location.pathname === '/dashboard/tracking'} onClick={() => handleNav('/dashboard/tracking')}>
-          <History size={20} /> Hisse Hareket Kaydı
-        </NavItem>
-        <NavItem $active={location.pathname === '/bots'} onClick={() => handleNav('/bots')}>
-          <Bot size={20} /> Bot Yönetimi
-        </NavItem>
+        <NavList>
+          <NavGroupLabel>Ana Menü</NavGroupLabel>
+          <NavItem $active={location.pathname === '/dashboard'} onClick={() => handleNav('/dashboard')}>
+            <LayoutDashboard size={18} /> Analiz Paneli
+          </NavItem>
+          <NavItem $active={location.pathname === '/dashboard/wallet'} onClick={() => handleNav('/dashboard/wallet')}>
+            <Briefcase size={18} /> Varlıklarım
+          </NavItem>
+          <NavItem $active={location.pathname === '/watchlist'} onClick={() => handleNav('/watchlist')}>
+            <Wallet size={18} /> Cüzdan Takibi
+          </NavItem>
+          <NavItem $active={location.pathname === '/dashboard/tracking'} onClick={() => handleNav('/dashboard/tracking')}>
+            <History size={18} /> Hisse Hareket Kaydı
+          </NavItem>
+          <NavItem $active={location.pathname === '/bots'} onClick={() => handleNav('/bots')}>
+            <Bot size={18} /> Bot Yönetimi
+          </NavItem>
 
-        {isAdmin && (
-          <>
-            <NavGroupLabel>Yönetim</NavGroupLabel>
-            <NavItem $active={location.pathname.startsWith('/admin/userlist')} onClick={() => handleNav('/admin/userlist')}>
-              <Users size={20} /> Kullanıcılar
-            </NavItem>
-            <NavItem $active={location.pathname.startsWith('/admin/settings')} onClick={() => handleNav('/admin/settings')}>
-              <Settings size={20} /> Sistem Ayarları
-            </NavItem>
-            <NavItem $active={location.pathname.startsWith('/admin/stocks')} onClick={() => handleNav('/admin/stocks')}>
-              <BarChart3 size={20} /> Hisse Yönetimi
-            </NavItem>
-          </>
-        )}
-      </NavList>
+          {isAdmin && (
+            <>
+              <NavGroupLabel>Yönetim</NavGroupLabel>
+              <NavItem $active={location.pathname.startsWith('/admin/userlist')} onClick={() => handleNav('/admin/userlist')}>
+                <Users size={18} /> Kullanıcılar
+              </NavItem>
+              <NavItem $active={location.pathname.startsWith('/admin/settings')} onClick={() => handleNav('/admin/settings')}>
+                <Settings size={18} /> Sistem Ayarları
+              </NavItem>
+              <NavItem $active={location.pathname.startsWith('/admin/stocks')} onClick={() => handleNav('/admin/stocks')}>
+                <BarChart3 size={18} /> Hisse Yönetimi
+              </NavItem>
+            </>
+          )}
+        </NavList>
 
-      <AccountBadge>
-        <div className="label">HESAP DURUMU</div>
-        <div className="type">
-          {isAdmin ? <ShieldCheck size={14} /> : null}
-          {isAdmin ? 'Administrator' : 'Institutional Pro'}
-        </div>
-      </AccountBadge>
-      
-      <LogoutButton onClick={() => logout()}>
-        <LogOut size={20} /> Güvenli Çıkış
-      </LogoutButton>
+        <AccountBadge>
+          <div className="label">HESAP DURUMU</div>
+          <div className="type">
+            {isAdmin ? <ShieldCheck size={14} /> : null}
+            {isAdmin ? 'Administrator' : 'Institutional Pro'}
+          </div>
+        </AccountBadge>
+
+        <LogoutButton onClick={() => logout()}>
+          <LogOut size={18} /> Güvenli Çıkış
+        </LogoutButton>
       </SidebarAside>
     </>
   );

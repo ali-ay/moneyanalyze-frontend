@@ -48,7 +48,7 @@ export const CardHeader = styled.div`
 `;
 
 export const CardTitle = styled.h3`
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
   margin: 0;
@@ -81,13 +81,13 @@ export const CardIcon = styled.div<{ $variant?: 'primary' | 'success' | 'danger'
 `;
 
 export const CardValue = styled.div`
-  font-size: 32px;
+  font-size: 2rem;
   font-weight: 700;
   color: ${props => props.theme?.colors?.textMain || '#202124'};
   letter-spacing: -1px;
 
   @media (max-width: ${props => props.theme?.breakpoints?.mobile || '768px'}) {
-    font-size: 24px;
+    font-size: 1.5rem;
     margin-top: 4px;
   }
 `;

@@ -37,7 +37,7 @@ const Login = () => {
           <InputGroup>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <label>Şifre</label>
-              <Link to="/forgot-password" style={{ fontSize: '12px', color: '#3b82f6', textDecoration: 'none' }}>Şifremi Unuttum</Link>
+              <Link to="/forgot-password" style={{ fontSize: '0.75rem', color: '#3b82f6', textDecoration: 'none' }}>Şifremi Unuttum</Link>
             </div>
             <input 
               type="password" 

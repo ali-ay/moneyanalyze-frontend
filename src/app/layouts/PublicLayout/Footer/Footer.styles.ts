@@ -26,21 +26,21 @@ export const FooterColumn = styled.div`
 
   h4 {
     color: #f8fafc;
-    font-size: 16px;
+    font-size: 1rem;
     margin-bottom: 10px;
   }
 
   a {
     color: #94a3b8;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 0.875rem;
     transition: 0.3s;
     &:hover { color: #38bdf8; }
   }
 `;
 
 export const Logo = styled.h2`
-  font-size: 20px;
+  font-size: 1.25rem;
   color: #38bdf8;
   font-weight: 800;
   margin: 0;
@@ -52,5 +52,5 @@ export const Copyright = styled.div`
   width: 100%;
   text-align: center;
   color: #64748b;
-  font-size: 13px;
+  font-size: 0.8125rem;
 `;

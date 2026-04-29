@@ -30,13 +30,17 @@ export const tokens = {
     xl: '24px',
     full: '999px',
   },
+  // rem-based, %20 küçültülmüş ölçek (base 16px varsayımı)
+  // Eski px karşılıkları: xs=4 sm=8 md=16 lg=24 xl=32 xxl=48
+  // Rem (base 16): 0.25 / 0.5 / 1 / 1.5 / 2 / 3
+  // %20 küçültme (×0.8): 0.2 / 0.4 / 0.8 / 1.2 / 1.6 / 2.4
   spacing: {
-    xs: '4px',
-    sm: '8px',
-    md: '16px',
-    lg: '24px',
-    xl: '32px',
-    xxl: '48px',
+    xs: '0.2rem',
+    sm: '0.4rem',
+    md: '0.8rem',
+    lg: '1.2rem',
+    xl: '1.6rem',
+    xxl: '2.4rem',
   },
   breakpoints: {
     mobile: '576px',

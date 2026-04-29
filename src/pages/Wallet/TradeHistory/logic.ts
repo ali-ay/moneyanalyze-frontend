@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getHistory } from '../../../services/wallet.api';
 import { io, Socket } from 'socket.io-client';
-import { useAuth } from '../../../core/providers/AuthContext';
+import { useAuth } from '../../../app/providers/AuthContext';
 
 const SOCKET_URL = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_URL?.replace('/api', '') || '');
 

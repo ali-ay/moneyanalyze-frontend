@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import api from '../../services/apiClient';
-import { useNotification } from '../../core/providers/NotificationContext';
+import { useNotification } from '../../app/providers/NotificationContext';
 import { useMarketMode } from '../../context/MarketModeContext';
 
 export interface BotData {
@@ -127,19 +127,22 @@ export const useBotManagement = () => {
     setActiveBotCount(bots.filter(b => b.isActive).length);
   }, [bots]);
 
-  return { 
-    bots, 
-    loading, 
-    pendingChanges, 
+  return {
+    bots,
+    loading,
+    pendingChanges,
     applyChanges,
-    updatingBot, 
-    error, 
-    activeBotCount, 
-    toggleBot, 
+    updatingBot,
+    error,
+    activeBotCount,
+    toggleBot,
     updateBotConfig,
-    buyAmount, 
-    setBuyAmount, 
-    updateBuyAmount, 
-    settingsLoading 
+    buyAmount,
+    setBuyAmount,
+    updateBuyAmount,
+    settingsLoading,
+    mode,
+    currency: (mode === 'stock' ? '₺' : '$') as '$' | '₺',
+    currencyLabel: (mode === 'stock' ? 'TRY' : 'USDT') as 'USDT' | 'TRY'
   };
 };

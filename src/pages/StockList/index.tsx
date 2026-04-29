@@ -36,7 +36,7 @@ const SearchContainer = styled.div`
     border: 1px solid #DADCE0;
     padding: 12px 16px 12px 42px;
     border-radius: 12px;
-    font-size: 14px;
+    font-size: 0.875rem;
     color: #202124;
     &:focus { 
       outline: none; 
@@ -52,7 +52,7 @@ const DataTable = styled.table`
   th {
     text-align: left;
     padding: 12px 16px;
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: 700;
     color: #5F6368;
     text-transform: uppercase;
@@ -62,7 +62,7 @@ const DataTable = styled.table`
   td {
     padding: 16px;
     border-bottom: 1px solid #F1F3F4;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 600;
   }
 `;
@@ -88,14 +88,14 @@ const AssetInfo = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: 800;
   }
   .label-box {
     display: flex;
     flex-direction: column;
     .name { font-weight: 700; color: #202124; }
-    .symbol { font-size: 11px; color: #5F6368; }
+    .symbol { font-size: 0.6875rem; color: #5F6368; }
   }
 `;
 
@@ -135,9 +135,9 @@ const StockListPage: React.FC = () => {
           <Button $variant="secondary" $size="sm" onClick={() => navigate(-1)} style={{ borderRadius: '50%', width: '40px', height: '40px', padding: 0 }}>
             <ArrowLeft size={20} />
           </Button>
-          <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 800 }}>{title}</h2>
+          <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800 }}>{title}</h2>
         </div>
-        <p style={{ margin: '4px 0 0', color: '#5F6368', fontSize: '13px' }}>Piyasadaki tüm varlıkların anlık durumları</p>
+        <p style={{ margin: '4px 0 0', color: '#5F6368', fontSize: '0.8125rem' }}>Piyasadaki tüm varlıkların anlık durumları</p>
       </PageHeader>
 
       <Card>
@@ -151,7 +151,7 @@ const StockListPage: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </SearchContainer>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: '#5F6368' }}>
+          <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#5F6368' }}>
             Toplam: {filteredData.length} Varlık
           </div>
         </Card.Header>

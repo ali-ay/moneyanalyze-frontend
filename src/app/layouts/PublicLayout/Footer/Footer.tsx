@@ -6,7 +6,7 @@ const Footer = () => {
       <S.FooterGrid>
         <S.FooterColumn>
           <S.Logo>MoneyAnalyze</S.Logo>
-          <p style={{ color: '#94a3b8', fontSize: '14px', lineHeight: '1.6', marginTop: '10px' }}>
+          <p style={{ color: '#94a3b8', fontSize: '0.875rem', lineHeight: '1.6', marginTop: '10px' }}>
             Finansal verileri analiz etmenin en modern yolu. 
             Gerçek zamanlı verilerle portföyünüzü yönetin.
           </p>
@@ -29,7 +29,7 @@ const Footer = () => {
         <S.FooterColumn>
           <h4>İletişim</h4>
           <a href="mailto:info@moneyanalyze.com">destek@moneyanalyze.com</a>
-          <p style={{ color: '#94a3b8', fontSize: '14px' }}>Istanbul, Türkiye</p>
+          <p style={{ color: '#94a3b8', fontSize: '0.875rem' }}>Istanbul, Türkiye</p>
         </S.FooterColumn>
       </S.FooterGrid>
 

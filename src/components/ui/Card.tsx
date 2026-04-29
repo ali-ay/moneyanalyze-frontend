@@ -32,7 +32,7 @@ const CardHeader = styled.div`
 `;
 
 const CardTitle = styled.h3`
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 700;
   color: ${props => props.theme.colors.textMain};
   margin: 0;

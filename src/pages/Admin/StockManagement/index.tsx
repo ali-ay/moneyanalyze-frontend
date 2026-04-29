@@ -57,8 +57,8 @@ const SearchBox = styled.div`
 const StockTable = styled.table`
   width: 100%;
   border-collapse: collapse;
-  th { text-align: left; padding: 12px; color: #5F6368; font-size: 12px; border-bottom: 1px solid #F1F3F4; }
-  td { padding: 12px; border-bottom: 1px solid #F1F3F4; font-size: 14px; }
+  th { text-align: left; padding: 12px; color: #5F6368; font-size: 0.75rem; border-bottom: 1px solid #F1F3F4; }
+  td { padding: 12px; border-bottom: 1px solid #F1F3F4; font-size: 0.875rem; }
 `;
 
 const Modal = styled.div`
@@ -86,7 +86,7 @@ const InputGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  label { font-size: 13px; font-weight: 700; color: #3C4043; }
+  label { font-size: 0.8125rem; font-weight: 700; color: #3C4043; }
   input { padding: 10px; border-radius: 8px; border: 1px solid #DADCE0; }
 `;
 
@@ -177,7 +177,7 @@ const StockManagement: React.FC = () => {
                 onChange={e => setSearchTerm(e.target.value)}
               />
             </SearchBox>
-            <div style={{ fontSize: '13px', color: '#5F6368', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.8125rem', color: '#5F6368', fontWeight: 600 }}>
               Toplam: {filteredStocks.length} Hisse
             </div>
           </Controls>
@@ -219,7 +219,7 @@ const StockManagement: React.FC = () => {
                         </span>
                       </td>
                       <td>{stock.name || '-'}</td>
-                      <td style={{ color: '#5F6368', fontSize: '12px' }}>
+                      <td style={{ color: '#5F6368', fontSize: '0.75rem' }}>
                         {new Date(stock.createdAt).toLocaleDateString('tr-TR')}
                       </td>
                       <td style={{ textAlign: 'right' }}>

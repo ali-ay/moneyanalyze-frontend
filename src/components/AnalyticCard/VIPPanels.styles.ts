@@ -21,7 +21,7 @@ export const Panel = styled.div<{ type: 'buy' | 'sell' }>`
   h3 {
     color: ${props => props.type === 'buy' ? '#10b981' : '#ef4444'};
     margin-bottom: 15px;
-    font-size: 16px;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -33,7 +33,7 @@ export const Panel = styled.div<{ type: 'buy' | 'sell' }>`
     padding: 8px 0;
     border-bottom: 1px solid #334155;
     color: #f8fafc;
-    font-size: 14px;
+    font-size: 0.875rem;
 
     &:last-child { border: none; }
     

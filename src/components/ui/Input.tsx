@@ -7,7 +7,7 @@ export const Input = styled.input`
   border: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
   background: ${props => props.theme?.colors?.white || '#FFFFFF'};
   color: ${props => props.theme?.colors?.textMain || '#202124'};
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s ease;
 
@@ -31,7 +31,7 @@ export const Input = styled.input`
 
 export const Label = styled.label`
   display: block;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
   margin-bottom: 8px;

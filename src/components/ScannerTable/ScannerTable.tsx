@@ -30,7 +30,7 @@ const ScannerTable = ({ data, onFollow, onBuy }: Props) => {
                   {coin.totalScore >= 5 ? '🌟 GÜÇLÜ' : 
                    coin.totalScore >= 4 ? '✅ AL' : 
                    coin.totalSellScore >= 3 ? '⚠️ SAT' : 'BEKLE'}
-                  <span style={{ fontSize: '10px', marginLeft: '5px' }}>({coin.totalScore}/6)</span>
+                  <span style={{ fontSize: '0.625rem', marginLeft: '5px' }}>({coin.totalScore}/6)</span>
                 </S.Badge>
               </S.Td>
               <S.Td><strong>{coin.symbol}</strong></S.Td>

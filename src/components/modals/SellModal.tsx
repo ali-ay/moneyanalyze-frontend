@@ -1,145 +1,178 @@
 import React, { useState } from 'react';
+import styled from 'styled-components';
 import api from '../../services/apiClient';
-import { useAuth } from '../../core/providers/AuthContext';
+import { useAuth } from '../../app/providers/AuthContext';
+import { useNotification } from '../../app/providers/NotificationContext';
+import { Modal } from '../ui/Modal';
+import { Button } from '../ui/Button';
 
 interface SellModalProps {
   coin: {
     symbol: string;
-    currentPrice: number; // Güncel piyasa fiyatı
-    balance: number;      // Kullanıcının elindeki adet
+    currentPrice: number;
+    balance: number;
   };
   onClose: () => void;
   onSuccess: () => void;
 }
 
+const InfoBox = styled.div`
+  margin-bottom: ${props => props.theme.spacing?.md || '16px'};
+  padding: ${props => props.theme.spacing?.md || '16px'};
+  background: ${props => props.theme.colors.surfaceHover};
+  border-radius: ${props => props.theme.radius.md};
+  font-size: 0.875rem;
+  color: ${props => props.theme.colors.textSecondary};
+
+  strong {
+    color: ${props => props.theme.colors.textMain};
+  }
+
+  & + & {
+    margin-top: 0;
+  }
+`;
+
+const InputGroup = styled.div`
+  margin-bottom: ${props => props.theme.spacing?.md || '16px'};
+`;
+
+const Label = styled.label`
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: ${props => props.theme.colors.textSecondary};
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: ${props => props.theme.radius.md};
+  border: 1px solid ${props => props.theme.colors.border};
+  background: ${props => props.theme.colors.white};
+  color: ${props => props.theme.colors.textMain};
+  font-size: 0.875rem;
+  box-sizing: border-box;
+  transition: ${props => props.theme.transitions?.default || 'all 0.2s ease'};
+
+  &:focus {
+    outline: none;
+    border-color: ${props => props.theme.colors.danger};
+    box-shadow: 0 0 0 3px ${props => props.theme.colors.danger}20;
+  }
+`;
+
 export const SellModal: React.FC<SellModalProps> = ({ coin, onClose, onSuccess }) => {
   const { user } = useAuth();
-  const [amount, setAmount] = useState<number | string>(coin.balance); // Varsayılan olarak hepsini seç
-  const [totalGain, setTotalGain] = useState<number | string>((coin.balance * coin.currentPrice).toFixed(2));
+  const { showNotification } = useNotification();
+  const [amount, setAmount] = useState<number | string>(coin.balance);
+  const [totalGain, setTotalGain] = useState<number | string>(
+    (coin.balance * coin.currentPrice).toFixed(2)
+  );
+  const [loading, setLoading] = useState(false);
 
-  // Adet değiştiğinde tutarı hesapla
   const handleAmountChange = (val: string) => {
     const numVal = Number(val);
-    
-    // Elindeki bakiyeden fazlasını girmesini engelle
     if (numVal > coin.balance) {
       setAmount(coin.balance);
       setTotalGain((coin.balance * coin.currentPrice).toFixed(2));
       return;
     }
-
     setAmount(val);
-    if (val && !isNaN(numVal)) {
-      setTotalGain((numVal * coin.currentPrice).toFixed(2));
-    } else {
-      setTotalGain('');
-    }
+    setTotalGain(val && !isNaN(numVal) ? (numVal * coin.currentPrice).toFixed(2) : '');
   };
 
-  // Tutar değiştiğinde adeti hesapla
   const handlePriceChange = (val: string) => {
     const numVal = Number(val);
     const maxPossibleGain = coin.balance * coin.currentPrice;
-
-    // Elindeki varlığın toplam değerinden fazlasını girmesini engelle
     if (numVal > maxPossibleGain) {
       setTotalGain(maxPossibleGain.toFixed(2));
       setAmount(coin.balance);
       return;
     }
-
     setTotalGain(val);
-    if (val && !isNaN(numVal)) {
-      setAmount((numVal / coin.currentPrice).toFixed(8));
-    } else {
-      setAmount('');
-    }
+    setAmount(val && !isNaN(numVal) ? (numVal / coin.currentPrice).toFixed(8) : '');
   };
 
   const confirmSell = async () => {
     if (!amount || Number(amount) <= 0) return;
 
     try {
-      const payload = {
+      setLoading(true);
+      await api.post('/portfolio/sell', {
         userId: user?.id || localStorage.getItem('id'),
         symbol: coin.symbol,
         sellAmount: Number(amount),
         sellPrice: coin.currentPrice,
-        totalGain: Number(totalGain)
-      };
+        totalGain: Number(totalGain),
+      });
 
-      await api.post('/portfolio/sell', payload);
-      
-      alert('Satış işlemi başarıyla tamamlandı, bakiye hesabınıza aktarıldı.');
+      showNotification('Satış işlemi başarıyla tamamlandı.', 'success');
       onSuccess();
     } catch (err: any) {
-      console.error(err);
-      alert(err.response?.data?.message || 'Satış işlemi sırasında bir hata oluştu.');
+      showNotification(
+        err.response?.data?.message || 'Satış işlemi sırasında bir hata oluştu.',
+        'error'
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={modalStyles.overlay}>
-      <div style={modalStyles.content}>
-        <h3 style={{ marginTop: 0, color: '#f87171' }}>{coin.symbol} Satış Yap</h3>
-        <p style={modalStyles.infoText}>
-          Elinizdeki Miktar: <strong>{coin.balance} {coin.symbol.replace('USDT', '')}</strong>
-        </p>
-        <p>Güncel Satış Fiyatı: <strong>${coin.currentPrice.toLocaleString()}</strong></p>
-        
-        <div style={modalStyles.inputGroup}>
-          <label style={modalStyles.label}>Satılacak Miktar</label>
-          <input 
-            type="number" 
-            style={modalStyles.input}
-            value={amount} 
-            onChange={(e) => handleAmountChange(e.target.value)} 
-            placeholder="0.00"
-            max={coin.balance}
-          />
-        </div>
-
-        <div style={modalStyles.inputGroup}>
-          <label style={modalStyles.label}>Alınacak Tutar (USDT)</label>
-          <input 
-            type="number" 
-            style={modalStyles.input}
-            value={totalGain} 
-            onChange={(e) => handlePriceChange(e.target.value)} 
-            placeholder="0.00"
-          />
-        </div>
-
-        <div style={modalStyles.actions}>
-          <button style={modalStyles.cancelBtn} onClick={onClose}>İptal</button>
-          <button 
-            style={{...modalStyles.sellBtn, opacity: !amount ? 0.5 : 1}} 
-            onClick={confirmSell} 
-            disabled={!amount}
+    <Modal
+      title={`${coin.symbol} Satış Yap`}
+      onClose={onClose}
+      size="sm"
+      footer={
+        <>
+          <Button $variant="secondary" onClick={onClose} disabled={loading}>
+            İptal
+          </Button>
+          <Button
+            $variant="danger"
+            onClick={confirmSell}
+            disabled={!amount || loading}
           >
-            Satış Yap
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
+            {loading ? 'İşleniyor...' : 'Satış Yap'}
+          </Button>
+        </>
+      }
+    >
+      <InfoBox>
+        Elinizdeki Miktar:{' '}
+        <strong>
+          {coin.balance} {coin.symbol.replace('USDT', '')}
+        </strong>
+      </InfoBox>
 
-const modalStyles: { [key: string]: React.CSSProperties } = {
-  overlay: {
-    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-  },
-  content: {
-    backgroundColor: '#1e293b', padding: '24px', borderRadius: '12px', width: '350px', color: 'white', border: '1px solid #ef4444'
-  },
-  infoText: { fontSize: '14px', backgroundColor: '#0f172a', padding: '10px', borderRadius: '6px', color: '#94a3b8' },
-  inputGroup: { marginBottom: '16px' },
-  label: { display: 'block', marginBottom: '8px', fontSize: '14px', color: '#94a3b8' },
-  input: {
-    width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#0f172a', color: 'white'
-  },
-  actions: { display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' },
-  cancelBtn: { padding: '8px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', backgroundColor: '#475569', color: 'white' },
-  sellBtn: { padding: '8px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', backgroundColor: '#ef4444', color: 'white', fontWeight: 'bold' }
+      <InfoBox>
+        Güncel Satış Fiyatı: <strong>${coin.currentPrice.toLocaleString()}</strong>
+      </InfoBox>
+
+      <InputGroup>
+        <Label>Satılacak Miktar</Label>
+        <Input
+          type="number"
+          value={amount}
+          onChange={e => handleAmountChange(e.target.value)}
+          placeholder="0.00"
+          max={coin.balance}
+          disabled={loading}
+        />
+      </InputGroup>
+
+      <InputGroup>
+        <Label>Alınacak Tutar (USDT)</Label>
+        <Input
+          type="number"
+          value={totalGain}
+          onChange={e => handlePriceChange(e.target.value)}
+          placeholder="0.00"
+          disabled={loading}
+        />
+      </InputGroup>
+    </Modal>
+  );
 };

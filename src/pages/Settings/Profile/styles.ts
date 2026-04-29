@@ -16,7 +16,7 @@ export const ProfileCard = styled.div`
 export const Title = styled.h2`
   margin-bottom: 24px;
   color: #1a1a2e;
-  font-size: 24px;
+  font-size: 1.5rem;
   border-bottom: 2px solid #f0f0f0;
   padding-bottom: 12px;
 `;
@@ -48,6 +48,6 @@ export const Badge = styled.span`
   color: #0369a1;
   padding: 4px 12px;
   border-radius: 20px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
 `;

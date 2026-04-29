@@ -20,7 +20,7 @@ const MainContent = styled.main`
 `;
 
 const PageWrapper = styled.div`
-  padding: 32px;
+  padding: 1.6rem;
   flex: 1;
   overflow-y: auto;
 

@@ -44,7 +44,7 @@ export const AddBotModal: React.FC<AddBotModalProps> = ({ userId, onClose, onSuc
     <div style={modalStyles.overlay}>
       <div style={modalStyles.content}>
         <h3 style={{ marginTop: 0, color: '#10b981' }}>🤖 Yeni Bot Yapılandır</h3>
-        <p style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '20px' }}>
+        <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '20px' }}>
           Bot, belirlediğiniz limit dahilinde otomatik al-sat yapacaktır.
         </p>
 
@@ -122,7 +122,7 @@ const modalStyles: { [key: string]: React.CSSProperties } = {
     color: 'white', border: '1px solid #334155', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)'
   },
   inputGroup: { marginBottom: '16px' },
-  label: { display: 'block', marginBottom: '6px', fontSize: '13px', color: '#94a3b8' },
+  label: { display: 'block', marginBottom: '6px', fontSize: '0.8125rem', color: '#94a3b8' },
   input: {
     width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #334155',
     backgroundColor: '#0f172a', color: 'white', outline: 'none'

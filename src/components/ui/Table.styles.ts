@@ -38,7 +38,7 @@ export const Th = styled.th`
   text-align: left;
   background: ${props => props.theme.colors.surface};
   color: ${props => props.theme.colors.textSecondary};
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -67,7 +67,7 @@ const flashRed = keyframes`
 
 export const Td = styled.td<{ $flash?: 'up' | 'down' | null }>`
   padding: 16px 15px;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: ${props => props.theme.colors.textMain};
   font-weight: 500;
   vertical-align: middle;
@@ -110,7 +110,7 @@ export const Badge = styled.span<{ type: string }>`
   align-items: center;
   padding: 4px 10px;
   border-radius: ${props => props.theme.radius.sm};
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: bold;
   
   background: ${props =>

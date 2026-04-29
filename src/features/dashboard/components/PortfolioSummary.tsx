@@ -11,7 +11,7 @@ const ValueDisplay = styled.div`
   margin-top: 8px;
 
   .amount {
-    font-size: 36px;
+    font-size: 2.25rem;
     font-weight: 800;
     color: ${props => props.theme?.colors?.textMain || '#202124'};
     letter-spacing: -1px;
@@ -25,7 +25,7 @@ const AiSection = styled.div`
 `;
 
 const AiTitle = styled.div`
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 800;
   color: #9AA0A6;
   margin-bottom: 12px;
@@ -49,13 +49,13 @@ const AiCard = styled.div`
 `;
 
 const AiLabel = styled.span`
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   color: #5F6368;
 `;
 
 const AiValue = styled.span<{ $pos: boolean }>`
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 800;
   color: ${props => props.$pos ? '#0F9D58' : '#DB4437'};
 `;
@@ -89,7 +89,7 @@ export const PortfolioSummary: React.FC = () => {
   return (
     <Card $padding="24px">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <span style={{ fontSize: 11, fontWeight: 800, color: '#9AA0A6', letterSpacing: '0.5px' }}>
+        <span style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#9AA0A6', letterSpacing: '0.5px' }}>
           TOPLAM PORTFÖY DEĞERİ
         </span>
         <Wallet size={20} color="#1A73E8" />

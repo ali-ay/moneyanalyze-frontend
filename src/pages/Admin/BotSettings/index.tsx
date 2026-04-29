@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../../../services/apiClient';
 import { io } from 'socket.io-client';
-import { useAuth } from '../../../core/providers/AuthContext';
+import { useAuth } from '../../../app/providers/AuthContext';
 import { AddBotModal } from '../../../components/modals/AddBotModal';
 
 // WebSocket bağlantısı - dinamik URL kullanımı (Canlı ortamda VITE_API_URL kullanılacak)
@@ -69,7 +69,7 @@ const GeneralSettings = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <div>
           <h2 style={{ margin: 0 }}>🔧 Genel Bot Ayarları</h2>
-          <p style={{ color: '#94a3b8', fontSize: '14px' }}>Tüm aktif botlarını buradan yönetebilirsin.</p>
+          <p style={{ color: '#94a3b8', fontSize: '0.875rem' }}>Tüm aktif botlarını buradan yönetebilirsin.</p>
         </div>
         <button onClick={() => setIsModalOpen(true)} style={styles.addBtn}>
           + Yeni Bot Oluştur
@@ -88,7 +88,7 @@ const GeneralSettings = () => {
             <div style={styles.cardHeader}>
               <div>
                 <h3 style={{ margin: 0 }}>{bot.symbol}</h3>
-                <span style={{ fontSize: '12px', color: '#10b981' }}>{bot.strategy} STRATEJİSİ</span>
+                <span style={{ fontSize: '0.75rem', color: '#10b981' }}>{bot.strategy} STRATEJİSİ</span>
               </div>
               <div style={{ 
                 ...styles.statusDot, 
@@ -109,7 +109,7 @@ const GeneralSettings = () => {
                 </div>
               ))}
               {(!botLogs[bot.id] || botLogs[bot.id].length === 0) && (
-                <div style={{ color: '#475569', fontSize: '11px' }}>Sistem hazır, botun başlatılması bekleniyor...</div>
+                <div style={{ color: '#475569', fontSize: '0.6875rem' }}>Sistem hazır, botun başlatılması bekleniyor...</div>
               )}
             </div>
 
@@ -144,9 +144,9 @@ const styles = {
   card: { backgroundColor: '#1e293b', borderRadius: '16px', padding: '20px', border: '1px solid #334155', display: 'flex', flexDirection: 'column' as const },
   cardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' },
   statusDot: { width: '10px', height: '10px', borderRadius: '50%' },
-  infoRow: { display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#94a3b8', marginBottom: '15px' },
+  infoRow: { display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', color: '#94a3b8', marginBottom: '15px' },
   terminal: { backgroundColor: '#0f172a', borderRadius: '8px', padding: '12px', height: '120px', overflowY: 'auto' as const, marginBottom: '15px', border: '1px solid #1e293b', fontFamily: 'monospace' },
-  logText: { fontSize: '11px', color: '#34d399', marginBottom: '4px', lineHeight: '1.4' },
+  logText: { fontSize: '0.6875rem', color: '#34d399', marginBottom: '4px', lineHeight: '1.4' },
   addBtn: { padding: '10px 20px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold' as const, cursor: 'pointer' },
   actionBtn: { padding: '12px', border: 'none', borderRadius: '8px', color: 'white', fontWeight: 'bold' as const, cursor: 'pointer', transition: '0.2s opacity' }
 };

@@ -19,21 +19,21 @@ export const HeaderSection = styled.div`
 export const BalanceInfo = styled.div`
   h3 { 
     margin: 0; 
-    font-size: 14px; 
+    font-size: 0.875rem; 
     color: rgba(255, 255, 255, 0.8); 
     text-transform: uppercase; 
     letter-spacing: 1px; 
     font-weight: 500;
   }
   div { 
-    font-size: 40px; 
+    font-size: 2.5rem; 
     font-weight: 800; 
     color: #ffffff; 
     letter-spacing: -1px;
     margin-top: 4px;
 
     @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-      font-size: 32px;
+      font-size: 2rem;
     }
   }
   }
@@ -51,7 +51,7 @@ export const AddButton = styled.button`
   align-items: center; 
   gap: 8px; 
   transition: all 0.3s ease;
-  font-size: 15px;
+  font-size: 0.9375rem;
 
   &:hover { 
     transform: translateY(-2px); 
@@ -64,6 +64,6 @@ export const HistorySection = styled.div`
   h3 { 
     margin-bottom: 20px; 
     color: ${props => props.theme.colors.textMain}; 
-    font-size: 18px;
+    font-size: 1.125rem;
   }
 `;

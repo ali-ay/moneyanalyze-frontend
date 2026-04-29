@@ -17,7 +17,7 @@ const DashboardGrid = styled.div`
 const SectionRow = styled.div<{ $reverse?: boolean }>`
   display: grid;
   grid-template-columns: ${props => props.$reverse ? '1fr 380px' : '380px 1fr'};
-  gap: 24px;
+  gap: 18px;
   margin-bottom: 24px;
   
   @media (max-width: 1100px) {
@@ -36,7 +36,7 @@ const DashboardPage: React.FC = () => {
       </SectionRow>
 
       <AssetsTableSection data={marketData} loading={loading} error={error} />
-      
+
       <div style={{ marginTop: '32px' }}>
         <OpportunitiesSection />
       </div>

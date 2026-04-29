@@ -50,14 +50,14 @@ export const getWatchlistSymbols = (marketMode: 'crypto' | 'stock' = 'crypto'): 
   return getWatchlist(marketMode).map(item => item.symbol);
 };
 
-export const addToWatchlist = (symbol: string, price: number, marketMode: 'crypto' | 'stock' = 'crypto'): WatchlistItem[] => {
+export const addToWatchlist = (symbol: string, price: number, marketMode: 'crypto' | 'stock' = 'crypto', addedAt?: string): WatchlistItem[] => {
   const storageKey = getStorageKey(marketMode);
   const current = getWatchlist(marketMode);
   if (!current.find(item => item.symbol === symbol)) {
     const newItem: WatchlistItem = {
       symbol,
       addedPrice: price,
-      addedAt: new Date().toISOString(),
+      addedAt: addedAt || new Date().toISOString(),
     };
     const updated = [...current, newItem];
     localStorage.setItem(storageKey, JSON.stringify(updated));
@@ -80,4 +80,14 @@ export const isInWatchlist = (symbol: string, marketMode: 'crypto' | 'stock' = '
 
 export const getWatchlistItem = (symbol: string, marketMode: 'crypto' | 'stock' = 'crypto'): WatchlistItem | undefined => {
   return getWatchlist(marketMode).find(item => item.symbol === symbol);
+};
+
+export const updateWatchlistItem = (symbol: string, updates: Partial<WatchlistItem>, marketMode: 'crypto' | 'stock' = 'crypto'): WatchlistItem[] => {
+  const storageKey = getStorageKey(marketMode);
+  const current = getWatchlist(marketMode);
+  const updated = current.map(item => 
+    item.symbol === symbol ? { ...item, ...updates } : item
+  );
+  localStorage.setItem(storageKey, JSON.stringify(updated));
+  return updated;
 };

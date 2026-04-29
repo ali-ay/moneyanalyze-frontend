@@ -39,7 +39,7 @@ export const useTrackingLogLogic = () => {
         price: sig.entryPrice,
         amount: '-',
         total: '-',
-        createdAt: sig.createdAt,
+        createdAt: sig.updatedAt || sig.createdAt,
         period: sig.period,
         entryType: 'AI_SIGNAL'
       }))];

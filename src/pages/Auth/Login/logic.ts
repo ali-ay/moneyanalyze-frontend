@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../../services/auth.api';
-import { useAuth } from '../../../core/providers/AuthContext';
+import { useAuth } from '../../../app/providers/AuthContext';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 export const useLoginLogic = () => {

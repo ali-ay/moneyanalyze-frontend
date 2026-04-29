@@ -22,7 +22,7 @@ const SearchContainer = styled.div`
     border: none;
     padding: 10px 16px 10px 42px;
     border-radius: ${props => props.theme?.radius?.md || '12px'};
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: ${props => props.theme?.colors?.textMain || '#202124'};
     &:focus { 
       outline: none; 
@@ -37,7 +37,7 @@ const DataTable = styled.table`
   th {
     text-align: left;
     padding: 12px 16px;
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: 700;
     color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
     text-transform: uppercase;
@@ -47,7 +47,7 @@ const DataTable = styled.table`
   td {
     padding: 16px;
     border-bottom: 1px solid ${props => props.theme?.colors?.surfaceHover || '#F8F9FA'};
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 600;
   }
 `;
@@ -73,14 +73,14 @@ const AssetInfo = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: 800;
   }
   .label-box {
     display: flex;
     flex-direction: column;
     .name { font-weight: 700; color: ${props => props.theme?.colors?.textMain || '#202124'}; }
-    .symbol { font-size: 11px; color: ${props => props.theme?.colors?.textSecondary || '#5F6368'}; }
+    .symbol { font-size: 0.6875rem; color: ${props => props.theme?.colors?.textSecondary || '#5F6368'}; }
   }
 `;
 
@@ -155,7 +155,7 @@ export const AssetsTableSection: React.FC<AssetsTableProps> = ({ data, loading, 
   return (
     <Card>
       <ResponsiveCardHeader>
-        <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{title}</h3>
+        <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>{title}</h3>
         <ResponsiveSearchContainer>
           <Search size={16} />
           <input
@@ -177,7 +177,7 @@ export const AssetsTableSection: React.FC<AssetsTableProps> = ({ data, loading, 
             <EmptyState>
               <AlertCircle size={32} style={{ color: '#DB4437' }} />
               <p style={{ color: '#DB4437', fontWeight: 600 }}>{error}</p>
-              <p style={{ fontSize: 12 }}>Piyasa verilerine şu an erişilemiyor.</p>
+              <p style={{ fontSize: '0.75rem' }}>Piyasa verilerine şu an erişilemiyor.</p>
             </EmptyState>
           ) : filteredData.length === 0 && searchTerm !== '' ? (
             <EmptyState>

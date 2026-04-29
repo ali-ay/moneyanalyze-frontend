@@ -10,7 +10,7 @@ export const Badge = styled.span<BadgeProps>`
   align-items: center;
   padding: 4px 10px;
   border-radius: ${props => props.theme.radius.md};
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;

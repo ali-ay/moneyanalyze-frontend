@@ -55,7 +55,7 @@ const Transactions: React.FC = () => {
             </CardHeader>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <div style={{ 
-                fontSize: '32px', 
+                fontSize: '2rem', 
                 fontWeight: '800', 
                 color: metrics.netProfit >= 0 ? '#0F9D58' : '#DB4437',
                 display: 'flex',
@@ -63,11 +63,11 @@ const Transactions: React.FC = () => {
                 gap: '10px'
               }}>
                 {metrics.netProfit >= 0 ? '+' : ''}{metrics.netProfit.toLocaleString('tr-TR', { maximumFractionDigits: 2 })} USDT
-                <span style={{ fontSize: '18px', fontWeight: '600', opacity: 0.8 }}>
+                <span style={{ fontSize: '1.125rem', fontWeight: '600', opacity: 0.8 }}>
                   ({metrics.profitPercentage >= 0 ? '+' : ''}{metrics.profitPercentage.toFixed(2)}%)
                 </span>
               </div>
-              <div style={{ color: '#5F6368', fontSize: '14px', fontWeight: '500' }}>
+              <div style={{ color: '#5F6368', fontSize: '0.875rem', fontWeight: '500' }}>
                 Toplam {metrics.totalCount} adet işlem üzerinden hesaplanmıştır.
               </div>
             </div>
@@ -125,7 +125,7 @@ const Transactions: React.FC = () => {
                     </Td>
                     <Td style={{ fontWeight: 'bold' }}>{tx.symbol}</Td>
                     <Td>
-                      <Badge type={tx.origin === 'MANUAL' ? 'secondary' : 'primary'} style={{ fontSize: '10px', background: tx.origin === 'MANUAL' ? '#f1f3f4' : '#e8f0fe', color: tx.origin === 'MANUAL' ? '#5f6368' : '#1a73e8' }}>
+                      <Badge type={tx.origin === 'MANUAL' ? 'secondary' : 'primary'} style={{ fontSize: '0.625rem', background: tx.origin === 'MANUAL' ? '#f1f3f4' : '#e8f0fe', color: tx.origin === 'MANUAL' ? '#5f6368' : '#1a73e8' }}>
                         {tx.origin === 'MANUAL' ? 'MANUEL' : 'BOT'}
                       </Badge>
                     </Td>

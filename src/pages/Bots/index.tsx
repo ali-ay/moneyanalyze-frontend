@@ -103,13 +103,13 @@ const BotConfigForm: React.FC<{ bot: BotData, onUpdate: (config: any) => void, i
           </ConfigGrid>
         );
       default:
-        return <p style={{ fontSize: '12px', color: '#9AA0A6' }}>Bu strateji için ek ayar bulunmuyor.</p>;
+        return <p style={{ fontSize: '0.75rem', color: '#9AA0A6' }}>Bu strateji için ek ayar bulunmuyor.</p>;
     }
   };
 
   return (
     <div style={{ marginTop: '16px', borderTop: '1px solid #DADCE0', paddingTop: '16px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600, color: '#9AA0A6', marginBottom: '12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8125rem', fontWeight: 600, color: '#9AA0A6', marginBottom: '12px' }}>
         <Settings2 size={14} /> Bot Parametreleri
       </div>
       {renderContent()}
@@ -123,9 +123,10 @@ const BotConfigForm: React.FC<{ bot: BotData, onUpdate: (config: any) => void, i
 // ─── Main Component ─────────────────────────────────────
 
 const BotsPage: React.FC = () => {
-  const { 
+  const {
     bots, loading, pendingChanges, applyChanges, updatingBot, activeBotCount, toggleBot, updateBotConfig,
-    buyAmount, setBuyAmount, updateBuyAmount, settingsLoading 
+    buyAmount, setBuyAmount, updateBuyAmount, settingsLoading,
+    mode, currencyLabel
   } = useBotManagement();
 
   if (loading) return <LoadingState>Bot paneli yükleniyor...</LoadingState>;
@@ -134,9 +135,13 @@ const BotsPage: React.FC = () => {
     <PageContainer>
       <PageHeader style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <PageTitle>Bot Yönetimi</PageTitle>
+          <PageTitle>
+            Bot Yönetimi — {mode === 'stock' ? 'BIST' : 'Kripto'}
+          </PageTitle>
           <PageSubtitle>
-            Stratejileri küresel olarak yönetin. Burada aktif ettiğiniz stratejiler, Coin Detay sayfalarında o coine özel olarak aktif edilebilir hale gelir.
+            {mode === 'stock'
+              ? 'BIST hisseleri için botları yönetin. Sadece bu modda aktif edilen stratejiler hisselere özel uygulanabilir.'
+              : 'Kripto stratejilerini küresel olarak yönetin. Aktif stratejiler Coin Detay sayfalarında özelleştirilebilir.'}
           </PageSubtitle>
         </div>
         {pendingChanges && (
@@ -164,7 +169,7 @@ const BotsPage: React.FC = () => {
 
         <MetricCard style={{ gridColumn: 'span 2' }}>
            <CardHeader>
-            <CardTitle>İşlem Başına Alım Tutarı (USDT)</CardTitle>
+            <CardTitle>İşlem Başına Alım Tutarı ({currencyLabel})</CardTitle>
             <CardIcon $variant="warning"><TrendingUp size={20} /></CardIcon>
           </CardHeader>
           <BuyAmountContainer>

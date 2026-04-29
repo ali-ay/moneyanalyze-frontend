@@ -40,12 +40,12 @@ const BotIconWrap = styled.div<{ $isActive: boolean }>`
 
 const BotName = styled.h4`
   margin: 0;
-  font-size: 15px;
+  font-size: 0.9375rem;
   color: ${props => props.theme.colors.textMain};
 `;
 
 const BotDescription = styled.p`
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: ${props => props.theme.colors.textSecondary};
   margin: 12px 0;
   line-height: 1.5;

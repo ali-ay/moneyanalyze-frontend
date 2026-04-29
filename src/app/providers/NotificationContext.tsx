@@ -115,9 +115,9 @@ const Toast = styled.div<{ $type: NotificationType }>`
   border-left: 5px solid rgba(0,0,0,0.2);
 
   .icon { display: flex; align-items: center; }
-  .message { flex: 1; font-size: 14px; font-weight: 600; }
-  .close { 
-    background: none; border: none; color: white; cursor: pointer; 
+  .message { flex: 1; font-size: 0.875rem; font-weight: 600; }
+  .close {
+    background: none; border: none; color: white; cursor: pointer;
     opacity: 0.6; padding: 4px; display: flex; align-items: center;
     &:hover { opacity: 1; }
   }

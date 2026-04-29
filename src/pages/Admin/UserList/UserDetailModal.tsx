@@ -75,7 +75,7 @@ const CardTitle = styled.h4`
   margin-top: 0;
   margin-bottom: 20px;
   color: ${props => props.theme.colors.primary};
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -95,14 +95,14 @@ const ListItem = styled.div`
   background: ${props => props.theme.colors.surface};
   border-radius: 12px;
   border: 1px solid ${props => props.theme.colors.border};
-  font-size: 14px;
+  font-size: 0.875rem;
   color: ${props => props.theme.colors.textMain};
 `;
 
 const Badge = styled.span<{ $active?: boolean }>`
   padding: 4px 10px;
   border-radius: 20px;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   background: ${props => props.$active ? 'rgba(15, 157, 88, 0.1)' : 'rgba(95, 99, 104, 0.1)'};
   color: ${props => props.$active ? '#0F9D58' : '#5F6368'};
@@ -142,16 +142,16 @@ const UserDetailModal = ({ userId, onClose }: { userId: string, onClose: () => v
         <CloseBtn onClick={onClose}><X size={20} /></CloseBtn>
         
         <div style={{ borderBottom: '1px solid #DADCE0', paddingBottom: '24px' }}>
-          <h2 style={{ color: '#202124', marginBottom: '8px', fontSize: '24px', fontWeight: 700 }}>
+          <h2 style={{ color: '#202124', marginBottom: '8px', fontSize: '1.5rem', fontWeight: 700 }}>
             {data.username}
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px', marginTop: '16px', color: '#5F6368', fontSize: '14px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px', marginTop: '16px', color: '#5F6368', fontSize: '0.875rem' }}>
             <div><strong>E-posta:</strong> {data.email}</div>
             <div><strong>Telefon:</strong> {data.phone || '-'}</div>
             <div><strong>ID:</strong> {data.id}</div>
           </div>
           {data.address && (
-            <div style={{ marginTop: '12px', fontSize: '14px', color: '#5F6368' }}>
+            <div style={{ marginTop: '12px', fontSize: '0.875rem', color: '#5F6368' }}>
               <strong>Adres:</strong> {data.address}
             </div>
           )}
@@ -161,8 +161,8 @@ const UserDetailModal = ({ userId, onClose }: { userId: string, onClose: () => v
           {/* Bakiye */}
           <Card>
             <CardTitle><Wallet size={18} /> Cüzdan Bakiyesi</CardTitle>
-            <div style={{ fontSize: '32px', fontWeight: 800, color: '#202124' }}>
-              {data.wallet?.balance?.toLocaleString()} <small style={{ fontSize: '16px', color: '#5F6368', fontWeight: 600 }}>USDT</small>
+            <div style={{ fontSize: '2rem', fontWeight: 800, color: '#202124' }}>
+              {data.wallet?.balance?.toLocaleString()} <small style={{ fontSize: '1rem', color: '#5F6368', fontWeight: 600 }}>USDT</small>
             </div>
           </Card>
 
@@ -175,7 +175,7 @@ const UserDetailModal = ({ userId, onClose }: { userId: string, onClose: () => v
                   <span style={{ fontWeight: 600 }}>{a.symbol}</span>
                   <span style={{ fontWeight: 700, color: '#1a73e8' }}>{a.amount.toFixed(4)}</span>
                 </ListItem>
-              )) : <div style={{ color: '#9AA0A6', fontSize: '13px', textAlign: 'center', padding: '10px' }}>Henüz varlık yok</div>}
+              )) : <div style={{ color: '#9AA0A6', fontSize: '0.8125rem', textAlign: 'center', padding: '10px' }}>Henüz varlık yok</div>}
             </List>
           </Card>
 
@@ -202,7 +202,7 @@ const UserDetailModal = ({ userId, onClose }: { userId: string, onClose: () => v
                     <span style={{ color: t.type === 'BUY' ? '#0F9D58' : '#DB4437', fontWeight: 700 }}>
                       {t.type} {t.symbol}
                     </span>
-                    <small style={{ color: '#9AA0A6', fontSize: '11px', marginTop: '2px' }}>
+                    <small style={{ color: '#9AA0A6', fontSize: '0.6875rem', marginTop: '2px' }}>
                       {new Date(t.createdAt).toLocaleDateString('tr-TR')}
                     </small>
                   </div>

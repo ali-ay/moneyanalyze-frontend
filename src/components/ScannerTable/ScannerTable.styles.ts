@@ -22,7 +22,7 @@ export const Th = styled.th`
   padding: 16px;
   background: #334155;
   color: #94a3b8;
-  font-size: 12px;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 `;
@@ -31,7 +31,7 @@ export const Td = styled.td`
   padding: 16px;
   border-top: 1px solid #334155;
   color: #f8fafc;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-family: 'JetBrains Mono', monospace;
 `;
 
@@ -40,7 +40,7 @@ export const Badge = styled.div<{ type: string }>`
   align-items: center;
   padding: 4px 10px;
   border-radius: 6px;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: bold;
   
   background: ${props => 
@@ -62,7 +62,7 @@ export const FollowBtn = styled.button`
   border: none;
   padding: 6px 12px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: bold;
   cursor: pointer;
   transition: 0.2s;

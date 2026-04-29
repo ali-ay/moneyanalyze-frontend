@@ -16,6 +16,7 @@ export const GlobalStyles = createGlobalStyle`
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     line-height: 1.5;
+    font-size: 12.8px;
   }
 
   #root {

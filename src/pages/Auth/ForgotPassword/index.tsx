@@ -34,7 +34,7 @@ const ForgotPassword = () => {
         <AuthTitle>Şifremi Unuttum</AuthTitle>
         <AuthSubtitle>E-posta adresinizi girerek şifrenizi sıfırlayabilirsiniz.</AuthSubtitle>
 
-        {message && <div style={{ color: '#0f9d58', background: '#e6f4ea', padding: '12px', borderRadius: '8px', marginBottom: '20px', fontSize: '14px' }}>{message}</div>}
+        {message && <div style={{ color: '#0f9d58', background: '#e6f4ea', padding: '12px', borderRadius: '8px', marginBottom: '20px', fontSize: '0.875rem' }}>{message}</div>}
         {error && <ErrorMessage>{error}</ErrorMessage>}
 
         <AuthForm onSubmit={handleSubmit}>

@@ -20,7 +20,7 @@ const StatusItem = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
   text-transform: uppercase;
@@ -41,7 +41,7 @@ export const DashboardFooter: React.FC<{ lastUpdated: string }> = ({ lastUpdated
         <StatusItem><div className="indicator" /> SİSTEM DURUMU: <span>NORMAL</span></StatusItem>
         <StatusItem><Globe size={14} /> API GECİKMESİ: <span>14MS</span></StatusItem>
       </StatusGroup>
-      <div style={{ fontSize: 11, fontWeight: 700, color: '#9AA0A6', textTransform: 'uppercase' }}>
+      <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#9AA0A6', textTransform: 'uppercase' }}>
         SON GÜNCELLEME: <span style={{ color: '#5F6368' }}>{lastUpdated}</span>
       </div>
     </FooterRow>

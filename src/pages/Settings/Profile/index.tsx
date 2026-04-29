@@ -44,7 +44,7 @@ const SectionIcon = styled.div<{ $color?: string }>`
 `;
 
 const SectionTitle = styled.h3`
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 700;
   color: ${props => props.theme?.colors?.textMain || '#202124'};
   margin: 0;
@@ -60,7 +60,7 @@ const InputGroup = styled.div`
 
 const Label = styled.label`
   display: block;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
   margin-bottom: 6px;
@@ -73,7 +73,7 @@ const Input = styled.input`
   padding: 12px 16px;
   border: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
   border-radius: ${props => props.theme?.radius?.md || '12px'};
-  font-size: 14px;
+  font-size: 0.875rem;
   color: ${props => props.theme?.colors?.textMain || '#202124'};
   background: transparent;
   transition: ${props => props.theme?.transitions?.fast || 'all 0.2s ease'};
@@ -100,7 +100,7 @@ const InfoValue = styled.div`
   padding: 12px 16px;
   background: ${props => props.theme?.colors?.surfaceHover || '#F8F9FA'};
   border-radius: ${props => props.theme?.radius?.md || '12px'};
-  font-size: 14px;
+  font-size: 0.875rem;
   color: ${props => props.theme?.colors?.textMain || '#202124'};
   border: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
 `;
@@ -109,7 +109,7 @@ const RoleBadge = styled.span<{ $isAdmin?: boolean }>`
   display: inline-block;
   padding: 4px 14px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   background: ${props => props.$isAdmin ? 'rgba(219, 68, 55, 0.1)' : 'rgba(26, 115, 232, 0.1)'};
   color: ${props => props.$isAdmin ? (props.theme?.colors?.danger || '#DB4437') : (props.theme?.colors?.primary || '#1A73E8')};
@@ -121,7 +121,7 @@ const SaveButton = styled.button`
   border: none;
   padding: 12px 32px;
   border-radius: ${props => props.theme?.radius?.md || '12px'};
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
@@ -149,7 +149,7 @@ const Alert = styled.div<{ $type: 'success' | 'error' }>`
   gap: 10px;
   padding: 12px 20px;
   border-radius: 10px;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   margin-bottom: ${props => props.theme?.spacing?.lg || '24px'};
   background: ${props => props.$type === 'success' ? 'rgba(15, 157, 88, 0.1)' : 'rgba(219, 68, 55, 0.1)'};
@@ -158,7 +158,7 @@ const Alert = styled.div<{ $type: 'success' | 'error' }>`
 `;
 
 const KeyHint = styled.p`
-  font-size: 12px;
+  font-size: 0.75rem;
   color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
   margin: 8px 0 0;
   line-height: 1.4;
@@ -337,7 +337,7 @@ const ProfilePage = () => {
               <KeyHint>Mevcut: {profile?.binanceSecretKey || 'Tanımsız'}</KeyHint>
             </InputGroup>
 
-            <KeyHint style={{ marginTop: 20, fontSize: 13, color: '#F4B400' }}>
+            <KeyHint style={{ marginTop: 20, fontSize: '0.8125rem', color: '#F4B400' }}>
               ⚠️ API Key'leriniz güvenli bir şekilde şifrelenerek saklanır. Sadece yeni bir key girdiğinizde güncellenir.
             </KeyHint>
           </Section>
@@ -359,7 +359,7 @@ const ProfilePage = () => {
               border: '1px solid #DB4437',
               padding: '10px 20px',
               borderRadius: '8px',
-              fontSize: '13px',
+              fontSize: '0.8125rem',
               fontWeight: '600',
               cursor: 'pointer',
               display: 'flex',

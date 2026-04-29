@@ -32,7 +32,7 @@ export const StatsColumn = styled.div`
 
 export const ProfitLossCard = styled.div<{ $isProfit: boolean }>`
   .profit-value {
-    font-size: 32px;
+    font-size: 2rem;
     font-weight: 800;
     color: ${props => props.$isProfit ? props.theme.colors.success : props.theme.colors.danger};
     margin-bottom: 8px;
@@ -40,7 +40,7 @@ export const ProfitLossCard = styled.div<{ $isProfit: boolean }>`
 
   .profit-percent {
     display: inline-block;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 700;
     padding: 4px 12px;
     border-radius: 20px;
@@ -131,23 +131,23 @@ export const CardRow = styled.div`
 
 export const AssetName = styled.div`
   font-weight: 800;
-  font-size: 16px;
+  font-size: 1rem;
   color: ${props => props.theme.colors.textMain};
 `;
 
 export const AssetAmount = styled.div`
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: ${props => props.theme.colors.textSecondary};
 `;
 
 export const CardLabel = styled.div`
-  font-size: 12px;
+  font-size: 0.75rem;
   color: ${props => props.theme.colors.textSecondary};
   margin-bottom: 2px;
 `;
 
 export const CardValue = styled.div`
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: ${props => props.theme.colors.textMain};
 `;
@@ -165,7 +165,7 @@ export const NotificationToast = styled.div<{ $type: 'success' | 'error' }>`
   border-radius: 12px;
   background: ${props => props.$type === 'success' ? '#0f9d58' : '#db4437'};
   color: white;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
   box-shadow: 0 8px 30px rgba(0,0,0,0.25);
   z-index: 10001;

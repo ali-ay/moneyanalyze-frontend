@@ -97,7 +97,7 @@ const UserList = () => {
                         borderRadius: '20px',
                         padding: '4px 12px',
                         cursor: 'pointer',
-                        fontSize: '12px',
+                        fontSize: '0.75rem',
                         fontWeight: '600',
                         color: user.isApproved ? '#0F9D58' : '#DB4437',
                         borderColor: user.isApproved ? 'rgba(15, 157, 88, 0.2)' : 'rgba(219, 68, 55, 0.2)',

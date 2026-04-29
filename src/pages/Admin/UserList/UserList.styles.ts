@@ -22,7 +22,7 @@ export const RefreshButton = styled.button`
   align-items: center;
   gap: 10px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.875rem;
   transition: all 0.2s ease;
 
   &:hover {
@@ -55,7 +55,7 @@ export const Th = styled.th`
   background: ${props => props.theme?.colors?.surfaceHover || '#F8F9FA'};
   color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
   font-weight: 700;
-  font-size: 11px;
+  font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   border-bottom: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
@@ -64,7 +64,7 @@ export const Th = styled.th`
 export const Td = styled.td`
   padding: 16px 24px;
   border-bottom: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
-  font-size: 14px;
+  font-size: 0.875rem;
   color: ${props => props.theme?.colors?.textMain || '#202124'};
 `;
 
@@ -126,7 +126,7 @@ export const RoleSelect = styled.select`
   border-radius: 8px;
   cursor: pointer;
   outline: none;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
 
   &:focus {

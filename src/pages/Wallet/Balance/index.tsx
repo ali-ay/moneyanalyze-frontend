@@ -39,7 +39,7 @@ const WalletBalance = () => {
           {isLive && (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', verticalAlign: 'middle', marginLeft: 15 }}>
               <Badge type={isRealData ? "AL" : "NÖTR"}>BINANCE LIVE</Badge>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: isRealData ? '#0f9d58' : '#db4437' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: isRealData ? '#0f9d58' : '#db4437' }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: isRealData ? '#0f9d58' : '#db4437' }} />
                 {isRealData ? 'Bağlantı Aktif' : 'Bağlantı Bekleniyor'}
               </div>
@@ -54,7 +54,7 @@ const WalletBalance = () => {
       </PageHeader>
 
       {error && (
-        <div style={{ background: '#fce8e6', color: '#d93025', padding: '16px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #f5c2c7', fontSize: '14px', fontWeight: 500 }}>
+        <div style={{ background: '#fce8e6', color: '#d93025', padding: '16px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #f5c2c7', fontSize: '0.875rem', fontWeight: 500 }}>
           ⚠️ {error}
         </div>
       )}

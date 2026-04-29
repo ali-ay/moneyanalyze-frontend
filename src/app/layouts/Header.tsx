@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { Bell, HelpCircle, Menu } from 'lucide-react';
-import { useAuth } from '../../core/providers/AuthContext';
+import { useAuth } from '../../app/providers/AuthContext';
 import { useMarketMode } from '../../context/MarketModeContext';
 
 const HeaderWrapper = styled.header`
@@ -19,7 +19,7 @@ const HeaderWrapper = styled.header`
 `;
 
 const HeaderTitle = styled.h1`
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 700;
   color: ${props => props.theme.colors.textMain};
   margin: 0;
@@ -61,8 +61,8 @@ const UserProfile = styled.div`
 
 const UserMeta = styled.div`
   text-align: right;
-  .name { font-size: 13px; font-weight: 700; color: ${props => props.theme.colors.textMain}; }
-  .role { font-size: 10px; font-weight: 600; color: ${props => props.theme.colors.textSecondary}; text-transform: uppercase; }
+  .name { font-size: 0.8125rem; font-weight: 700; color: ${props => props.theme.colors.textMain}; }
+  .role { font-size: 0.625rem; font-weight: 600; color: ${props => props.theme.colors.textSecondary}; text-transform: uppercase; }
 `;
 
 const UserAvatar = styled.div`
@@ -89,7 +89,7 @@ const ModeToggleButton = styled.button<{ $active: boolean }>`
   background: ${props => props.$active ? props.theme.colors.primary : 'transparent'};
   color: ${props => props.$active ? '#FFFFFF' : props.theme.colors.textSecondary};
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
