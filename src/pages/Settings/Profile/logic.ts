@@ -109,6 +109,7 @@ export const useProfileLogic = () => {
   };
 
   const [progress, setProgress] = useState<{ current: number; total: number; isRunning: boolean; message: string } | null>(null);
+  const [historyProgress, setHistoryProgress] = useState<{ current: number; total: number; isSyncing: boolean; percent: number; currentSymbol: string } | null>(null);
 
   const fetchProgress = useCallback(async () => {
     try {
@@ -122,9 +123,23 @@ export const useProfileLogic = () => {
     }
   }, []);
 
-  // Eğer sayfa açıldığında zaten çalışan bir analiz varsa takip et
+  const fetchHistoryProgress = useCallback(async () => {
+    try {
+      const res = await api.get('/stock/sync-history-status');
+      const data = res.data.data;
+      setHistoryProgress(data);
+      return data.isSyncing;
+    } catch (err) {
+      console.error('History progress fetch error:', err);
+      return false;
+    }
+  }, []);
+
+  // Eğer sayfa açıldığında zaten çalışan bir analiz veya eşitleme varsa takip et
   useEffect(() => {
     let interval: any;
+    let historyInterval: any;
+
     const check = async () => {
       const isRunning = await fetchProgress();
       if (isRunning) {
@@ -133,10 +148,21 @@ export const useProfileLogic = () => {
           if (!stillRunning) clearInterval(interval);
         }, 1000);
       }
+
+      const isSyncing = await fetchHistoryProgress();
+      if (isSyncing) {
+        historyInterval = setInterval(async () => {
+          const stillSyncing = await fetchHistoryProgress();
+          if (!stillSyncing) clearInterval(historyInterval);
+        }, 1500);
+      }
     };
     check();
-    return () => clearInterval(interval);
-  }, [fetchProgress]);
+    return () => {
+      clearInterval(interval);
+      clearInterval(historyInterval);
+    };
+  }, [fetchProgress, fetchHistoryProgress]);
 
   const runAIScan = async () => {
     try {
@@ -163,8 +189,33 @@ export const useProfileLogic = () => {
     }
   };
 
+  const runFullHistorySync = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+      setSuccess(null);
+      
+      await api.post('/stock/sync-all-history');
+      
+      // Hemen polling başlat
+      const interval = setInterval(async () => {
+        const isSyncing = await fetchHistoryProgress();
+        if (!isSyncing) {
+          clearInterval(interval);
+          setSaving(false);
+          setSuccess('Tüm geçmiş veriler başarıyla eşitlendi!');
+          setTimeout(() => setSuccess(null), 5000);
+        }
+      }, 1500);
+
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Eşitleme başlatılamadı.');
+      setSaving(false);
+    }
+  };
+
   return {
-    profile, loading, saving, error, success, progress,
+    profile, loading, saving, error, success, progress, historyProgress,
     firstName, setFirstName,
     lastName, setLastName,
     binanceApiKey, setBinanceApiKey,
@@ -173,5 +224,6 @@ export const useProfileLogic = () => {
     updateProfile,
     resetAccount,
     runAIScan,
+    runFullHistorySync,
   };
 };

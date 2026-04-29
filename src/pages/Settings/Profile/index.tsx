@@ -407,7 +407,7 @@ const ProfilePage = () => {
           </Section>
 
           {/* Yeni: AI Otomasyon Kontrolü */}
-          <Section style={{ gridColumn: '1 / -1' }}>
+          <Section>
             <SectionHeader>
               <SectionIcon $color="rgba(167, 107, 245, 0.1)">
                 <Zap size={20} color="#A76BF5" fill="#A76BF5" />
@@ -415,13 +415,13 @@ const ProfilePage = () => {
               <SectionTitle>Yapay Zeka Otomasyon Kontrolü</SectionTitle>
             </SectionHeader>
             
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
-              <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div>
                 <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#202124', marginBottom: '4px' }}>
                   Manuel Piyasa Taraması
                 </p>
                 <p style={{ fontSize: '0.8125rem', color: '#5F6368', lineHeight: '1.4' }}>
-                  Tüm BIST hisselerini anlık fiyatlarla tarar. 100+ skor alan hisseleri otomatik olarak İzleme Listenize ekler ve sinyal takibini başlatır.
+                  Tüm BIST hisselerini anlık fiyatlarla tarar. 100+ skor alan hisseleri otomatik olarak İzleme Listenize ekler.
                 </p>
               </div>
               
@@ -440,6 +440,7 @@ const ProfilePage = () => {
                   cursor: (saving || progress?.isRunning) ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   gap: '8px',
                   transition: 'all 0.2s',
                   boxShadow: (saving || progress?.isRunning) ? 'none' : '0 4px 10px rgba(167, 107, 245, 0.3)'
@@ -448,40 +449,90 @@ const ProfilePage = () => {
                 <Zap size={16} fill="white" />
                 {progress?.isRunning ? 'Tarama Sürüyor...' : 'Şimdi Taramayı Başlat'}
               </button>
-            </div>
 
-            {progress?.isRunning && (
-              <div style={{ marginTop: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#5F6368', marginBottom: '6px' }}>
-                  <span>{progress.message}</span>
-                  <span>%{Math.round((progress.current / (progress.total || 1)) * 100)}</span>
+              {progress?.isRunning && (
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#5F6368', marginBottom: '6px' }}>
+                    <span>{progress.message}</span>
+                    <span>%{Math.round((progress.current / (progress.total || 1)) * 100)}</span>
+                  </div>
+                  <div style={{ width: '100%', height: '8px', background: '#F1F3F4', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div 
+                      style={{ 
+                        width: `${(progress.current / (progress.total || 1)) * 100}%`, 
+                        height: '100%', 
+                        background: 'linear-gradient(90deg, #A76BF5, #1A73E8)',
+                        transition: 'width 0.4s ease'
+                      }} 
+                    />
+                  </div>
                 </div>
-                <div style={{ width: '100%', height: '8px', background: '#F1F3F4', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div 
-                    style={{ 
-                      width: `${(progress.current / (progress.total || 1)) * 100}%`, 
-                      height: '100%', 
-                      background: 'linear-gradient(90deg, #A76BF5, #1A73E8)',
-                      transition: 'width 0.4s ease'
-                    }} 
-                  />
-                </div>
-              </div>
-            )}
+              )}
+            </div>
+          </Section>
+
+          {/* Yeni: Genel Veri Yönetimi */}
+          <Section>
+            <SectionHeader>
+              <SectionIcon $color="rgba(15, 157, 88, 0.1)">
+                <TrendingUp size={20} color="#0F9D58" />
+              </SectionIcon>
+              <SectionTitle>Genel Veri Yönetimi</SectionTitle>
+            </SectionHeader>
             
-            <div style={{ 
-              marginTop: '16px', 
-              padding: '12px', 
-              background: 'rgba(26, 115, 232, 0.05)', 
-              borderRadius: '8px',
-              fontSize: '0.75rem',
-              color: '#1A73E8',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              <CheckCircle size={14} />
-              Sistem her saat başı otomatik tarama yapacak şekilde yapılandırıldı.
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div>
+                <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#202124', marginBottom: '4px' }}>
+                  Tüm Geçmiş Verileri Eşitle (1990+)
+                </p>
+                <p style={{ fontSize: '0.8125rem', color: '#5F6368', lineHeight: '1.4' }}>
+                  Tüm BIST hisselerinin tarihsel verilerini 1990 yılından itibaren tarar ve eksikleri veritabanına kaydeder. Bu işlem uzun sürebilir.
+                </p>
+              </div>
+              
+              <button
+                type="button"
+                onClick={runFullHistorySync}
+                disabled={saving || (historyProgress?.isSyncing ?? false)}
+                style={{
+                  background: (saving || historyProgress?.isSyncing) ? '#DADCE0' : '#0F9D58',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '10px',
+                  fontSize: '0.875rem',
+                  fontWeight: '700',
+                  cursor: (saving || historyProgress?.isSyncing) ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  transition: 'all 0.2s',
+                  boxShadow: (saving || historyProgress?.isSyncing) ? 'none' : '0 4px 10px rgba(15, 157, 88, 0.3)'
+                }}
+              >
+                <TrendingUp size={16} />
+                {historyProgress?.isSyncing ? 'Eşitleniyor...' : 'Tüm Geçmişi Eşitle'}
+              </button>
+
+              {historyProgress?.isSyncing && (
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#5F6368', marginBottom: '6px' }}>
+                    <span>Eşitleniyor: <strong>{historyProgress.currentSymbol}</strong> ({historyProgress.current}/{historyProgress.total})</span>
+                    <span>%{historyProgress.percent}</span>
+                  </div>
+                  <div style={{ width: '100%', height: '8px', background: '#F1F3F4', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div 
+                      style={{ 
+                        width: `${historyProgress.percent}%`, 
+                        height: '100%', 
+                        background: 'linear-gradient(90deg, #0F9D58, #1A73E8)',
+                        transition: 'width 0.4s ease'
+                      }} 
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </Section>
         </ProfileGrid>
