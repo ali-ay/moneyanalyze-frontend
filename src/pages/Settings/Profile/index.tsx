@@ -176,8 +176,8 @@ const ProfilePage = () => {
     binanceSecretKey, setBinanceSecretKey,
     tradingMode, setTradingMode,
     updateProfile, resetAccount,
-    runAIScan,
-    progress,
+    runAIScan, runFullHistorySync,
+    progress, historyProgress,
   } = useProfileLogic();
   const { mode, setMode } = useMarketMode();
 
