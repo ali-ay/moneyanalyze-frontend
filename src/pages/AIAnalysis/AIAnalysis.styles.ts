@@ -4,6 +4,10 @@ export const HeaderContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
+
+  @media (max-width: 768px) {
+    gap: 12px;
+  }
 `;
 
 export const IconBox = styled.div`
@@ -15,6 +19,13 @@ export const IconBox = styled.div`
   align-items: center;
   justify-content: center;
   color: white;
+
+  @media (max-width: 768px) {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    svg { width: 18px; height: 18px; }
+  }
 `;
 
 export const DisclaimerText = styled.span`

@@ -20,6 +20,8 @@ const TabsContainer = styled.div`
   margin-bottom: 24px;
   overflow-x: auto;
   padding-bottom: 8px;
+  margin: 0 -16px 24px -16px;
+  padding: 0 16px 8px 16px;
 
   &::-webkit-scrollbar {
     height: 4px;
@@ -27,6 +29,11 @@ const TabsContainer = styled.div`
   &::-webkit-scrollbar-thumb {
     background: #E8F0FE;
     border-radius: 10px;
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: 16px;
+    gap: 6px;
   }
 `;
 
@@ -46,12 +53,23 @@ const TabItem = styled.button<{ $active: boolean }>`
     border-color: ${props => props.theme?.colors?.primary || '#1A73E8'};
     background: ${props => props.$active ? props.theme?.colors?.secondary || '#E8F0FE' : props.theme?.colors?.surfaceHover || '#F8F9FA'};
   }
+
+  @media (max-width: 768px) {
+    padding: 8px 14px;
+    font-size: 0.8125rem;
+    border-radius: 10px;
+  }
 `;
 
 const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 `;
 
 const OpportunityCard = styled.div`
@@ -69,6 +87,15 @@ const OpportunityCard = styled.div`
     box-shadow: 0 12px 32px rgba(0,0,0,0.1);
     border-color: ${props => props.theme?.colors?.primary || '#1A73E8'};
   }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+    border-radius: 16px;
+    
+    &:hover {
+      transform: none;
+    }
+  }
 `;
 
 const ScoreBadge = styled.div<{ $score: number }>`
@@ -81,6 +108,12 @@ const ScoreBadge = styled.div<{ $score: number }>`
   font-size: 0.75rem;
   font-weight: 800;
   border-bottom-left-radius: 16px;
+
+  @media (max-width: 768px) {
+    padding: 4px 12px;
+    font-size: 0.6875rem;
+    border-bottom-left-radius: 12px;
+  }
 `;
 
 const Symbol = styled.div`
@@ -88,6 +121,10 @@ const Symbol = styled.div`
   font-weight: 800;
   color: #202124;
   margin-bottom: 4px;
+
+  @media (max-width: 768px) {
+    font-size: 1.125rem;
+  }
 `;
 
 const SignalTags = styled.div`
@@ -95,6 +132,11 @@ const SignalTags = styled.div`
   gap: 6px;
   flex-wrap: wrap;
   margin-bottom: 16px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 12px;
+    gap: 4px;
+  }
 `;
 
 const Tag = styled.span`
@@ -119,6 +161,11 @@ const Metric = styled.div`
   .value {
     font-weight: 700;
     color: #202124;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
+    margin-bottom: 6px;
   }
 `;
 
