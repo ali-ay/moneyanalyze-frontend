@@ -91,7 +91,10 @@ const UserList = () => {
                   <S.Td>
                     <S.ApprovalButton
                       $isApproved={user.isApproved}
-                      onClick={() => handleUpdate(user.id, { isApproved: !user.isApproved })}
+                      onClick={() => handleUpdate(user.id, { 
+                        isApproved: !user.isApproved,
+                        status: !user.isApproved ? 'ACTIVE' : 'PENDING'
+                      })}
                     >
                       {user.isApproved ? <CheckCircle size={14} /> : <XCircle size={14} />}
                       {user.isApproved ? 'Onaylı' : 'Onay Bekliyor'}

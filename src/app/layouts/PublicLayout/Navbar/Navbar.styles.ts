@@ -5,15 +5,17 @@ export const Navbar = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 40px;
-  background: transparent;
-  position: absolute;
+  padding: 0 5%;
+  background: rgba(8, 12, 20, 0.8);
+  backdrop-filter: blur(12px);
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 
-  @media (max-width: ${props => props.theme?.breakpoints?.mobile || '768px'}) {
+  @media (max-width: 768px) {
     padding: 0 20px;
     height: 70px;
   }
