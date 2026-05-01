@@ -62,7 +62,13 @@ const SidebarScrollArea = styled.div`
 const SidebarFooter = styled.div`
   border-top: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
   padding-bottom: 32px;
-  background: ${props => props.theme?.colors?.white || '#FFFFFF'};
+  background: transparent;
+  margin-top: 16px;
+
+  @media (max-width: 768px) {
+    padding-bottom: 24px;
+    margin-top: 8px;
+  }
 `;
 
 const Backdrop = styled.div<{ $show: boolean }>`
@@ -82,8 +88,8 @@ const MobileClose = styled.div`
   @media (max-width: 768px) {
     display: flex;
     position: absolute;
-    right: 16px;
-    top: 16px;
+    right: 4px;
+    top: 4px;
     padding: 8px;
     cursor: pointer;
     color: #5F6368;
@@ -98,6 +104,10 @@ const LogoSection = styled.div`
   gap: 12px;
   cursor: pointer;
   background: ${props => props.theme?.colors?.white || '#FFFFFF'};
+
+  @media (max-width: 768px) {
+    padding: 32px 16px 0px 16px;
+  }
   
   .logo-icon {
     width: 32px;
@@ -158,6 +168,15 @@ const AccountBadge = styled.div`
   border-radius: ${props => props.theme?.radius?.lg || '16px'};
   border: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
 
+  @media (max-width: 768px) {
+    margin: 8px 16px;
+    padding: 10px;
+    border-radius: 12px;
+
+    .label { font-size: 0.5rem; }
+    .type { font-size: 0.7rem; }
+  }
+
   .label {
     font-size: 0.5625rem;
     font-weight: 700;
@@ -191,6 +210,14 @@ const LogoutButton = styled.button`
   justify-content: center;
   gap: 8px;
   transition: all 0.2s;
+
+  @media (max-width: 768px) {
+    margin: 0 16px;
+    width: calc(100% - 32px);
+    padding: 10px;
+    font-size: 0.8rem;
+    svg { width: 16px; height: 16px; }
+  }
 
   &:hover {
     background: ${props => props.theme?.colors?.danger || '#DB4437'};
@@ -261,21 +288,21 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, o
               </>
             )}
           </NavList>
+
+          <SidebarFooter>
+            <AccountBadge>
+              <div className="label">HESAP DURUMU</div>
+              <div className="type">
+                {isAdmin ? <ShieldCheck size={14} /> : null}
+                {isAdmin ? 'Administrator' : 'Institutional Pro'}
+              </div>
+            </AccountBadge>
+
+            <LogoutButton onClick={() => logout()}>
+              <LogOut size={18} /> Güvenli Çıkış
+            </LogoutButton>
+          </SidebarFooter>
         </SidebarScrollArea>
-
-        <SidebarFooter>
-          <AccountBadge>
-            <div className="label">HESAP DURUMU</div>
-            <div className="type">
-              {isAdmin ? <ShieldCheck size={14} /> : null}
-              {isAdmin ? 'Administrator' : 'Institutional Pro'}
-            </div>
-          </AccountBadge>
-
-          <LogoutButton onClick={() => logout()}>
-            <LogOut size={18} /> Güvenli Çıkış
-          </LogoutButton>
-        </SidebarFooter>
       </SidebarAside>
     </>
   );
