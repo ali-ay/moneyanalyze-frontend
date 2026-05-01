@@ -348,7 +348,7 @@ const GlobalSettings = () => {
               </S.SectionTitle>
               
               <div style={{ marginBottom: '12px', fontSize: '13px', color: '#666', background: '#fdf3e8', padding: '8px 12px', borderRadius: '6px', border: '1px solid #ffcc80' }}>
-                <strong>Kullanılabilir Değişkenler:</strong> {isWelcome ? '{{username}}' : '{{resetUrl}}'}
+                <strong>Kullanılabilir Değişkenler:</strong> {isWelcome ? '{{username}}' : '{{username}}, {{resetUrl}}'}
               </div>
 
               <InputGroup style={{ marginBottom: '16px' }}>
