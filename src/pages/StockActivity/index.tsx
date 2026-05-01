@@ -121,7 +121,12 @@ const ResponsiveHeader = styled(PageHeader)`
   }
 `;
 
+import { useAuth } from '../../app/providers/AuthContext';
+
 const StockActivityPage: React.FC = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
+
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -247,10 +252,12 @@ const StockActivityPage: React.FC = () => {
               />
             </S.SearchContainer>
 
-            <S.CleanupButton onClick={handleCleanup} disabled={isCleaning}>
-              <Trash2 size={16} />
-              {isCleaning ? 'Temizleniyor...' : 'Mükerrer Temizlik'}
-            </S.CleanupButton>
+            {isAdmin && (
+              <S.CleanupButton onClick={handleCleanup} disabled={isCleaning}>
+                <Trash2 size={16} />
+                {isCleaning ? 'Temizleniyor...' : 'Mükerrer Temizlik'}
+              </S.CleanupButton>
+            )}
           </HStack>
         </HStack>
       </ResponsiveHeader>
