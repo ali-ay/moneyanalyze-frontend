@@ -82,36 +82,57 @@ const SearchResults = styled.div`
   top: 100%;
   left: 0;
   right: 0;
-  background: ${props => props.theme.colors.cardBg};
+  background: #ffffff; /* Varsayılan açık tema */
   border: 1px solid ${props => props.theme.colors.border};
   border-radius: 12px;
   margin-top: 8px;
-  max-height: 300px;
+  max-height: 400px;
   overflow-y: auto;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  z-index: 1000;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  z-index: 9999; /* En üstte görünmesi için */
+
+  /* Koyu tema desteği için (Eğer temanızda isDark gibi bir flag varsa ona göre ayarlayabiliriz) */
+  [data-theme='dark'] & {
+    background: #1e293b; 
+    border-color: #334155;
+  }
+  
+  /* Manuel düzeltme: Eğer temanız koyuysa burayı kullansın */
+  background: ${props => props.theme.colors.cardBg === 'transparent' ? '#1a1d21' : props.theme.colors.cardBg};
+  opacity: 1;
 `;
 
 const SearchItem = styled.div`
-  padding: 12px 16px;
+  padding: 14px 16px;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid ${props => props.theme.colors.border};
   transition: background 0.2s;
 
+  &:last-child {
+    border-bottom: none;
+  }
+
   &:hover {
-    background: ${props => props.theme.colors.surfaceHover};
+    background: rgba(26, 115, 232, 0.1);
   }
 
   .symbol {
-    font-weight: 700;
+    font-weight: 800;
     color: ${props => props.theme.colors.primary};
+    font-size: 0.9rem;
   }
 
   .name {
-    font-size: 0.75rem;
-    color: ${props => props.theme.colors.textSecondary};
+    font-size: 0.8rem;
+    color: ${props => props.theme.colors.textMain};
+    max-width: 70%;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 `;
 
