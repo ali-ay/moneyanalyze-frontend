@@ -17,6 +17,7 @@ declare module 'styled-components' {
       danger: string;
       warning: string;
       glass: string;
+      cardBg: string;
     };
     shadows: {
       xs: string;
