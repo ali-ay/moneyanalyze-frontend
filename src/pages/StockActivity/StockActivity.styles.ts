@@ -73,3 +73,112 @@ export const NotesText = styled.span`
   font-size: 0.8125rem;
   line-height: 1.4;
 `;
+
+export const LoadMoreContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 30px 0;
+`;
+
+export const LoadMoreButton = styled.button`
+  background: white;
+  border: 1px solid #E8EAED;
+  color: #1A73E8;
+  padding: 12px 32px;
+  border-radius: 24px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(60,64,67,0.1);
+
+  &:hover {
+    background: #F8F9FA;
+    border-color: #1A73E8;
+    box-shadow: 0 2px 6px rgba(26,115,232,0.15);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
+export const CleanupButton = styled.button`
+  background: transparent;
+  border: 1px solid #DADCE0;
+  color: #5F6368;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #FEECEB;
+    color: #D93025;
+    border-color: #D93025;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+export const SearchContainer = styled.div`
+  position: relative;
+  width: 280px;
+`;
+
+export const SearchInput = styled.input`
+  width: 100%;
+  background: #F1F3F4;
+  border: 1px solid transparent;
+  padding: 10px 16px 10px 40px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #202124;
+  transition: all 0.2s;
+
+  &:focus {
+    background: white;
+    border-color: #1A73E8;
+    box-shadow: 0 1px 2px rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+    outline: none;
+  }
+
+  &::placeholder {
+    color: #5F6368;
+  }
+`;
+
+export const SearchIconWrapper = styled.div`
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #5F6368;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+`;
+
+export const StatsBadge = styled.div`
+  background: #E8F0FE;
+  color: #1967D2;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;

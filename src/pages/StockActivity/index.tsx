@@ -4,7 +4,7 @@ import api from '../../services/apiClient';
 import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState, EmptyState } from '../../components/ui/Layout.styles';
 import { Card } from '../../components/ui/Card';
 import { HStack, VStack } from '../../components/primitives/Flex';
-import { History, TrendingUp, TrendingDown, Clock, Info, ArrowRightLeft } from 'lucide-react';
+import { History, TrendingUp, TrendingDown, Clock, Info, ArrowRightLeft, Trash2, Search, Activity } from 'lucide-react';
 import * as S from './StockActivity.styles';
 
 const LogTable = styled.table`
@@ -93,134 +93,242 @@ const ProfitBadge = styled.span<{ $positive: boolean }>`
 const StockActivityPage: React.FC = () => {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [isCleaning, setIsCleaning] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [total, setTotal] = useState(0);
+
+  const fetchLogs = async (pageNum: number, append: boolean = false, search: string = searchTerm) => {
+    try {
+      const response = await api.get(`/stock/activity-logs?page=${pageNum}&search=${search}`);
+      if (response.data.success) {
+        const newLogs = response.data.data;
+        setTotal(response.data.total || 0);
+        if (newLogs.length < 50) {
+          setHasMore(false);
+        } else {
+          setHasMore(true);
+        }
+
+        if (append) {
+          setLogs(prev => [...prev, ...newLogs]);
+        } else {
+          setLogs(newLogs);
+        }
+      }
+    } catch (error) {
+      console.error('Logs fetch error:', error);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const handleCleanup = async () => {
+    if (!window.confirm('Mükerrer (üst üste gelen) kayıtlar temizlenecektir. Emin misiniz?')) return;
+    
+    setIsCleaning(true);
+    try {
+      const response = await api.post('/stock/activity-logs/cleanup');
+      if (response.data.success) {
+        alert(response.data.message);
+        // Sayfayı yenile
+        setPage(1);
+        fetchLogs(1, false);
+      }
+    } catch (error) {
+      console.error('Cleanup error:', error);
+      alert('Temizleme işlemi sırasında bir hata oluştu.');
+    } finally {
+      setIsCleaning(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchLogs = async () => {
-      try {
-        const response = await api.get('/stock/activity-logs');
-        if (response.data.success) {
-          setLogs(response.data.data);
-        }
-      } catch (error) {
-        console.error('Logs fetch error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLogs();
-    const interval = setInterval(fetchLogs, 30000); // 30 saniyede bir güncelle
-    return () => clearInterval(interval);
+    // İlk yükleme
+    fetchLogs(1);
   }, []);
+
+  // Arama değiştiğinde debounced fetch
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      setPage(1);
+      fetchLogs(1, false, searchTerm);
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    // Canlı fiyatları güncellemek için interval
+    // Sadece 1. sayfadayken ve arama yokken çalışır
+    const interval = setInterval(() => {
+      if (page === 1 && !loadingMore && !isCleaning && !searchTerm) {
+        fetchLogs(1);
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [page, loadingMore, isCleaning, searchTerm]);
+
+  const handleLoadMore = () => {
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchLogs(nextPage, true, searchTerm);
+  };
 
   if (loading) return <LoadingState>Kayıtlar yükleniyor...</LoadingState>;
 
   return (
     <PageContainer>
       <PageHeader>
-        <VStack $gap="4px">
-          <PageTitle>
-            <HStack $gap="12px" $align="center">
-              <History size={32} color="#1A73E8" />
-              AI Hisse İşlem Dekontları
-            </HStack>
-          </PageTitle>
-          <PageSubtitle>
-            Yapay zekanın otomatik alım-satım ve takip hareketlerinin detaylı dökümü.
-          </PageSubtitle>
-        </VStack>
+        <HStack $justify="space-between" $align="center" style={{ width: '100%' }}>
+          <VStack $gap="4px">
+            <PageTitle>
+              <HStack $gap="12px" $align="center">
+                <History size={32} color="#1A73E8" />
+                AI Hisse İşlem Dekontları
+                {total > 0 && (
+                  <S.StatsBadge>
+                    <Activity size={14} />
+                    {total.toLocaleString()} Hareket
+                  </S.StatsBadge>
+                )}
+              </HStack>
+            </PageTitle>
+            <PageSubtitle>
+              Yapay zekanın otomatik alım-satım ve takip hareketlerinin detaylı dökümü.
+            </PageSubtitle>
+          </VStack>
+
+          <HStack $gap="16px" $align="center">
+            <S.SearchContainer>
+              <S.SearchIconWrapper>
+                <Search size={18} />
+              </S.SearchIconWrapper>
+              <S.SearchInput 
+                placeholder="Hisse ara (Örn: THYAO)..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </S.SearchContainer>
+
+            <S.CleanupButton onClick={handleCleanup} disabled={isCleaning}>
+              <Trash2 size={16} />
+              {isCleaning ? 'Temizleniyor...' : 'Mükerrer Temizlik'}
+            </S.CleanupButton>
+          </HStack>
+        </HStack>
       </PageHeader>
 
       <S.TableWrapper>
         {logs.length === 0 ? (
           <EmptyState>Henüz bir hareket kaydı bulunmuyor. AI analizleri başladığında burada görünecektir.</EmptyState>
         ) : (
-          <LogTable>
-            <thead>
-              <tr>
-                <Th>İşlem Tarihi</Th>
-                <Th>Varlık / Periyot</Th>
-                <Th>İşlem Tipi</Th>
-                <Th>Birim Fiyatlar</Th>
-                <Th>Performans</Th>
-                <Th>Analiz Notu</Th>
-              </tr>
-            </thead>
-            <tbody>
-              {logs.map((log) => {
-                const isAdd = log.action === 'ADD';
-                const profitValue = isAdd ? log.liveProfit : log.profit;
-                const isPositive = (profitValue || 0) >= 0;
+          <>
+            <LogTable>
+              <thead>
+                <tr>
+                  <Th>İşlem Tarihi</Th>
+                  <Th>Varlık / Periyot</Th>
+                  <Th>İşlem Tipi</Th>
+                  <Th>Birim Fiyatlar</Th>
+                  <Th>Performans</Th>
+                  <Th>Analiz Notu</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {logs.map((log) => {
+                  const isAdd = log.action === 'ADD';
+                  const profitValue = isAdd ? log.liveProfit : log.profit;
+                  const isPositive = (profitValue || 0) >= 0;
 
-                return (
-                  <Tr key={log.id}>
-                    <Td>
-                      <VStack $gap="4px">
-                        <S.DateColumn as={HStack} $gap="6px" $align="center">
-                          <Clock size={14} color="#1A73E8" />
-                          {new Date(log.createdAt).toLocaleDateString('tr-TR')}
-                        </S.DateColumn>
-                        <S.TimeText>
-                          {new Date(log.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
-                        </S.TimeText>
-                      </VStack>
-                    </Td>
-                    <Td>
-                      <VStack $gap="4px">
-                        <S.SymbolText>{log.symbol.replace('.IS', '')}</S.SymbolText>
-                        <S.PeriodBadge>
-                          {log.period?.toUpperCase()} TARAMASI
-                        </S.PeriodBadge>
-                      </VStack>
-                    </Td>
-                    <Td>
-                      <ActionBadge $action={log.action}>
-                        {isAdd ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                        {isAdd ? 'EKLENDİ' : 'ÇIKARILDI'}
-                      </ActionBadge>
-                    </Td>
-                    <Td>
-                      <HStack $gap="20px">
-                        <VStack>
-                          <Label>{isAdd ? 'Giriş Fiyatı' : 'Alış Fiyatı'}</Label>
-                          <PriceText>₺{log.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</PriceText>
+                  return (
+                    <Tr key={log.id}>
+                      <Td>
+                        <VStack $gap="4px">
+                          <S.DateColumn as={HStack} $gap="6px" $align="center">
+                            <Clock size={14} color="#1A73E8" />
+                            {new Date(log.createdAt).toLocaleDateString('tr-TR')}
+                          </S.DateColumn>
+                          <S.TimeText>
+                            {new Date(log.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                          </S.TimeText>
                         </VStack>
+                      </Td>
+                      <Td>
+                        <VStack $gap="4px">
+                          <S.SymbolText>{log.symbol.replace('.IS', '')}</S.SymbolText>
+                          <S.PeriodBadge>
+                            {log.period?.toUpperCase()} TARAMASI
+                          </S.PeriodBadge>
+                        </VStack>
+                      </Td>
+                      <Td>
+                        <ActionBadge $action={log.action}>
+                          {isAdd ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                          {isAdd ? 'EKLENDİ' : 'ÇIKARILDI'}
+                        </ActionBadge>
+                      </Td>
+                      <Td>
+                        <HStack $gap="20px">
+                          <VStack>
+                            <Label>{isAdd ? 'Giriş Fiyatı' : 'Alış Fiyatı'}</Label>
+                            <PriceText>₺{log.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</PriceText>
+                          </VStack>
 
-                        <VStack>
-                          <Label>{isAdd ? 'Anlık Fiyat' : 'Çıkış Fiyatı'}</Label>
-                          <S.PriceWithColor $entryPrice={isAdd}>
-                            ₺{(isAdd ? log.currentPrice : log.exitPrice)?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || '---'}
-                          </S.PriceWithColor>
+                          <VStack>
+                            <Label>{isAdd ? 'Anlık Fiyat' : 'Çıkış Fiyatı'}</Label>
+                            <S.PriceWithColor $entryPrice={isAdd}>
+                              ₺{(isAdd ? log.currentPrice : log.exitPrice)?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || '---'}
+                            </S.PriceWithColor>
+                          </VStack>
+                        </HStack>
+                      </Td>
+                      <Td>
+                        <VStack $gap="4px">
+                          <Label>{isAdd ? 'Anlık Kar/Zarar' : 'Net Kar/Zarar'}</Label>
+                          {profitValue !== null && profitValue !== undefined ? (
+                            <S.ProfitBadgeWithSize $positive={isPositive}>
+                              {isPositive ? '+' : ''}{profitValue.toFixed(2)}%
+                            </S.ProfitBadgeWithSize>
+                          ) : (
+                            <S.CalculatingText>Hesaplanıyor...</S.CalculatingText>
+                          )}
                         </VStack>
-                      </HStack>
-                    </Td>
-                    <Td>
-                      <VStack $gap="4px">
-                        <Label>{isAdd ? 'Anlık Kar/Zarar' : 'Net Kar/Zarar'}</Label>
-                        {profitValue !== null && profitValue !== undefined ? (
-                          <S.ProfitBadgeWithSize $positive={isPositive}>
-                            {isPositive ? '+' : ''}{profitValue.toFixed(2)}%
-                          </S.ProfitBadgeWithSize>
-                        ) : (
-                          <S.CalculatingText>Hesaplanıyor...</S.CalculatingText>
-                        )}
-                      </VStack>
-                    </Td>
-                    <Td>
-                      <HStack $gap="8px" $align="flex-start" as={S.NotesContainer}>
-                        <S.NotesIcon as="div">
-                          <Info size={16} color="#9AA0A6" />
-                        </S.NotesIcon>
-                        <S.NotesText>
-                          {log.description}
-                        </S.NotesText>
-                      </HStack>
-                    </Td>
-                  </Tr>
-                );
-              })}
-            </tbody>
-          </LogTable>
+                      </Td>
+                      <Td>
+                        <HStack $gap="8px" $align="flex-start" as={S.NotesContainer}>
+                          <S.NotesIcon as="div">
+                            <Info size={16} color="#9AA0A6" />
+                          </S.NotesIcon>
+                          <S.NotesText>
+                            {log.description}
+                          </S.NotesText>
+                        </HStack>
+                      </Td>
+                    </Tr>
+                  );
+                })}
+              </tbody>
+            </LogTable>
+
+            {hasMore && (
+              <S.LoadMoreContainer>
+                <S.LoadMoreButton onClick={handleLoadMore} disabled={loadingMore}>
+                  {loadingMore ? 'Yükleniyor...' : (
+                    <>
+                      <ArrowRightLeft size={16} />
+                      Daha Fazla Kayıt Göster
+                    </>
+                  )}
+                </S.LoadMoreButton>
+              </S.LoadMoreContainer>
+            )}
+          </>
         )}
       </S.TableWrapper>
     </PageContainer>

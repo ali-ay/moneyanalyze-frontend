@@ -326,7 +326,7 @@ const ProfilePage = () => {
                 {tradingMode === 'LIVE'
                   ? '⚠️ DİKKAT: Live modda işlemler gerçek Binance bakiyeniz ile yapılır!'
                   : 'ℹ️ Simülasyon modunda sanal bakiyeniz (10.000 USDT) kullanılır.'}
-              </KeyHint>
+              </S.TradingModeHint>
             </InputGroup>
 
             <S.Divider />

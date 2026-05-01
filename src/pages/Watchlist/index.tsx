@@ -159,10 +159,10 @@ const Watchlist: React.FC = () => {
                     Anlık Fiyat{getSortIndicator('currentPrice')}
                   </Th>
                   <Th $sortable onClick={() => requestSort('profitPercent')}>
-                    Sinyal K/Z (%){getSortIndicator('profitPercent')}
+                    Değişim (Girişten){getSortIndicator('profitPercent')}
                   </Th>
                   <Th $sortable onClick={() => requestSort('priceChangePercent')}>
-                    Değişim (Günlük){getSortIndicator('priceChangePercent')}
+                    Günlük Değişim{getSortIndicator('priceChangePercent')}
                   </Th>
                   <S.RightAlignTh>İşlem</S.RightAlignTh>
                 </tr>
