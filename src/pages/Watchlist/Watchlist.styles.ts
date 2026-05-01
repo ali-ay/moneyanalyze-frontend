@@ -10,6 +10,26 @@ export const RightAlignTd = styled.td`
 
 export const SymbolCell = styled.td`
   font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 16px;
+
+  .symbol {
+    font-size: 0.9375rem;
+    color: ${props => props.theme.colors.textMain};
+  }
+`;
+
+export const SymbolName = styled.span`
+  font-size: 0.65rem;
+  font-weight: 400;
+  color: ${props => props.theme.colors.textSecondary}80; /* %50 şeffaflık ile çok belirsiz */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+  display: block;
 `;
 
 export const PeriodBadge = styled.span`

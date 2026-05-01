@@ -181,7 +181,11 @@ const Watchlist: React.FC = () => {
                     <Tr key={item.id}>
                       <S.SymbolCell>
                         <div className="symbol">{item.symbol}</div>
-                        <div className="name">{item.name}</div>
+                        <S.SymbolName title={item.name}>
+                          {item.name && item.name.length > 17 
+                            ? `${item.name.substring(0, 17)}...` 
+                            : item.name || '-'}
+                        </S.SymbolName>
                       </S.SymbolCell>
                       <Td>
                         <S.PeriodBadge>
