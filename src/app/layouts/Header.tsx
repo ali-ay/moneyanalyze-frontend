@@ -248,13 +248,32 @@ const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
     }
   }, [isAdmin]);
 
+  // Türkçe karakterleri normalize eden yardımcı fonksiyon
+  const normalizeText = (text: string) => {
+    return text
+      .toLowerCase()
+      .replace(/ğ/g, 'g')
+      .replace(/ü/g, 'u')
+      .replace(/ş/g, 's')
+      .replace(/ı/g, 'i')
+      .replace(/ö/g, 'o')
+      .replace(/ç/g, 'c')
+      .trim();
+  };
+
   // Arama filtreleme
   useEffect(() => {
     if (searchQuery.length > 1) {
-      const filtered = stocks.filter(s => 
-        s.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (s.name && s.name.toLowerCase().includes(searchQuery.toLowerCase()))
-      ).slice(0, 10);
+      const normalizedQuery = normalizeText(searchQuery);
+      
+      const filtered = stocks.filter(s => {
+        const normalizedSymbol = normalizeText(s.symbol);
+        const normalizedName = s.name ? normalizeText(s.name) : '';
+        
+        return normalizedSymbol.includes(normalizedQuery) || 
+               normalizedName.includes(normalizedQuery);
+      }).slice(0, 10);
+      
       setFilteredStocks(filtered);
       setShowResults(true);
     } else {
@@ -311,7 +330,7 @@ const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
           {showResults && filteredStocks.length > 0 && (
             <SearchResults>
               {filteredStocks.map((s) => (
-                <SearchItem key={s.id} onClick={() => handleSelect(s.symbol)}>
+                <SearchItem key={s.symbol} onClick={() => handleSelect(s.symbol)}>
                   <div className="symbol">{s.symbol}</div>
                   <div className="name">{s.name}</div>
                 </SearchItem>
