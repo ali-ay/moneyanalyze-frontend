@@ -99,6 +99,40 @@ const GlobalSettings = () => {
         <S.SettingsForm onSubmit={handleSubmit}>
           
           <S.SectionContainer>
+            <S.SectionTitle>Sistem Durumu</S.SectionTitle>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px', 
+              padding: '16px', 
+              background: 'rgba(26, 115, 232, 0.05)', 
+              borderRadius: '12px', 
+              border: '1px solid rgba(26, 115, 232, 0.1)',
+              marginBottom: '24px'
+            }}>
+               <div style={{ 
+                 width: '10px', 
+                 height: '10px', 
+                 borderRadius: '50%', 
+                 background: formData.lastStockSync ? '#28a745' : '#ffc107',
+                 boxShadow: formData.lastStockSync ? '0 0 8px #28a745' : 'none'
+               }}></div>
+               <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1a73e8' }}>Otomatik Tarama Botu:</span>
+               <span style={{ fontSize: '0.875rem', color: '#5f6368' }}>
+                 {formData.lastStockSync 
+                   ? `Son başarılı çalışma: ${new Date(formData.lastStockSync).toLocaleString('tr-TR', {
+                       day: '2-digit',
+                       month: 'long',
+                       year: 'numeric',
+                       hour: '2-digit',
+                       minute: '2-digit'
+                     })}`
+                   : 'Bot henüz çalıştırılmadı.'}
+               </span>
+            </div>
+          </S.SectionContainer>
+
+          <S.SectionContainer>
             <S.SectionTitle>SEO & Meta Bilgileri</S.SectionTitle>
             <InputGroup>
               <label>Site Başlığı (Title)</label>
