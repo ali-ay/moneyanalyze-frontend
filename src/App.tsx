@@ -43,6 +43,7 @@ const UserList = lazy(() => import('./pages/Admin/UserList/UserList'));
 const GlobalSettings = lazy(() => import('./pages/Admin/Settings/GlobalSettings'));
 const BotSettings = lazy(() => import('./pages/Admin/BotSettings'));
 const StockManagement = lazy(() => import('./pages/Admin/StockManagement'));
+const MediaLibrary = lazy(() => import('./pages/Admin/Media/MediaLibrary'));
 
 const AppContent = () => {
   const { settings, loading } = useSettings();
@@ -110,6 +111,7 @@ const AppContent = () => {
                   <Route path="settings" element={<AdminRoute><GlobalSettings /></AdminRoute>} />
                   <Route path="bot-settings" element={<AdminRoute><BotSettings /></AdminRoute>} />
                   <Route path="stocks" element={<AdminRoute><StockManagement /></AdminRoute>} />
+                  <Route path="media" element={<AdminRoute><MediaLibrary /></AdminRoute>} />
                 </Route>
               </Route>
 

@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { Bell, HelpCircle, Menu } from 'lucide-react';
+import { Bell, HelpCircle, Menu, Search, X } from 'lucide-react';
 import { useAuth } from '../../app/providers/AuthContext';
 import { useMarketMode } from '../../context/MarketModeContext';
+import api from '../../services/apiClient';
 
 const HeaderWrapper = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px 48px;
+  padding: 24px;
   background: transparent;
   width: 100%;
+  gap: 20px;
 
   @media (max-width: 768px) {
     padding: 16px 20px;
@@ -23,9 +25,93 @@ const HeaderTitle = styled.h1`
   font-weight: 700;
   color: ${props => props.theme.colors.textMain};
   margin: 0;
+  white-space: nowrap;
 
+  @media (max-width: 1024px) {
+    display: none;
+  }
+`;
+
+const SearchContainer = styled.div`
+  flex: 1;
+  max-width: 500px;
+  position: relative;
+  
   @media (max-width: 768px) {
     display: none;
+  }
+`;
+
+const SearchInputWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  background: ${props => props.theme.colors.cardBg};
+  border: 1px solid ${props => props.theme.colors.border};
+  border-radius: 12px;
+  padding: 0 16px;
+  height: 44px;
+  transition: all 0.2s;
+
+  &:focus-within {
+    border-color: ${props => props.theme.colors.primary};
+    box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
+  }
+
+  svg {
+    color: ${props => props.theme.colors.textSecondary};
+    margin-right: 12px;
+  }
+`;
+
+const SearchInput = styled.input`
+  background: transparent;
+  border: none;
+  color: ${props => props.theme.colors.textMain};
+  font-size: 0.875rem;
+  width: 100%;
+  outline: none;
+
+  &::placeholder {
+    color: ${props => props.theme.colors.textSecondary};
+    opacity: 0.7;
+  }
+`;
+
+const SearchResults = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: ${props => props.theme.colors.cardBg};
+  border: 1px solid ${props => props.theme.colors.border};
+  border-radius: 12px;
+  margin-top: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  z-index: 1000;
+`;
+
+const SearchItem = styled.div`
+  padding: 12px 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s;
+
+  &:hover {
+    background: ${props => props.theme.colors.surfaceHover};
+  }
+
+  .symbol {
+    font-weight: 700;
+    color: ${props => props.theme.colors.primary};
+  }
+
+  .name {
+    font-size: 0.75rem;
+    color: ${props => props.theme.colors.textSecondary};
   }
 `;
 
@@ -45,7 +131,7 @@ const ToolGroup = styled.div`
     &:hover { color: ${props => props.theme.colors.primary}; }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     display: none;
   }
 `;
@@ -63,6 +149,10 @@ const UserMeta = styled.div`
   text-align: right;
   .name { font-size: 0.8125rem; font-weight: 700; color: ${props => props.theme.colors.textMain}; }
   .role { font-size: 0.625rem; font-weight: 600; color: ${props => props.theme.colors.textSecondary}; text-transform: uppercase; }
+
+  @media (max-width: 480px) {
+    display: none;
+  }
 `;
 
 const UserAvatar = styled.div`
@@ -101,7 +191,7 @@ const ModeToggleButton = styled.button<{ $active: boolean }>`
 
 const MenuButton = styled.div`
   display: none;
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     display: flex;
     padding: 8px;
     margin-left: -8px;
@@ -114,6 +204,60 @@ const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { mode, setMode } = useMarketMode();
+  const isAdmin = user?.role === 'ADMIN';
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [stocks, setStocks] = useState<any[]>([]);
+  const [filteredStocks, setFilteredStocks] = useState<any[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  // Hisseleri yükle (Sadece Admin için)
+  useEffect(() => {
+    if (isAdmin) {
+      const fetchStocks = async () => {
+        try {
+          const res = await api.get('/admin/stocks');
+          setStocks(res.data);
+        } catch (err) {
+          console.error('Stocks fetch error:', err);
+        }
+      };
+      fetchStocks();
+    }
+  }, [isAdmin]);
+
+  // Arama filtreleme
+  useEffect(() => {
+    if (searchQuery.length > 1) {
+      const filtered = stocks.filter(s => 
+        s.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (s.name && s.name.toLowerCase().includes(searchQuery.toLowerCase()))
+      ).slice(0, 10);
+      setFilteredStocks(filtered);
+      setShowResults(true);
+    } else {
+      setFilteredStocks([]);
+      setShowResults(false);
+    }
+  }, [searchQuery, stocks]);
+
+  // Dışarı tıklayınca kapat
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSelect = (symbol: string) => {
+    navigate(`/dashboard/stock/${symbol}`);
+    setSearchQuery('');
+    setShowResults(false);
+  };
 
   return (
     <HeaderWrapper>
@@ -124,16 +268,48 @@ const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
         <HeaderTitle>Pazar Analiz Paneli</HeaderTitle>
       </div>
 
+      {isAdmin && (
+        <SearchContainer ref={searchRef}>
+          <SearchInputWrapper>
+            <Search size={18} />
+            <SearchInput 
+              placeholder="Hisse senedi ara (Örn: THYAO)..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => searchQuery.length > 1 && setShowResults(true)}
+            />
+            {searchQuery && (
+              <X 
+                size={16} 
+                style={{ cursor: 'pointer' }} 
+                onClick={() => setSearchQuery('')} 
+              />
+            )}
+          </SearchInputWrapper>
+
+          {showResults && filteredStocks.length > 0 && (
+            <SearchResults>
+              {filteredStocks.map((s) => (
+                <SearchItem key={s.id} onClick={() => handleSelect(s.symbol)}>
+                  <div className="symbol">{s.symbol}</div>
+                  <div className="name">{s.name}</div>
+                </SearchItem>
+              ))}
+            </SearchResults>
+          )}
+        </SearchContainer>
+      )}
+
       <HeaderActions>
         <ModeToggleContainer>
-          <ModeToggleButton 
-            $active={mode === 'crypto'} 
+          <ModeToggleButton
+            $active={mode === 'crypto'}
             onClick={() => setMode('crypto')}
           >
             Kripto
           </ModeToggleButton>
-          <ModeToggleButton 
-            $active={mode === 'stock'} 
+          <ModeToggleButton
+            $active={mode === 'stock'}
             onClick={() => setMode('stock')}
           >
             Borsa
