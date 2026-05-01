@@ -90,27 +90,94 @@ export const NotesContainer = styled.div`
 `;
 
 export const NotesIcon = styled.div`
-  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: rgba(26, 115, 232, 0.08);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #1A73E8;
 
-  &:hover {
-    background: rgba(26, 115, 232, 0.2) !important;
-    transform: scale(1.1);
+  @media (max-width: 768px) {
+    width: 32px;
+    height: 32px;
+    svg { width: 18px; height: 18px; }
   }
 `;
 
-export const NotesText = styled.span`
-  color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
-  font-size: 0.8125rem;
-  line-height: 1.4;
+export const TooltipBox = styled.div`
+  position: absolute;
+  bottom: 120%;
+  right: 0;
+  width: 280px;
+  background: #ffffff;
+  color: #3C4043;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  box-shadow: 0 10px 30px rgba(60,64,67,0.2);
+  border: 1px solid #E8EAED;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  pointer-events: none;
+  text-align: left;
 
-  .short-text { display: none; }
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 14px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: #ffffff transparent transparent transparent;
+  }
+
+  .tooltip-header {
+    font-weight: 700;
+    color: #202124;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #F1F3F4;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 
   @media (max-width: 768px) {
-    .full-text { display: none; }
-    .short-text { display: inline; }
+    width: 240px;
+    right: -20px;
+    bottom: 110%;
+    
+    &::after {
+      right: 28px;
+    }
+  }
+`;
+
+export const TooltipContainer = styled.div`
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  width: 100%;
+  padding: 8px 0;
+
+  &:hover {
+    ${NotesIcon} {
+      background: rgba(26, 115, 232, 0.15);
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
+    }
+    ${TooltipBox} {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 `;
 

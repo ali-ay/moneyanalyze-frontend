@@ -4,7 +4,8 @@ import api from '../../services/apiClient';
 import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState, EmptyState } from '../../components/ui/Layout.styles';
 import { Card } from '../../components/ui/Card';
 import { HStack, VStack } from '../../components/primitives/Flex';
-import { History, TrendingUp, TrendingDown, Clock, Info, ArrowRightLeft, Trash2, Search, Activity } from 'lucide-react';
+import { History, TrendingUp, TrendingDown, Clock, Info, ArrowRightLeft, Trash2, Search, Activity, X } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
 import * as S from './StockActivity.styles';
 
 const LogTable = styled.table`
@@ -387,26 +388,15 @@ const StockActivityPage: React.FC = () => {
                         </VStack>
                       </Td>
                       <Td>
-                        <div 
-                          onClick={() => setSelectedNote(log.description)}
-                          style={{ 
-                            cursor: 'pointer', 
-                            display: 'flex', 
-                            justifyContent: 'center', 
-                            alignItems: 'center',
-                            width: '100%'
-                          }}
-                        >
-                          <S.NotesIcon as="div" style={{ 
-                            background: 'rgba(26, 115, 232, 0.1)', 
-                            padding: '10px', 
-                            borderRadius: '50%',
-                            display: 'flex',
-                            transition: 'all 0.2s'
-                          }}>
+                        <S.TooltipContainer>
+                          <S.NotesIcon as="div">
                             <Info size={22} color="#1A73E8" />
                           </S.NotesIcon>
-                        </div>
+                          <S.TooltipBox>
+                            <div className="tooltip-header">Analiz Notu</div>
+                            {log.description}
+                          </S.TooltipBox>
+                        </S.TooltipContainer>
                       </Td>
                     </Tr>
                   );
@@ -429,27 +419,6 @@ const StockActivityPage: React.FC = () => {
           </>
         )}
       </S.TableWrapper>
-
-      {selectedNote && (
-        <ModalBackdrop onClick={() => setSelectedNote(null)}>
-          <ModalContent onClick={e => e.stopPropagation()}>
-            <ModalHeader>
-              <h4>Analiz Notu Detayı</h4>
-              <CloseButton onClick={() => setSelectedNote(null)}>
-                <Activity size={20} />
-              </CloseButton>
-            </ModalHeader>
-            <div style={{ lineHeight: 1.6, color: '#3C4043', fontSize: '0.9375rem' }}>
-              {selectedNote}
-            </div>
-            <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end' }}>
-              <Button $variant="primary" $size="sm" onClick={() => setSelectedNote(null)}>
-                Kapat
-              </Button>
-            </div>
-          </ModalContent>
-        </ModalBackdrop>
-      )}
     </PageContainer>
   );
 };
