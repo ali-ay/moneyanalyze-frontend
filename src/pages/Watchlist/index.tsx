@@ -99,7 +99,12 @@ const ResponsiveHeader = styled(PageHeader)`
   }
 `;
 
+import { useAuth } from '../../app/providers/AuthContext';
+
 const Watchlist: React.FC = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
+
   const {
     watchlist,
     loading,
@@ -158,18 +163,20 @@ const Watchlist: React.FC = () => {
               {mode === 'stock' ? 'BIST hisseleri' : 'Kripto varlıklar'} — anlık takip.
             </PageSubtitle>
           </div>
-          <HStack className="button-group" $gap="sm">
-            <Button
-              $variant="danger"
-              onClick={handleClearClick}
-              disabled={watchlist.length === 0 || adding}
-            >
-              <Trash size={16} /> <span className="btn-text">Listeyi Temizle</span>
-            </Button>
-            <Button $variant="primary" onClick={handleAddClick} disabled={adding}>
-              <Plus size={16} /> <span className="btn-text">Sembol Ekle</span>
-            </Button>
-          </HStack>
+          {isAdmin && (
+            <HStack className="button-group" $gap="sm">
+              <Button
+                $variant="danger"
+                onClick={handleClearClick}
+                disabled={watchlist.length === 0 || adding}
+              >
+                <Trash size={16} /> <span className="btn-text">Listeyi Temizle</span>
+              </Button>
+              <Button $variant="primary" onClick={handleAddClick} disabled={adding}>
+                <Plus size={16} /> <span className="btn-text">Sembol Ekle</span>
+              </Button>
+            </HStack>
+          )}
         </HStack>
       </ResponsiveHeader>
 
@@ -204,7 +211,7 @@ const Watchlist: React.FC = () => {
                     </Th>
                     <Th>AI Hedef (Tahmin)</Th>
                     <Th>Stop-Loss</Th>
-                    <S.RightAlignTh>İşlem</S.RightAlignTh>
+                    {isAdmin && <S.RightAlignTh>İşlem</S.RightAlignTh>}
                   </tr>
                 </thead>
                 <tbody>
@@ -261,15 +268,17 @@ const Watchlist: React.FC = () => {
                             <span style={{ color: '#999' }}>-</span>
                           )}
                         </Td>
-                        <S.RightAlignTd>
-                          <Button
-                            $variant="danger"
-                            $size="sm"
-                            onClick={() => handleRemove(item.symbol)}
-                          >
-                            <Trash2 size={14} />
-                          </Button>
-                        </S.RightAlignTd>
+                        {isAdmin && (
+                          <S.RightAlignTd>
+                            <Button
+                              $variant="danger"
+                              $size="sm"
+                              onClick={() => handleRemove(item.symbol)}
+                            >
+                              <Trash2 size={14} />
+                            </Button>
+                          </S.RightAlignTd>
+                        )}
                       </Tr>
                     );
                   })}
