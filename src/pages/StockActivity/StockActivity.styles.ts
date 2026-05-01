@@ -53,6 +53,13 @@ export const PeriodBadge = styled.div`
   border: 1px solid #E8EAED;
   font-weight: 700;
   color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
+
+  .short-text { display: none; }
+
+  @media (max-width: 768px) {
+    .full-text { display: none; }
+    .short-text { display: inline; }
+  }
 `;
 
 export const PriceWithColor = styled.div<{ $entryPrice?: boolean }>`
@@ -91,6 +98,13 @@ export const NotesText = styled.span`
   color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
   font-size: 0.8125rem;
   line-height: 1.4;
+
+  .short-text { display: none; }
+
+  @media (max-width: 768px) {
+    .full-text { display: none; }
+    .short-text { display: inline; }
+  }
 `;
 
 export const LoadMoreContainer = styled.div`

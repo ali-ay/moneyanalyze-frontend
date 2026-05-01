@@ -75,8 +75,16 @@ const ActionBadge = styled.span<{ $action: string }>`
   color: ${props => props.$action === 'ADD' ? '#0F9D58' : '#DB4437'};
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   border: 1px solid ${props => props.$action === 'ADD' ? 'rgba(15, 157, 88, 0.2)' : 'rgba(219, 68, 55, 0.2)'};
+
+  @media (max-width: 768px) {
+    padding: 6px;
+    width: 28px;
+    height: 28px;
+    .btn-text { display: none; }
+  }
 `;
 
 const PriceText = styled.div`
@@ -103,6 +111,44 @@ const ProfitBadge = styled.span<{ $positive: boolean }>`
   align-items: center;
   gap: 4px;
   font-size: 0.9375rem;
+`;
+
+const ModalBackdrop = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+`;
+
+const ModalContent = styled.div`
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+`;
+
+const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  h4 { margin: 0; color: #202124; }
+`;
+
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #5F6368;
 `;
 
 const ResponsiveHeader = styled(PageHeader)`
@@ -135,6 +181,7 @@ const StockActivityPage: React.FC = () => {
   const [isCleaning, setIsCleaning] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [total, setTotal] = useState(0);
+  const [selectedNote, setSelectedNote] = useState<string | null>(null);
 
   const fetchLogs = async (pageNum: number, append: boolean = false, search: string = searchTerm) => {
     try {
@@ -301,25 +348,26 @@ const StockActivityPage: React.FC = () => {
                         <VStack $gap="4px">
                           <S.SymbolText>{log.symbol.replace('.IS', '')}</S.SymbolText>
                           <S.PeriodBadge>
-                            {log.period?.toUpperCase()} TARAMASI
+                            <span className="full-text">{log.period?.toUpperCase()} TARAMASI</span>
+                            <span className="short-text">{log.period?.toUpperCase()}</span>
                           </S.PeriodBadge>
                         </VStack>
                       </Td>
                       <Td>
                         <ActionBadge $action={log.action}>
                           {isAdd ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                          {isAdd ? 'EKLENDİ' : 'ÇIKARILDI'}
+                          <span className="btn-text">{isAdd ? 'EKLENDİ' : 'ÇIKARILDI'}</span>
                         </ActionBadge>
                       </Td>
                       <Td>
                         <HStack $gap="20px">
                           <VStack>
-                            <Label>{isAdd ? 'Giriş Fiyatı' : 'Alış Fiyatı'}</Label>
+                            <Label>{isAdd ? 'Giriş' : 'Alış'}</Label>
                             <PriceText>₺{log.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</PriceText>
                           </VStack>
 
                           <VStack>
-                            <Label>{isAdd ? 'Anlık Fiyat' : 'Çıkış Fiyatı'}</Label>
+                            <Label>{isAdd ? 'Anlık' : 'Çıkış'}</Label>
                             <S.PriceWithColor $entryPrice={isAdd}>
                               ₺{(isAdd ? log.currentPrice : log.exitPrice)?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || '---'}
                             </S.PriceWithColor>
@@ -328,7 +376,7 @@ const StockActivityPage: React.FC = () => {
                       </Td>
                       <Td>
                         <VStack $gap="4px">
-                          <Label>{isAdd ? 'Anlık Kar/Zarar' : 'Net Kar/Zarar'}</Label>
+                          <Label>{isAdd ? 'Kar/Zarar' : 'Net K/Z'}</Label>
                           {profitValue !== null && profitValue !== undefined ? (
                             <S.ProfitBadgeWithSize $positive={isPositive}>
                               {isPositive ? '+' : ''}{profitValue.toFixed(2)}%
@@ -339,12 +387,23 @@ const StockActivityPage: React.FC = () => {
                         </VStack>
                       </Td>
                       <Td>
-                        <HStack $gap="8px" $align="flex-start" as={S.NotesContainer}>
+                        <HStack 
+                          $gap="8px" 
+                          $align="flex-start" 
+                          as={S.NotesContainer}
+                          onClick={() => setSelectedNote(log.description)}
+                          style={{ cursor: 'pointer' }}
+                        >
                           <S.NotesIcon as="div">
                             <Info size={16} color="#9AA0A6" />
                           </S.NotesIcon>
                           <S.NotesText>
-                            {log.description}
+                            <span className="full-text">{log.description}</span>
+                            <span className="short-text">
+                              {log.description.length > 20 
+                                ? `${log.description.substring(0, 20)}...` 
+                                : log.description}
+                            </span>
                           </S.NotesText>
                         </HStack>
                       </Td>
@@ -369,6 +428,27 @@ const StockActivityPage: React.FC = () => {
           </>
         )}
       </S.TableWrapper>
+
+      {selectedNote && (
+        <ModalBackdrop onClick={() => setSelectedNote(null)}>
+          <ModalContent onClick={e => e.stopPropagation()}>
+            <ModalHeader>
+              <h4>Analiz Notu Detayı</h4>
+              <CloseButton onClick={() => setSelectedNote(null)}>
+                <Activity size={20} />
+              </CloseButton>
+            </ModalHeader>
+            <div style={{ lineHeight: 1.6, color: '#3C4043', fontSize: '0.9375rem' }}>
+              {selectedNote}
+            </div>
+            <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+              <Button $variant="primary" $size="sm" onClick={() => setSelectedNote(null)}>
+                Kapat
+              </Button>
+            </div>
+          </ModalContent>
+        </ModalBackdrop>
+      )}
     </PageContainer>
   );
 };
