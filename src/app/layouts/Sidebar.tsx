@@ -282,5 +282,3 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, o
 };
 
 export default Sidebar;
-
-export default Sidebar;
