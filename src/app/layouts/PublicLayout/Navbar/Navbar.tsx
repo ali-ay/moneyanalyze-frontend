@@ -8,33 +8,12 @@ const Navbar = () => {
     <S.Navbar>
         <S.Logo onClick={() => navigate('/')}>MoneyAnalyze</S.Logo>
         <S.NavButtons>
-            <button 
-              onClick={() => navigate('/login')}
-              style={{ 
-                background: 'transparent', 
-                border: 'none', 
-                fontWeight: 800, 
-                cursor: 'pointer',
-                fontSize: '1rem'
-              }}
-            >
+            <S.LoginLink onClick={() => navigate('/login')}>
               Giriş Yap
-            </button>
-            <button 
-              onClick={() => navigate('/register')}
-              style={{ 
-                background: '#171717', 
-                color: 'white',
-                border: 'none', 
-                fontWeight: 800, 
-                cursor: 'pointer',
-                padding: '12px 24px',
-                borderRadius: '99px',
-                fontSize: '1rem'
-              }}
-            >
+            </S.LoginLink>
+            <S.ActionButton onClick={() => navigate('/register')}>
               Hemen Başla
-            </button>
+            </S.ActionButton>
         </S.NavButtons>
     </S.Navbar>)};
 
