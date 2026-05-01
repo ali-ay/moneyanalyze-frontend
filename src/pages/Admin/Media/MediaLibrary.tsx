@@ -31,7 +31,7 @@ const MediaLibrary = () => {
 
   const fetchMedia = async () => {
     try {
-      const res = await api.get('/admin/media');
+      const res = await api.get('/admin/media-library');
       if (res.data.success) {
         setMedia(res.data.data);
       }
@@ -51,7 +51,7 @@ const MediaLibrary = () => {
 
     setUploading(true);
     try {
-      const res = await api.post('/admin/media/upload', formData, {
+      const res = await api.post('/admin/media-library/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       if (res.data.success) {
@@ -69,7 +69,7 @@ const MediaLibrary = () => {
     if (!window.confirm('Bu dosyayı silmek istediğinizden emin misiniz?')) return;
 
     try {
-      await api.delete(`/admin/media/${id}`);
+      await api.delete(`/admin/media-library/${id}`);
       setMedia(prev => prev.filter(m => m.id !== id));
     } catch (err) {
       alert('Silme işlemi başarısız oldu.');
