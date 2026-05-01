@@ -33,12 +33,20 @@ export const MarketModeContainer = styled.div`
   display: flex;
   gap: 10px;
   margin-top: 8px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 export const TradingModeContainer = styled.div`
   display: flex;
   gap: 10px;
   margin-top: 8px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 export const SectionHeaderBorderless = styled.div`
@@ -178,6 +186,16 @@ export const ButtonGroup = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-top: 24px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 12px;
+    
+    button {
+      width: 100%;
+      margin-top: 0;
+    }
+  }
 `;
 
 export const ResetButton = styled.button`

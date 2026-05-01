@@ -7,6 +7,8 @@ import * as S from './Profile.styles';
 
 // ─── Styled Components ─────────────────────────────────
 
+import { useAuth } from '../../../app/providers/AuthContext';
+
 const ProfileGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -14,6 +16,7 @@ const ProfileGrid = styled.div`
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 `;
 
@@ -23,6 +26,11 @@ const Section = styled.div`
   padding: 28px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   border: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
+
+  @media (max-width: 768px) {
+    padding: 20px;
+    border-radius: 12px;
+  }
 `;
 
 const SectionHeader = styled.div`
@@ -32,6 +40,11 @@ const SectionHeader = styled.div`
   margin-bottom: 24px;
   padding-bottom: 16px;
   border-bottom: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
+
+  @media (max-width: 768px) {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
 `;
 
 const SectionIcon = styled.div<{ $color?: string }>`
@@ -43,6 +56,12 @@ const SectionIcon = styled.div<{ $color?: string }>`
   justify-content: center;
   background: ${props => props.$color || 'rgba(26, 115, 232, 0.1)'};
   color: ${props => props.$color === 'rgba(244, 180, 0, 0.1)' ? '#F4B400' : (props.theme?.colors?.primary || '#1A73E8')};
+
+  @media (max-width: 768px) {
+    width: 32px;
+    height: 32px;
+    svg { width: 16px; height: 16px; }
+  }
 `;
 
 const SectionTitle = styled.h3`
@@ -50,6 +69,10 @@ const SectionTitle = styled.h3`
   font-weight: 700;
   color: ${props => props.theme?.colors?.textMain || '#202124'};
   margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 0.9375rem;
+  }
 `;
 
 const InputGroup = styled.div`
@@ -57,6 +80,10 @@ const InputGroup = styled.div`
 
   &:last-of-type {
     margin-bottom: 0;
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: 16px;
   }
 `;
 
@@ -68,6 +95,10 @@ const Label = styled.label`
   margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
+  }
 `;
 
 const Input = styled.input`
@@ -96,6 +127,11 @@ const Input = styled.input`
     color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
     cursor: not-allowed;
   }
+
+  @media (max-width: 768px) {
+    padding: 10px 14px;
+    font-size: 0.8125rem;
+  }
 `;
 
 const InfoValue = styled.div`
@@ -105,6 +141,11 @@ const InfoValue = styled.div`
   font-size: 0.875rem;
   color: ${props => props.theme?.colors?.textMain || '#202124'};
   border: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
+
+  @media (max-width: 768px) {
+    padding: 10px 14px;
+    font-size: 0.8125rem;
+  }
 `;
 
 const RoleBadge = styled.span<{ $isAdmin?: boolean }>`
@@ -143,6 +184,11 @@ const SaveButton = styled.button`
     cursor: not-allowed;
     transform: none;
   }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+  }
 `;
 
 const Alert = styled.div<{ $type: 'success' | 'error' }>`
@@ -169,6 +215,9 @@ const KeyHint = styled.p`
 // ─── Component ──────────────────────────────────────────
 
 const ProfilePage = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
+
   const {
     profile, loading, saving, error, success,
     firstName, setFirstName,
@@ -358,99 +407,103 @@ const ProfilePage = () => {
             </S.APIWarningHint>
           </Section>
 
-          {/* Yeni: AI Otomasyon Kontrolü */}
-          <Section>
-            <SectionHeader>
-              <SectionIcon $color="rgba(167, 107, 245, 0.1)">
-                <Zap size={20} color="#A76BF5" fill="#A76BF5" />
-              </SectionIcon>
-              <SectionTitle>Yapay Zeka Otomasyon Kontrolü</SectionTitle>
-            </SectionHeader>
+          {/* AI Otomasyon Kontrolü - Sadece Admin */}
+          {isAdmin && (
+            <Section>
+              <SectionHeader>
+                <SectionIcon $color="rgba(167, 107, 245, 0.1)">
+                  <Zap size={20} color="#A76BF5" fill="#A76BF5" />
+                </SectionIcon>
+                <SectionTitle>Yapay Zeka Otomasyon Kontrolü</SectionTitle>
+              </SectionHeader>
 
-            <S.AIAutomationContainer>
-              <div>
-                <S.SectionDescription>
-                  Manuel Piyasa Taraması
-                </S.SectionDescription>
-                <S.SectionNote>
-                  Tüm BIST hisselerini anlık fiyatlarla tarar. 100+ skor alan hisseleri otomatik olarak İzleme Listenize ekler.
-                </S.SectionNote>
-              </div>
+              <S.AIAutomationContainer>
+                <div>
+                  <S.SectionDescription>
+                    Manuel Piyasa Taraması
+                  </S.SectionDescription>
+                  <S.SectionNote>
+                    Tüm BIST hisselerini anlık fiyatlarla tarar. 100+ skor alan hisseleri otomatik olarak İzleme Listenize ekler.
+                  </S.SectionNote>
+                </div>
 
-              <S.AutomationButton
-                type="button"
-                onClick={runAIScan}
-                disabled={saving || (progress?.isRunning ?? false)}
-                $color="#A76BF5"
-                $disabled={saving || (progress?.isRunning ?? false)}
-              >
-                <Zap size={16} fill="white" />
-                {progress?.isRunning ? 'Tarama Sürüyor...' : 'Şimdi Taramayı Başlat'}
-              </S.AutomationButton>
+                <S.AutomationButton
+                  type="button"
+                  onClick={runAIScan}
+                  disabled={saving || (progress?.isRunning ?? false)}
+                  $color="#A76BF5"
+                  $disabled={saving || (progress?.isRunning ?? false)}
+                >
+                  <Zap size={16} fill="white" />
+                  {progress?.isRunning ? 'Tarama Sürüyor...' : 'Şimdi Taramayı Başlat'}
+                </S.AutomationButton>
 
-              {progress?.isRunning && (
-                <S.ProgressSection>
-                  <S.ProgressHeader>
-                    <span>{progress.message}</span>
-                    <span>%{Math.round((progress.current / (progress.total || 1)) * 100)}</span>
-                  </S.ProgressHeader>
-                  <S.ProgressBarContainer>
-                    <S.GradientProgressBar
-                      $percent={(progress.current / (progress.total || 1)) * 100}
-                      $color="#A76BF5"
-                    />
-                  </S.ProgressBarContainer>
-                </S.ProgressSection>
-              )}
-            </S.AIAutomationContainer>
-          </Section>
+                {progress?.isRunning && (
+                  <S.ProgressSection>
+                    <S.ProgressHeader>
+                      <span>{progress.message}</span>
+                      <span>%{Math.round((progress.current / (progress.total || 1)) * 100)}</span>
+                    </S.ProgressHeader>
+                    <S.ProgressBarContainer>
+                      <S.GradientProgressBar
+                        $percent={(progress.current / (progress.total || 1)) * 100}
+                        $color="#A76BF5"
+                      />
+                    </S.ProgressBarContainer>
+                  </S.ProgressSection>
+                )}
+              </S.AIAutomationContainer>
+            </Section>
+          )}
 
-          {/* Yeni: Genel Veri Yönetimi */}
-          <Section>
-            <SectionHeader>
-              <SectionIcon $color="rgba(15, 157, 88, 0.1)">
-                <TrendingUp size={20} color="#0F9D58" />
-              </SectionIcon>
-              <SectionTitle>Genel Veri Yönetimi</SectionTitle>
-            </SectionHeader>
+          {/* Genel Veri Yönetimi - Sadece Admin */}
+          {isAdmin && (
+            <Section>
+              <SectionHeader>
+                <SectionIcon $color="rgba(15, 157, 88, 0.1)">
+                  <TrendingUp size={20} color="#0F9D58" />
+                </SectionIcon>
+                <SectionTitle>Genel Veri Yönetimi</SectionTitle>
+              </SectionHeader>
 
-            <S.AIAutomationContainer>
-              <div>
-                <S.SectionDescription>
-                  Tüm Geçmiş Verileri Eşitle (1900+)
-                </S.SectionDescription>
-                <S.SectionNote>
-                  Tüm BIST hisselerinin tarihsel verilerini 1900 yılından itibaren tarar ve eksikleri veritabanına kaydeder. Bu işlem uzun sürebilir.
-                </S.SectionNote>
-              </div>
+              <S.AIAutomationContainer>
+                <div>
+                  <S.SectionDescription>
+                    Tüm Geçmiş Verileri Eşitle (1900+)
+                  </S.SectionDescription>
+                  <S.SectionNote>
+                    Tüm BIST hisselerinin tarihsel verilerini 1900 yılından itibaren tarar ve eksikleri veritabanına kaydeder. Bu işlem uzun sürebilir.
+                  </S.SectionNote>
+                </div>
 
-              <S.AutomationButton
-                type="button"
-                onClick={runFullHistorySync}
-                disabled={saving || (historyProgress?.isSyncing ?? false)}
-                $color="#0F9D58"
-                $disabled={saving || (historyProgress?.isSyncing ?? false)}
-              >
-                <TrendingUp size={16} />
-                {historyProgress?.isSyncing ? 'Eşitleniyor...' : 'Tüm Geçmişi Eşitle'}
-              </S.AutomationButton>
+                <S.AutomationButton
+                  type="button"
+                  onClick={runFullHistorySync}
+                  disabled={saving || (historyProgress?.isSyncing ?? false)}
+                  $color="#0F9D58"
+                  $disabled={saving || (historyProgress?.isSyncing ?? false)}
+                >
+                  <TrendingUp size={16} />
+                  {historyProgress?.isSyncing ? 'Eşitleniyor...' : 'Tüm Geçmişi Eşitle'}
+                </S.AutomationButton>
 
-              {historyProgress?.isSyncing && (
-                <S.ProgressSection>
-                  <S.ProgressHeader>
-                    <span>Eşitleniyor: <strong>{historyProgress.currentSymbol}</strong> ({historyProgress.current}/{historyProgress.total})</span>
-                    <span>%{historyProgress.percent}</span>
-                  </S.ProgressHeader>
-                  <S.ProgressBarContainer>
-                    <S.GradientProgressBar
-                      $percent={historyProgress.percent}
-                      $color="#0F9D58"
-                    />
-                  </S.ProgressBarContainer>
-                </S.ProgressSection>
-              )}
-            </S.AIAutomationContainer>
-          </Section>
+                {historyProgress?.isSyncing && (
+                  <S.ProgressSection>
+                    <S.ProgressHeader>
+                      <span>Eşitleniyor: <strong>{historyProgress.currentSymbol}</strong> ({historyProgress.current}/{historyProgress.total})</span>
+                      <span>%{historyProgress.percent}</span>
+                    </S.ProgressHeader>
+                    <S.ProgressBarContainer>
+                      <S.GradientProgressBar
+                        $percent={historyProgress.percent}
+                        $color="#0F9D58"
+                      />
+                    </S.ProgressBarContainer>
+                  </S.ProgressSection>
+                )}
+              </S.AIAutomationContainer>
+            </Section>
+          )}
         </ProfileGrid>
 
         <S.ButtonGroup>
