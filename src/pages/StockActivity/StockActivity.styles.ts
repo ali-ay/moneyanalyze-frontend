@@ -20,6 +20,7 @@ export const TableWrapper = styled.div`
   @media (max-width: 768px) {
     margin: 0 -12px;
     padding: 0px;
+    overflow-x: auto;
   }
 `;
 
@@ -109,7 +110,7 @@ export const NotesIcon = styled.div`
 
 export const TooltipBox = styled.div`
   position: absolute;
-  bottom: 120%;
+  top: 100%;
   right: 0;
   width: 280px;
   background: #ffffff;
@@ -118,24 +119,25 @@ export const TooltipBox = styled.div`
   border-radius: 12px;
   font-size: 0.875rem;
   line-height: 1.6;
-  box-shadow: 0 10px 30px rgba(60,64,67,0.2);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
   border: 1px solid #E8EAED;
   visibility: hidden;
   opacity: 0;
   transform: translateY(10px);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 1000;
+  z-index: 9999;
   pointer-events: none;
   text-align: left;
+  margin-top: 8px;
 
   &::after {
     content: '';
     position: absolute;
-    top: 100%;
+    bottom: 100%;
     right: 14px;
     border-width: 8px;
     border-style: solid;
-    border-color: #ffffff transparent transparent transparent;
+    border-color: transparent transparent #ffffff transparent;
   }
 
   .tooltip-header {
@@ -166,8 +168,10 @@ export const TooltipContainer = styled.div`
   justify-content: center;
   width: 100%;
   padding: 8px 0;
+  z-index: 100;
 
   &:hover {
+    z-index: 10000;
     ${NotesIcon} {
       background: rgba(26, 115, 232, 0.15);
       transform: scale(1.1);
