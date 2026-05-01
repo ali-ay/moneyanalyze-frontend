@@ -32,7 +32,7 @@ const ForgotPassword = () => {
   return (
     <AuthContainer>
       <AuthBox>
-        <AuthTitle>Şifremi Unuttum</AuthTitle>
+        <AuthTitle>Şifremi Unuttumm</AuthTitle>
         <AuthSubtitle>E-posta adresinizi girerek şifrenizi sıfırlayabilirsiniz.</AuthSubtitle>
 
         {message && <S.SuccessAlert>{message}</S.SuccessAlert>}
