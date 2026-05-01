@@ -1,25 +1,11 @@
 import { useEffect, useState } from 'react';
+import * as S from './GlobalSettings.styles';
 import api from '../../../services/apiClient';
-import { 
-  PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState 
+import {
+  PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState
 } from '../../../components/ui/Layout.styles';
 import { MetricCard } from '../../../components/ui/Card.styles';
 import { SubmitButton, InputGroup } from '../../../components/ui/Auth.styles';
-import styled from 'styled-components';
-
-const SettingsForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  max-width: 800px;
-`;
-
-const SectionTitle = styled.h3`
-  margin: 0 0 16px 0;
-  color: ${props => props.theme?.colors?.textMain || '#202124'};
-  border-bottom: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
-  padding-bottom: 8px;
-`;
 
 const GlobalSettings = () => {
   const [formData, setFormData] = useState({
@@ -78,87 +64,80 @@ const GlobalSettings = () => {
         <PageSubtitle>SEO, GTM ve Güvenlik anahtarlarını buradan yönetin.</PageSubtitle>
       </PageHeader>
 
-      <MetricCard style={{ padding: '32px' }}>
-        <SettingsForm onSubmit={handleSubmit}>
+      <MetricCard as={S.FormContent}>
+        <S.SettingsForm onSubmit={handleSubmit}>
           
-          <div>
-            <SectionTitle>SEO & Meta Bilgileri</SectionTitle>
+          <S.SectionContainer>
+            <S.SectionTitle>SEO & Meta Bilgileri</S.SectionTitle>
             <InputGroup>
               <label>Site Başlığı (Title)</label>
-              <input 
-                name="siteTitle" 
-                value={formData.siteTitle || ''} 
-                onChange={handleChange} 
+              <input
+                name="siteTitle"
+                value={formData.siteTitle || ''}
+                onChange={handleChange}
                 placeholder="Örn: MoneyAnalyze | Profesyonel Kripto Botu"
               />
             </InputGroup>
             <InputGroup style={{ marginTop: '16px' }}>
               <label>Site Açıklaması (Description)</label>
-              <textarea 
-                name="siteDescription" 
-                value={formData.siteDescription || ''} 
+              <S.TextArea
+                name="siteDescription"
+                value={formData.siteDescription || ''}
                 onChange={handleChange as any}
                 placeholder="Site hakkında kısa açıklama..."
-                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', minHeight: '80px' }}
               />
             </InputGroup>
-          </div>
+          </S.SectionContainer>
 
-          <div>
-            <SectionTitle>Google Entegrasyonları</SectionTitle>
+          <S.SectionContainer>
+            <S.SectionTitle>Google Entegrasyonları</S.SectionTitle>
             <InputGroup>
               <label>Google Tag Manager (GTM) ID</label>
-              <input 
-                name="gtmId" 
-                value={formData.gtmId || ''} 
-                onChange={handleChange} 
+              <input
+                name="gtmId"
+                value={formData.gtmId || ''}
+                onChange={handleChange}
                 placeholder="GTM-XXXXXXX"
               />
             </InputGroup>
-          </div>
+          </S.SectionContainer>
 
-          <div>
-            <SectionTitle>Google reCAPTCHA v3 Keys</SectionTitle>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <S.SectionContainer>
+            <S.SectionTitle>Google reCAPTCHA v3 Keys</S.SectionTitle>
+            <S.RecaptchaKeysGrid>
               <InputGroup>
                 <label>Site Key (Public)</label>
-                <input 
-                  name="recaptchaSiteKey" 
-                  value={formData.recaptchaSiteKey || ''} 
-                  onChange={handleChange} 
+                <input
+                  name="recaptchaSiteKey"
+                  value={formData.recaptchaSiteKey || ''}
+                  onChange={handleChange}
                   placeholder="6L..."
                 />
               </InputGroup>
               <InputGroup>
                 <label>Secret Key (Private)</label>
-                <input 
+                <input
                   type="password"
-                  name="recaptchaSecretKey" 
-                  value={formData.recaptchaSecretKey || ''} 
-                  onChange={handleChange} 
+                  name="recaptchaSecretKey"
+                  value={formData.recaptchaSecretKey || ''}
+                  onChange={handleChange}
                   placeholder="Gizli Anahtar"
                 />
               </InputGroup>
-            </div>
-          </div>
+            </S.RecaptchaKeysGrid>
+          </S.SectionContainer>
 
           {message.text && (
-            <div style={{ 
-              padding: '12px', 
-              borderRadius: '8px', 
-              backgroundColor: message.type === 'success' ? '#e6f4ea' : '#fce8e6',
-              color: message.type === 'success' ? '#0f9d58' : '#d93025',
-              fontWeight: 600
-            }}>
+            <S.Message $type={message.type as 'success' | 'error'}>
               {message.text}
-            </div>
+            </S.Message>
           )}
 
-          <SubmitButton type="submit" disabled={saving} style={{ alignSelf: 'flex-start', padding: '12px 32px' }}>
+          <SubmitButton type="submit" disabled={saving} as="button">
             {saving ? 'Kaydediliyor...' : 'Ayarları Kaydet'}
           </SubmitButton>
 
-        </SettingsForm>
+        </S.SettingsForm>
       </MetricCard>
     </PageContainer>
   );

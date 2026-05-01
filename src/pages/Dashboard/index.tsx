@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import * as S from './Dashboard.styles';
 import { useDashboardData } from '../../features/dashboard/hooks/useDashboardData';
 
 // Feature Components
@@ -9,40 +9,24 @@ import { AssetsTableSection } from '../../features/dashboard/components/AssetsTa
 import { OpportunitiesSection } from '../../features/dashboard/components/OpportunitiesSection';
 import { DashboardFooter } from '../../features/dashboard/components/DashboardFooter';
 
-const DashboardGrid = styled.div`
-  max-width: 1400px;
-  margin: 0 auto;
-`;
-
-const SectionRow = styled.div<{ $reverse?: boolean }>`
-  display: grid;
-  grid-template-columns: ${props => props.$reverse ? '1fr 380px' : '380px 1fr'};
-  gap: 18px;
-  margin-bottom: 24px;
-  
-  @media (max-width: 1100px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
 const DashboardPage: React.FC = () => {
   const { marketData, lastUpdated, loading, error } = useDashboardData();
 
   return (
-    <DashboardGrid>
-      <SectionRow>
+    <S.DashboardGrid>
+      <S.SectionRow>
         <PortfolioSummary />
         <MarketTrendSection />
-      </SectionRow>
+      </S.SectionRow>
 
       <AssetsTableSection data={marketData} loading={loading} error={error} />
 
-      <div style={{ marginTop: '32px' }}>
+      <S.OpportunitiesWrapper>
         <OpportunitiesSection />
-      </div>
+      </S.OpportunitiesWrapper>
 
       <DashboardFooter lastUpdated={lastUpdated} />
-    </DashboardGrid>
+    </S.DashboardGrid>
   );
 };
 

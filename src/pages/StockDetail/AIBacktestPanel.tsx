@@ -1,4 +1,5 @@
 import React from 'react';
+import * as S from './AIBacktestPanel.styles';
 import styled from 'styled-components';
 import api from '../../services/apiClient';
 import { Card } from '../../components/ui/Card';
@@ -210,12 +211,12 @@ export const AIBacktestPanel: React.FC<Props> = ({
   return (
     <PanelContainer>
       <Card.Header>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <S.HeaderContainer>
+          <S.HeaderLeft>
             <Zap size={20} color="#1A73E8" fill="#1A73E8" />
-            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800 }}>AI Strateji Optimizasyonu</h3>
-          </div>
-          <div style={{ display: 'flex', gap: 4 }}>
+            <S.HeaderTitle>AI Strateji Optimizasyonu</S.HeaderTitle>
+          </S.HeaderLeft>
+          <S.PeriodTabsContainer>
             {periods.map(p => (
               <PeriodTab 
                 key={p.id} 
@@ -228,49 +229,37 @@ export const AIBacktestPanel: React.FC<Props> = ({
                 {p.label}
               </PeriodTab>
             ))}
-          </div>
-        </div>
+          </S.PeriodTabsContainer>
+        </S.HeaderContainer>
       </Card.Header>
       <Card.Body>
         {(loading || optimizedLoading) ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 32 }}>
+          <S.LoadingContainer>
             <Loader2 className="animate-spin" size={32} color="#1A73E8" />
-          </div>
+          </S.LoadingContainer>
         ) : data ? (
           <>
             {showOptimization && (
-              <div style={{ 
-                background: '#E8F0FE', 
-                borderRadius: 12, 
-                padding: '16px', 
-                marginBottom: 20,
-                border: '1px solid rgba(26, 115, 232, 0.2)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                  <div style={{ 
-                    background: '#1A73E8', 
-                    borderRadius: '50%', 
-                    padding: 8, 
-                    color: 'white',
-                    display: 'flex'
-                  }}>
+              <S.OptimizationBox>
+                <S.OptimizationHeader>
+                  <S.OptimizationBadge>
                     <Sparkles size={16} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1A73E8', textTransform: 'uppercase' }}>
+                  </S.OptimizationBadge>
+                  <S.OptimizationInfo>
+                    <S.OptimizationLabel>
                       BU HİSSE İÇİN EN İYİ ÇALIŞAN STRATEJİ (AI SEÇİMİ)
-                    </div>
-                    <div style={{ fontSize: '0.8125rem', color: '#202124', fontWeight: 600 }}>
+                    </S.OptimizationLabel>
+                    <S.OptimizationDetails>
                       RSI {optimizedData.rsiThreshold} Altı | SMA {optimizedData.smaShort}/{optimizedData.smaLong} Kesişimi
-                    </div>
-                  </div>
-                  <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-                    <div style={{ fontSize: '0.625rem', color: '#5F6368', fontWeight: 700 }}>AI BAŞARI SKORU</div>
-                    <div style={{ fontSize: '1.125rem', fontWeight: 900, color: '#0F9D58' }}>%{optimizedData.winRate.toFixed(1)}</div>
-                  </div>
-                </div>
+                    </S.OptimizationDetails>
+                  </S.OptimizationInfo>
+                  <S.OptimizationScore>
+                    <S.ScoreLabel>AI BAŞARI SKORU</S.ScoreLabel>
+                    <S.ScoreValue>%{optimizedData.winRate.toFixed(1)}</S.ScoreValue>
+                  </S.OptimizationScore>
+                </S.OptimizationHeader>
 
-                <button 
+                <S.SaveSignalButton
                   onClick={async () => {
                     try {
                       const response = await api.post('/watchlist', {
@@ -286,48 +275,32 @@ export const AIBacktestPanel: React.FC<Props> = ({
                       console.error('Watchlist hatası:', error);
                     }
                   }}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    background: '#1A73E8',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontSize: '0.8125rem',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    transition: 'all 0.2s'
-                  }}
                 >
                   <TrendingUp size={16} />
                   BU SİNYALİ TAKİP LİSTEME KAYDET
-                </button>
-              </div>
+                </S.SaveSignalButton>
+              </S.OptimizationBox>
             )}
 
-            <div style={{ fontSize: '0.875rem', color: '#5F6368', marginBottom: 16 }}>
-              {showOptimization 
+            <S.DescriptionText>
+              {showOptimization
                 ? "Yapay zeka, bu hisse için yukarıdaki parametreleri en verimli strateji olarak belirledi. İşte bu özel stratejinin geçmiş performansı:"
                 : `Bu hissede ${period === 'weekly' ? 'Haftalık' : period === 'monthly' ? 'Aylık' : period} strateji şartları sağlandığında oluşan geçmiş performans verileri:`
               }
-            </div>
+            </S.DescriptionText>
             
             <StatsGrid>
               <StatItem>
                 <div className="label"><Target size={12} /> Başarı Oranı</div>
-                <div className="value" style={{ color: data.winRate > 60 ? '#0F9D58' : '#202124' }}>
+                <S.StatValue as="div" className="value" $positive={data.winRate > 60}>
                   %{data.winRate.toFixed(1)}
-                </div>
+                </S.StatValue>
               </StatItem>
               <StatItem>
                 <div className="label"><TrendingUp size={12} /> Ort. Getiri</div>
-                <div className="value" style={{ color: data.avgProfit > 0 ? '#0F9D58' : '#DB4437' }}>
+                <S.StatValue as="div" className="value" $positive={data.avgProfit > 0}>
                   %{data.avgProfit.toFixed(2)}
-                </div>
+                </S.StatValue>
               </StatItem>
               <StatItem>
                 <div className="label"><CheckCircle2 size={12} /> Sinyal Sayısı</div>
@@ -337,25 +310,25 @@ export const AIBacktestPanel: React.FC<Props> = ({
 
             {data.recentSignals && data.recentSignals.length > 0 && (
               <SignalHistory>
-                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#9AA0A6', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <S.SignalHistoryHeader>
                   <History size={14} /> {isExpanded ? 'TÜM GEÇMİŞ SİNYALLER' : 'SON 5 SİNYAL PERFORMANSI'}
-                </div>
+                </S.SignalHistoryHeader>
                 {signalsToShow.map((sig: any, idx: number) => (
                   <HistoryRow key={idx}>
                     <span className="date">{new Date(sig.date).toLocaleDateString('tr-TR')}</span>
                     <span className="price">₺{sig.entryPrice.toFixed(2)} ➔ ₺{sig.exitPrice.toFixed(2)}</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <span className="profit" style={{ color: sig.profit > 0 ? '#0F9D58' : '#DB4437' }}>
+                    <S.SignalRow>
+                      <S.SignalProfit className="profit" $positive={sig.profit > 0}>
                         {sig.profit > 0 ? '+' : ''}{sig.profit.toFixed(2)}%
-                      </span>
+                      </S.SignalProfit>
                       <InfoIconWrapper>
                         <Info size={14} />
                         <div className="tooltip">
-                          <div style={{ fontWeight: 800, marginBottom: 4, color: '#1A73E8' }}>AI ANALİZİ</div>
+                          <S.TooltipLabel>AI ANALİZİ</S.TooltipLabel>
                           {getSignalAnalysis(sig.date, sig.profit)}
                         </div>
                       </InfoIconWrapper>
-                    </div>
+                    </S.SignalRow>
                   </HistoryRow>
                 ))}
 
@@ -373,14 +346,14 @@ export const AIBacktestPanel: React.FC<Props> = ({
               </SignalHistory>
             )}
 
-            <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.6875rem', color: '#DB4437', fontWeight: 600 }}>
+            <S.DisclaimerText>
               <AlertCircle size={12} /> Geçmiş performans, gelecekteki sonuçların garantisi değildir.
-            </div>
+            </S.DisclaimerText>
           </>
         ) : (
-          <div style={{ textAlign: 'center', color: '#9AA0A6', padding: 20 }}>
+          <S.NoDataContainer>
             Veri alınamadı.
-          </div>
+          </S.NoDataContainer>
         )}
       </Card.Body>
     </PanelContainer>

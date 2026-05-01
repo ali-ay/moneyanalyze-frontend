@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useLoginLogic } from './logic';
-import { 
-  AuthContainer, AuthBox, AuthTitle, AuthSubtitle, AuthForm, 
-  InputGroup, SubmitButton, ErrorMessage, FooterText 
+import {
+  AuthContainer, AuthBox, AuthTitle, AuthSubtitle, AuthForm,
+  InputGroup, SubmitButton, ErrorMessage, FooterText
 } from '../../../components/ui/Auth.styles';
+import * as S from '../Auth.styles';
 
 const Login = () => {
   const {
@@ -35,10 +36,10 @@ const Login = () => {
           </InputGroup>
 
           <InputGroup>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <S.PasswordLabelContainer>
               <label>Şifre</label>
-              <Link to="/forgot-password" style={{ fontSize: '0.75rem', color: '#3b82f6', textDecoration: 'none' }}>Şifremi Unuttum</Link>
-            </div>
+              <S.ForgotPasswordLink as={Link} to="/forgot-password">Şifremi Unuttum</S.ForgotPasswordLink>
+            </S.PasswordLabelContainer>
             <input 
               type="password" 
               placeholder="••••••••"

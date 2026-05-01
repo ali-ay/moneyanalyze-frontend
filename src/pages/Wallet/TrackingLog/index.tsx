@@ -1,4 +1,5 @@
 import React from 'react';
+import * as S from './TrackingLog.styles';
 import { useTrackingLogLogic } from './logic';
 import { useNavigate } from 'react-router-dom';
 import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState, EmptyState } from '../../../components/ui/Layout.styles';
@@ -19,13 +20,13 @@ const TrackingLog: React.FC = () => {
   return (
     <PageContainer>
       <PageHeader>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <S.HeaderRow>
           <History size={32} color="#1A73E8" />
           <div>
             <PageTitle>Hisse Hareket Kaydı</PageTitle>
             <PageSubtitle>Cüzdanınıza eklediğiniz ve çıkardığınız tüm hisselerin tarihsel dökümü.</PageSubtitle>
           </div>
-        </div>
+        </S.HeaderRow>
       </PageHeader>
 
       {loading ? (
@@ -35,13 +36,13 @@ const TrackingLog: React.FC = () => {
           <Table>
             <thead>
               <tr>
-                <Th onClick={() => requestSort('createdAt')} style={{ cursor: 'pointer' }}>Tarih / Saat{getSortIndicator('createdAt')}</Th>
+                <S.SortableHeader as={Th} onClick={() => requestSort('createdAt')}>Tarih / Saat{getSortIndicator('createdAt')}</S.SortableHeader>
                 <Th>İşlem</Th>
-                <Th onClick={() => requestSort('symbol')} style={{ cursor: 'pointer' }}>Hisse{getSortIndicator('symbol')}</Th>
+                <S.SortableHeader as={Th} onClick={() => requestSort('symbol')}>Hisse{getSortIndicator('symbol')}</S.SortableHeader>
                 <Th>İşlem Tipi</Th>
-                <Th onClick={() => requestSort('price')} style={{ cursor: 'pointer' }}>İşlem Fiyatı{getSortIndicator('price')}</Th>
-                <Th onClick={() => requestSort('currentPrice')} style={{ cursor: 'pointer' }}>Anlık Fiyat{getSortIndicator('currentPrice')}</Th>
-                <Th onClick={() => requestSort('profit')} style={{ cursor: 'pointer' }}>Değişim (%){getSortIndicator('profit')}</Th>
+                <S.SortableHeader as={Th} onClick={() => requestSort('price')}>İşlem Fiyatı{getSortIndicator('price')}</S.SortableHeader>
+                <S.SortableHeader as={Th} onClick={() => requestSort('currentPrice')}>Anlık Fiyat{getSortIndicator('currentPrice')}</S.SortableHeader>
+                <S.SortableHeader as={Th} onClick={() => requestSort('profit')}>Değişim (%){getSortIndicator('profit')}</S.SortableHeader>
               </tr>
             </thead>
             <tbody>
@@ -54,20 +55,19 @@ const TrackingLog: React.FC = () => {
                 const isPositive = changePercent !== null && changePercent >= 0;
 
                 return (
-                  <TableRow
+                  <S.ClickableRow
                     key={tx.id}
                     onClick={() => navigate(`/dashboard/stock/${cleanSym}`)}
-                    style={{ cursor: 'pointer' }}
                   >
                     <Td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <S.DateCell>
                         <Clock size={14} color="#9AA0A6" />
                         {new Date(tx.createdAt).toLocaleString('tr-TR')}
-                      </div>
+                      </S.DateCell>
                     </Td>
                     <Td>
                       {tx.entryType === 'AI_SIGNAL' ? (
-                        <Badge type="info" style={{ background: '#e8f0fe', color: '#1a73e8', border: '1px solid #1a73e8' }}>
+                        <Badge type="info" as={S.AISignalBadge}>
                           YAPAY ZEKA ({tx.period === 'weekly' ? 'Haftalık' : tx.period === 'monthly' ? 'Aylık' : tx.period})
                         </Badge>
                       ) : (
@@ -76,7 +76,7 @@ const TrackingLog: React.FC = () => {
                         </Badge>
                       )}
                     </Td>
-                    <Td style={{ fontWeight: 'bold', color: '#1A73E8' }}>{cleanSym}</Td>
+                    <S.SymbolCell>{cleanSym}</S.SymbolCell>
                     <Td>
                       <Badge type={tx.type === 'BUY' || tx.entryType === 'AI_SIGNAL' ? 'BUY' : 'SELL'}>
                         {tx.type === 'BUY' || tx.entryType === 'AI_SIGNAL' ? 'ALIM' : 'SATIM'}
@@ -86,24 +86,18 @@ const TrackingLog: React.FC = () => {
                     <Td>
                       {currentPrice
                         ? `₺${currentPrice.toLocaleString('tr-TR')}`
-                        : <span style={{ color: '#9AA0A6' }}>Yükleniyor...</span>
+                        : <S.LoadingText>Yükleniyor...</S.LoadingText>
                       }
                     </Td>
                     <Td>
                       {changePercent !== null ? (
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          color: isPositive ? '#0F9D58' : '#DB4437',
-                          fontWeight: 'bold'
-                        }}>
+                        <S.ChangeContainer $isPositive={isPositive}>
                           {isPositive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
                           {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
-                        </div>
+                        </S.ChangeContainer>
                       ) : '-'}
                     </Td>
-                  </TableRow>
+                  </S.ClickableRow>
                 );
               })}
             </tbody>

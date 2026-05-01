@@ -2,16 +2,17 @@ import React from 'react';
 import styled from 'styled-components';
 import { useAIAnalysisLogic } from './logic';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Zap, 
-  ChevronRight, 
-  Loader2, 
-  TrendingUp, 
+import {
+  Zap,
+  ChevronRight,
+  Loader2,
+  TrendingUp,
   Calendar,
   AlertCircle
 } from 'lucide-react';
 import { PageContainer, PageHeader, PageTitle, PageSubtitle } from '../../components/ui/Layout.styles';
 import { Card } from '../../components/ui/Card';
+import * as S from './AIAnalysis.styles';
 
 const TabsContainer = styled.div`
   display: flex;
@@ -142,29 +143,20 @@ const AIAnalysis: React.FC = () => {
   return (
     <PageContainer>
       <PageHeader>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ 
-            width: 48, 
-            height: 48, 
-            background: '#1A73E8', 
-            borderRadius: 12, 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            color: 'white'
-          }}>
+        <S.HeaderContainer>
+          <S.IconBox>
             <Zap size={24} fill="white" />
-          </div>
+          </S.IconBox>
           <div>
             <PageTitle>Yapay Zeka Teknik Analiz</PageTitle>
             <PageSubtitle>
               Algoritmik modeller ve indikatörler ışığında hazırlanan teknik görünüm özetleri.
-              <span style={{ display: 'block', color: '#DB4437', fontWeight: 700, marginTop: 4, fontSize: '0.75rem' }}>
+              <S.DisclaimerText>
                 * Yatırım tavsiyesi değildir.
-              </span>
+              </S.DisclaimerText>
             </PageSubtitle>
           </div>
-        </div>
+        </S.HeaderContainer>
       </PageHeader>
 
       <TabsContainer>
@@ -180,9 +172,9 @@ const AIAnalysis: React.FC = () => {
       </TabsContainer>
 
       {loading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: 64 }}>
+        <S.LoadingContainer>
           <Loader2 className="animate-spin" size={48} color="#1A73E8" />
-        </div>
+        </S.LoadingContainer>
       ) : (
         <>
           {opportunities.length > 0 ? (
@@ -210,50 +202,37 @@ const AIAnalysis: React.FC = () => {
                     </Metric>
                     <Metric>
                       <span className="label">Güncel Fiyat:</span>
-                      <span className="value" style={{ color: '#1A73E8' }}>
+                      <S.CurrentPriceValue className="value">
                         ₺{currentPrice > 0 ? currentPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) : '---'}
-                      </span>
+                      </S.CurrentPriceValue>
                     </Metric>
                     <Metric>
                       <span className="label">Potansiyel Getiri:</span>
-                      <span className="value" style={{ color: isPositive ? '#0F9D58' : '#DB4437' }}>
+                      <S.ProfitValue className="value" $positive={isPositive}>
                         {isPositive ? '+' : ''}{profit}%
-                      </span>
+                      </S.ProfitValue>
                     </Metric>
                     <Metric>
                       <span className="label">Son Tarama:</span>
-                      <span className="value" style={{ fontSize: '0.6875rem' }}>
+                      <S.LastScanDate className="value">
                         {new Date(opp.updatedAt).toLocaleDateString('tr-TR')}
-                      </span>
+                      </S.LastScanDate>
                     </Metric>
 
-                    <div style={{ 
-                      marginTop: 16, 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'flex-end', 
-                      color: '#1A73E8', 
-                      fontSize: '0.75rem', 
-                      fontWeight: 700 
-                    }}>
+                    <S.DetailLink>
                       DETAYLI ANALİZ <ChevronRight size={14} />
-                    </div>
+                    </S.DetailLink>
                   </OpportunityCard>
                 );
               })}
             </Grid>
           ) : (
-            <div style={{ 
-              background: '#F8F9FA', 
-              borderRadius: 20, 
-              padding: 48, 
-              textAlign: 'center',
-              color: '#5F6368',
-              border: '1px dashed #DADCE0'
-            }}>
-              <AlertCircle size={48} style={{ marginBottom: 16, opacity: 0.5 }} />
+            <S.EmptyState>
+              <S.EmptyStateIcon as="div">
+                <AlertCircle size={48} />
+              </S.EmptyStateIcon>
               <p>Bu periyot için henüz güçlü bir sinyal oluşmamış.</p>
-            </div>
+            </S.EmptyState>
           )}
         </>
       )}

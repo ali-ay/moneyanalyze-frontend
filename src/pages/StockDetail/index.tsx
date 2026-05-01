@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import * as S from './StockDetail.styles';
 import styled from 'styled-components';
 import { useStockDetailLogic } from './logic';
 import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState } from '../../components/ui/Layout.styles';
@@ -97,29 +98,32 @@ const StockDetail: React.FC = () => {
 
   return (
     <PageContainer>
-      <Button
-        $variant="secondary"
-        $size="sm"
-        onClick={() => navigate(-1)}
-        style={{ marginBottom: '16px', alignSelf: 'flex-start' }}
-      >
-        <ArrowLeft size={16} /> Geri
-      </Button>
+      <S.BackButton>
+        <Button
+          $variant="secondary"
+          $size="sm"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft size={16} /> Geri
+        </Button>
+      </S.BackButton>
 
       <PageHeader>
         <HStack $justify="space-between" $align="flex-start" $fullWidth>
           <div>
             <PageTitle>{fundamentals?.name || symbol}</PageTitle>
             <PageSubtitle>{symbol} • BIST</PageSubtitle>
-            <PriceDisplay style={{ marginTop: 12 }}>
-              <PriceText>₺{price.toFixed(2)}</PriceText>
-              <ChangeBadge $positive={isUp}>
-                {isUp ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                {isUp ? '+' : ''}
-                {change.toFixed(2)} ({isUp ? '+' : ''}
-                {changePercent.toFixed(2)}%)
-              </ChangeBadge>
-            </PriceDisplay>
+            <S.PriceDisplayWrapper>
+                <PriceDisplay>
+                  <PriceText>₺{price.toFixed(2)}</PriceText>
+                  <ChangeBadge $positive={isUp}>
+                    {isUp ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                    {isUp ? '+' : ''}
+                    {change.toFixed(2)} ({isUp ? '+' : ''}
+                    {changePercent.toFixed(2)}%)
+                  </ChangeBadge>
+                </PriceDisplay>
+            </S.PriceDisplayWrapper>
           </div>
         </HStack>
       </PageHeader>
@@ -173,11 +177,11 @@ const StockDetail: React.FC = () => {
       </ChartContainer>
 
       {fundamentals && (
-        <Card style={{ marginBottom: 24 }}>
+        <S.CardWithMargin as={Card}>
           <Card.Body>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: '1rem', fontWeight: 700 }}>
+            <S.SectionTitle>
               Temel Veriler
-            </h3>
+            </S.SectionTitle>
             <Grid $columns="repeat(auto-fit, minmax(150px, 1fr))" $gap="md">
               <FundamentalCard>
                 <FundamentalLabel>Piyasa Değeri</FundamentalLabel>
@@ -211,7 +215,7 @@ const StockDetail: React.FC = () => {
               </FundamentalCard>
             </Grid>
           </Card.Body>
-        </Card>
+        </S.CardWithMargin>
       )}
 
       <AIBacktestPanel 

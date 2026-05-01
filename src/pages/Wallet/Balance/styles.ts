@@ -60,10 +60,134 @@ export const AddButton = styled.button`
   }
 `;
 
-export const HistorySection = styled.div`
-  h3 { 
-    margin-bottom: 20px; 
-    color: ${props => props.theme.colors.textMain}; 
+export const HistorySection = styled.div<{ $marginBottom?: string }>`
+  h3 {
+    margin-bottom: 20px;
+    color: ${props => props.theme.colors.textMain};
     font-size: 1.125rem;
   }
+  margin-bottom: ${props => props.$marginBottom || '0'};
+`;
+
+export const LoadingContainer = styled.div`
+  padding: 40px;
+  text-align: center;
+  color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
+`;
+
+export const ErrorAlert = styled.div`
+  background: #fce8e6;
+  color: #d93025;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  border: 1px solid #f5c2c7;
+  font-size: 0.875rem;
+  font-weight: 500;
+`;
+
+export const LiveBadgeContainer = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  vertical-align: middle;
+  margin-left: 15px;
+`;
+
+export const StatusIndicator = styled.div<{ $isActive: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: ${props => props.$isActive ? '#0f9d58' : '#db4437'};
+`;
+
+export const StatusDot = styled.div<{ $isActive: boolean }>`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: ${props => props.$isActive ? '#0f9d58' : '#db4437'};
+`;
+
+export const BalanceValue = styled.div<{ $isRealData: boolean }>`
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: ${props => props.$isRealData ? '#1a73e8' : '#9AA0A6'};
+`;
+
+export const BalanceUnit = styled.span`
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-left: 8px;
+  color: #5F6368;
+`;
+
+export const BalanceEquivalent = styled.div`
+  margin-top: 8px;
+  font-size: 1.1rem;
+  color: #5F6368;
+`;
+
+export const EquivalentUnit = styled.span`
+  font-weight: 600;
+`;
+
+export const ExchangeRate = styled.span`
+  font-size: 0.9rem;
+  margin-left: 12px;
+  color: #9AA0A6;
+`;
+
+export const AssetsHeaderRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+`;
+
+export const SectionTitle = styled.h3`
+  margin: 0;
+  color: ${props => props.theme?.colors?.textMain || '#202124'};
+`;
+
+export const TransactionHeaderRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+`;
+
+export const SymbolCell = styled.td`
+  font-weight: bold;
+`;
+
+export const PriceCell = styled.td`
+  color: #1a73e8;
+  font-weight: 600;
+`;
+
+export const ValueCell = styled.td`
+  font-weight: bold;
+`;
+
+export const FreeCell = styled.td`
+  color: #0f9d58;
+`;
+
+export const LockedCell = styled.td`
+  color: #f4b400;
+`;
+
+export const AmountCell = styled.td`
+  font-weight: bold;
+`;
+
+export const DescriptionCell = styled.td`
+  color: #5F6368;
+`;
+
+export const EmptyCell = styled.td`
+  text-align: center;
+  padding: 40px;
+  color: #9AA0A6;
 `;

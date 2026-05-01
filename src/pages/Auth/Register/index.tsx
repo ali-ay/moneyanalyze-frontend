@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useRegisterLogic } from './logic';
-import { 
-  AuthContainer, AuthBox, AuthTitle, AuthSubtitle, AuthForm, 
-  InputGroup, SubmitButton, ErrorMessage, FooterText 
+import {
+  AuthContainer, AuthBox, AuthTitle, AuthSubtitle, AuthForm,
+  InputGroup, SubmitButton, ErrorMessage, FooterText
 } from '../../../components/ui/Auth.styles';
 import styled from 'styled-components';
+import * as S from '../Auth.styles';
 
 const SuccessMessage = styled.div`
   background: rgba(15, 157, 88, 0.1);
@@ -37,7 +38,7 @@ const Register = () => {
 
   return (
     <AuthContainer>
-      <AuthBox style={{ maxWidth: '600px' }}>
+      <S.RegisterBox as={AuthBox}>
         <AuthTitle>Kayıt Ol</AuthTitle>
         <AuthSubtitle>Platforma katılarak botları kullanmaya başla</AuthSubtitle>
         
@@ -79,19 +80,11 @@ const Register = () => {
 
           <InputGroup>
             <label>Adres</label>
-            <textarea 
-              name="address" 
-              placeholder="Açık adresiniz" 
-              value={formData.address} 
+            <S.TextArea
+              name="address"
+              placeholder="Açık adresiniz"
+              value={formData.address}
               onChange={handleChange as any}
-              style={{
-                width: '100%',
-                padding: '12px',
-                borderRadius: '8px',
-                border: '1px solid #ddd',
-                minHeight: '80px',
-                fontFamily: 'inherit'
-              }}
             />
           </InputGroup>
 
@@ -103,7 +96,7 @@ const Register = () => {
         <FooterText>
           Zaten hesabın var mı? <Link to="/login">Giriş Yap</Link>
         </FooterText>
-      </AuthBox>
+      </S.RegisterBox>
     </AuthContainer>
   );
 };

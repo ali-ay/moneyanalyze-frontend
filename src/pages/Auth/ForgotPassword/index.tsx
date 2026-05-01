@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../../services/apiClient';
-import { 
-  AuthContainer, AuthBox, AuthTitle, AuthSubtitle, AuthForm, 
-  InputGroup, SubmitButton, ErrorMessage, FooterText 
+import {
+  AuthContainer, AuthBox, AuthTitle, AuthSubtitle, AuthForm,
+  InputGroup, SubmitButton, ErrorMessage, FooterText
 } from '../../../components/ui/Auth.styles';
+import * as S from '../Auth.styles';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -34,7 +35,7 @@ const ForgotPassword = () => {
         <AuthTitle>Şifremi Unuttum</AuthTitle>
         <AuthSubtitle>E-posta adresinizi girerek şifrenizi sıfırlayabilirsiniz.</AuthSubtitle>
 
-        {message && <div style={{ color: '#0f9d58', background: '#e6f4ea', padding: '12px', borderRadius: '8px', marginBottom: '20px', fontSize: '0.875rem' }}>{message}</div>}
+        {message && <S.SuccessAlert>{message}</S.SuccessAlert>}
         {error && <ErrorMessage>{error}</ErrorMessage>}
 
         <AuthForm onSubmit={handleSubmit}>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import * as S from './BotSettings.styles';
 import api from '../../../services/apiClient';
 import { io } from 'socket.io-client';
 import { useAuth } from '../../../app/providers/AuthContext';
@@ -65,90 +66,68 @@ const GeneralSettings = () => {
   };
 
   return (
-    <div style={{ padding: '24px', color: 'white' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-        <div>
-          <h2 style={{ margin: 0 }}>🔧 Genel Bot Ayarları</h2>
-          <p style={{ color: '#94a3b8', fontSize: '0.875rem' }}>Tüm aktif botlarını buradan yönetebilirsin.</p>
-        </div>
-        <button onClick={() => setIsModalOpen(true)} style={styles.addBtn}>
+    <S.Container>
+      <S.Header>
+        <S.HeaderContent>
+          <S.HeaderTitle>🔧 Genel Bot Ayarları</S.HeaderTitle>
+          <S.HeaderSubtitle>Tüm aktif botlarını buradan yönetebilirsin.</S.HeaderSubtitle>
+        </S.HeaderContent>
+        <S.AddButton onClick={() => setIsModalOpen(true)}>
           + Yeni Bot Oluştur
-        </button>
-      </div>
+        </S.AddButton>
+      </S.Header>
 
-      <div style={styles.grid}>
+      <S.Grid>
         {bots.length === 0 && (
-          <p style={{ color: '#475569', gridColumn: '1/-1', textAlign: 'center', padding: '40px' }}>
+          <S.EmptyMessage>
             Henüz yapılandırılmış bir botun yok.
-          </p>
+          </S.EmptyMessage>
         )}
 
         {bots.map((bot) => (
-          <div key={bot.id} style={styles.card}>
-            <div style={styles.cardHeader}>
+          <S.Card key={bot.id}>
+            <S.CardHeader>
               <div>
-                <h3 style={{ margin: 0 }}>{bot.symbol}</h3>
-                <span style={{ fontSize: '0.75rem', color: '#10b981' }}>{bot.strategy} STRATEJİSİ</span>
+                <S.CardTitle>{bot.symbol}</S.CardTitle>
+                <S.StrategyLabel>{bot.strategy} STRATEJİSİ</S.StrategyLabel>
               </div>
-              <div style={{ 
-                ...styles.statusDot, 
-                backgroundColor: bot.isActive ? '#10b981' : '#ef4444',
-                boxShadow: bot.isActive ? '0 0 10px #10b981' : 'none'
-              }} />
-            </div>
+              <S.StatusDot $isActive={bot.isActive} />
+            </S.CardHeader>
 
-            <div style={styles.infoRow}>
+            <S.InfoRow>
               <span>İşlem Başına Limit:</span>
-              <strong style={{ color: '#f1f5f9' }}>${bot.limit}</strong>
-            </div>
+              <S.InfoValue>${bot.limit}</S.InfoValue>
+            </S.InfoRow>
 
-            <div style={styles.terminal}>
+            <S.Terminal>
               {botLogs[bot.id]?.map((log, idx) => (
-                <div key={idx} style={styles.logText}>
-                  <span style={{ color: '#475569' }}>[{new Date().toLocaleTimeString()}]</span> {log}
-                </div>
+                <S.LogText key={idx}>
+                  <S.LogTimestamp>[{new Date().toLocaleTimeString()}]</S.LogTimestamp> {log}
+                </S.LogText>
               ))}
               {(!botLogs[bot.id] || botLogs[bot.id].length === 0) && (
-                <div style={{ color: '#475569', fontSize: '0.6875rem' }}>Sistem hazır, botun başlatılması bekleniyor...</div>
+                <S.EmptyLog>Sistem hazır, botun başlatılması bekleniyor...</S.EmptyLog>
               )}
-            </div>
+            </S.Terminal>
 
-            <button 
+            <S.ActionButton
+              $isActive={bot.isActive}
               onClick={() => handleToggleBot(bot.id)}
-              style={{
-                ...styles.actionBtn,
-                backgroundColor: bot.isActive ? '#ef4444' : '#3b82f6'
-              }}
             >
               {bot.isActive ? 'BOTU DURDUR' : 'BOTU BAŞLAT'}
-            </button>
-          </div>
+            </S.ActionButton>
+          </S.Card>
         ))}
-      </div>
+      </S.Grid>
 
       {isModalOpen && (
-        <AddBotModal 
-          userId={user?.id} 
-          onClose={() => setIsModalOpen(false)} 
-          onSuccess={fetchBots} 
+        <AddBotModal
+          userId={user?.id}
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={fetchBots}
         />
-        
       )}
-    </div>
+    </S.Container>
   );
 };
-
-// Tasarım Nesneleri (Aynı kalabilir)
-const styles = {
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' },
-  card: { backgroundColor: '#1e293b', borderRadius: '16px', padding: '20px', border: '1px solid #334155', display: 'flex', flexDirection: 'column' as const },
-  cardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' },
-  statusDot: { width: '10px', height: '10px', borderRadius: '50%' },
-  infoRow: { display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', color: '#94a3b8', marginBottom: '15px' },
-  terminal: { backgroundColor: '#0f172a', borderRadius: '8px', padding: '12px', height: '120px', overflowY: 'auto' as const, marginBottom: '15px', border: '1px solid #1e293b', fontFamily: 'monospace' },
-  logText: { fontSize: '0.6875rem', color: '#34d399', marginBottom: '4px', lineHeight: '1.4' },
-  addBtn: { padding: '10px 20px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold' as const, cursor: 'pointer' },
-  actionBtn: { padding: '12px', border: 'none', borderRadius: '8px', color: 'white', fontWeight: 'bold' as const, cursor: 'pointer', transition: '0.2s opacity' }
-};
-
 export default GeneralSettings;

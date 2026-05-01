@@ -5,6 +5,7 @@ import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState } from
 import { MetricsGrid, MetricCard, CardHeader, CardTitle, CardIcon, CardValue } from '../../components/ui/Card.styles';
 import { Bot, Power, Zap, TrendingUp, Save, Settings2 } from 'lucide-react';
 import styled from 'styled-components';
+import * as S from './Bots.styles';
 
 // UI Components
 import { Button } from '../../components/ui/Button';
@@ -103,20 +104,20 @@ const BotConfigForm: React.FC<{ bot: BotData, onUpdate: (config: any) => void, i
           </ConfigGrid>
         );
       default:
-        return <p style={{ fontSize: '0.75rem', color: '#9AA0A6' }}>Bu strateji için ek ayar bulunmuyor.</p>;
+        return <S.NoConfigText>Bu strateji için ek ayar bulunmuyor.</S.NoConfigText>;
     }
   };
 
   return (
-    <div style={{ marginTop: '16px', borderTop: '1px solid #DADCE0', paddingTop: '16px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8125rem', fontWeight: 600, color: '#9AA0A6', marginBottom: '12px' }}>
+    <S.ConfigSection>
+      <S.ConfigHeader>
         <Settings2 size={14} /> Bot Parametreleri
-      </div>
+      </S.ConfigHeader>
       {renderContent()}
       <Button $variant="primary" $size="sm" $fullWidth onClick={() => onUpdate(localConfig)} disabled={isLoading}>
-        {isLoading ? 'Kaydediliyor...' : <><Save size={14} style={{ marginRight: '6px' }} /> Ayarları Kaydet</>}
+        {isLoading ? 'Kaydediliyor...' : <><S.SaveButtonIcon as="span"><Save size={14} /></S.SaveButtonIcon> Ayarları Kaydet</>}
       </Button>
-    </div>
+    </S.ConfigSection>
   );
 };
 
@@ -133,7 +134,7 @@ const BotsPage: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <S.PageHeaderContainer as={PageHeader}>
         <div>
           <PageTitle>
             Bot Yönetimi — {mode === 'stock' ? 'BIST' : 'Kripto'}
@@ -149,7 +150,7 @@ const BotsPage: React.FC = () => {
             <Zap size={18} fill="white" /> Değişiklikleri Uygula
           </ApplyChangesButton>
         )}
-      </PageHeader>
+      </S.PageHeaderContainer>
 
       <MetricsGrid>
         <MetricCard>
@@ -167,23 +168,22 @@ const BotsPage: React.FC = () => {
           <CardValue>{activeBotCount}</CardValue>
         </MetricCard>
 
-        <MetricCard style={{ gridColumn: 'span 2' }}>
+        <S.FullWidthMetricCard as={MetricCard}>
            <CardHeader>
             <CardTitle>İşlem Başına Alım Tutarı ({currencyLabel})</CardTitle>
             <CardIcon $variant="warning"><TrendingUp size={20} /></CardIcon>
           </CardHeader>
           <BuyAmountContainer>
-            <Input 
-              type="number" 
-              value={buyAmount || ''} 
+            <S.InputFlex as={Input}
+              type="number"
+              value={buyAmount || ''}
               onChange={(e) => setBuyAmount(Number(e.target.value))}
-              style={{ flex: 1 }}
             />
             <Button $variant="primary" onClick={() => updateBuyAmount(buyAmount)} disabled={settingsLoading}>
               {settingsLoading ? '...' : 'Güncelle'}
             </Button>
           </BuyAmountContainer>
-        </MetricCard>
+        </S.FullWidthMetricCard>
       </MetricsGrid>
 
       <BotGrid>

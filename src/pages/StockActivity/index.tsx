@@ -5,6 +5,7 @@ import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState, Empty
 import { Card } from '../../components/ui/Card';
 import { HStack, VStack } from '../../components/primitives/Flex';
 import { History, TrendingUp, TrendingDown, Clock, Info, ArrowRightLeft } from 'lucide-react';
+import * as S from './StockActivity.styles';
 
 const LogTable = styled.table`
   width: 100%;
@@ -130,7 +131,7 @@ const StockActivityPage: React.FC = () => {
         </VStack>
       </PageHeader>
 
-      <div style={{ padding: '0 4px' }}>
+      <S.TableWrapper>
         {logs.length === 0 ? (
           <EmptyState>Henüz bir hareket kaydı bulunmuyor. AI analizleri başladığında burada görünecektir.</EmptyState>
         ) : (
@@ -155,31 +156,21 @@ const StockActivityPage: React.FC = () => {
                   <Tr key={log.id}>
                     <Td>
                       <VStack $gap="4px">
-                        <HStack $gap="6px" $align="center" style={{ color: '#202124', fontWeight: 600 }}>
+                        <S.DateColumn as={HStack} $gap="6px" $align="center">
                           <Clock size={14} color="#1A73E8" />
                           {new Date(log.createdAt).toLocaleDateString('tr-TR')}
-                        </HStack>
-                        <span style={{ fontSize: '0.75rem', color: '#5F6368', marginLeft: '20px' }}>
+                        </S.DateColumn>
+                        <S.TimeText>
                           {new Date(log.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
-                        </span>
+                        </S.TimeText>
                       </VStack>
                     </Td>
                     <Td>
                       <VStack $gap="4px">
-                        <span style={{ fontWeight: 900, color: '#1A73E8', fontSize: '1.05rem' }}>{log.symbol.replace('.IS', '')}</span>
-                        <div style={{ 
-                          fontSize: '0.65rem', 
-                          background: '#F8F9FA', 
-                          padding: '2px 6px', 
-                          borderRadius: '4px',
-                          display: 'inline-block',
-                          width: 'fit-content',
-                          border: '1px solid #E8EAED',
-                          fontWeight: 700,
-                          color: '#5F6368'
-                        }}>
+                        <S.SymbolText>{log.symbol.replace('.IS', '')}</S.SymbolText>
+                        <S.PeriodBadge>
                           {log.period?.toUpperCase()} TARAMASI
-                        </div>
+                        </S.PeriodBadge>
                       </VStack>
                     </Td>
                     <Td>
@@ -194,12 +185,12 @@ const StockActivityPage: React.FC = () => {
                           <Label>{isAdd ? 'Giriş Fiyatı' : 'Alış Fiyatı'}</Label>
                           <PriceText>₺{log.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</PriceText>
                         </VStack>
-                        
+
                         <VStack>
                           <Label>{isAdd ? 'Anlık Fiyat' : 'Çıkış Fiyatı'}</Label>
-                          <PriceText style={{ color: isAdd ? '#1A73E8' : '#202124' }}>
+                          <S.PriceWithColor $entryPrice={isAdd}>
                             ₺{(isAdd ? log.currentPrice : log.exitPrice)?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || '---'}
-                          </PriceText>
+                          </S.PriceWithColor>
                         </VStack>
                       </HStack>
                     </Td>
@@ -207,20 +198,22 @@ const StockActivityPage: React.FC = () => {
                       <VStack $gap="4px">
                         <Label>{isAdd ? 'Anlık Kar/Zarar' : 'Net Kar/Zarar'}</Label>
                         {profitValue !== null && profitValue !== undefined ? (
-                          <ProfitBadge $positive={isPositive} style={{ fontSize: '1rem' }}>
+                          <S.ProfitBadgeWithSize $positive={isPositive}>
                             {isPositive ? '+' : ''}{profitValue.toFixed(2)}%
-                          </ProfitBadge>
+                          </S.ProfitBadgeWithSize>
                         ) : (
-                          <span style={{ color: '#9AA0A6', fontSize: '0.8125rem' }}>Hesaplanıyor...</span>
+                          <S.CalculatingText>Hesaplanıyor...</S.CalculatingText>
                         )}
                       </VStack>
                     </Td>
                     <Td>
-                      <HStack $gap="8px" $align="flex-start" style={{ maxWidth: '280px' }}>
-                        <Info size={16} color="#9AA0A6" style={{ marginTop: '2px', flexShrink: 0 }} />
-                        <span style={{ color: '#5F6368', fontSize: '0.8125rem', lineHeight: '1.4' }}>
+                      <HStack $gap="8px" $align="flex-start" as={S.NotesContainer}>
+                        <S.NotesIcon as="div">
+                          <Info size={16} color="#9AA0A6" />
+                        </S.NotesIcon>
+                        <S.NotesText>
                           {log.description}
-                        </span>
+                        </S.NotesText>
                       </HStack>
                     </Td>
                   </Tr>
@@ -229,7 +222,7 @@ const StockActivityPage: React.FC = () => {
             </tbody>
           </LogTable>
         )}
-      </div>
+      </S.TableWrapper>
     </PageContainer>
   );
 };

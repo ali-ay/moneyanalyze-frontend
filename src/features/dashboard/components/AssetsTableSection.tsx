@@ -132,9 +132,9 @@ export const AssetsTableSection: React.FC<AssetsTableProps> = ({ data, loading, 
 
   const filteredData = hasData
     ? data.filter(item =>
-        item.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase()))
-      )
+      item.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
     : [];
 
   const displayData = searchTerm.trim() === ''
@@ -199,7 +199,6 @@ export const AssetsTableSection: React.FC<AssetsTableProps> = ({ data, loading, 
                   const price = coin.price || '0.00';
                   const change = parseFloat(coin.change || '0');
                   const isUp = change >= 0;
-
                   return (
                     <TableRow key={coin.symbol} onClick={() => handleCoinClick(coin.symbol)}>
                       <td>
@@ -234,11 +233,11 @@ export const AssetsTableSection: React.FC<AssetsTableProps> = ({ data, loading, 
             </DataTable>
           )}
         </div>
-        
+
         {hasData && searchTerm === '' && (
           <div style={{ padding: '0 24px 24px', display: 'flex', justifyContent: 'center' }}>
-            <Button 
-              $variant="secondary" 
+            <Button
+              $variant="secondary"
               style={{ width: '100%', padding: '12px', fontWeight: 700, borderRadius: '12px' }}
               onClick={() => navigate('/stocks')}
             >

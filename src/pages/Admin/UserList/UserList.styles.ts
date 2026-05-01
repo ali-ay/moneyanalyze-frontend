@@ -118,9 +118,9 @@ export const ActionButton = styled.button<{ $type?: 'approve' | 'delete' | 'deta
   }
 `;
 
-export const RoleSelect = styled.select`
+export const RoleSelect = styled.select<{ $isBanned?: boolean }>`
   background: ${props => props.theme?.colors?.surfaceHover || '#F8F9FA'};
-  color: ${props => props.theme?.colors?.textMain || '#202124'};
+  color: ${props => props.$isBanned ? '#DB4437' : (props.theme?.colors?.textMain || '#202124')};
   border: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
   padding: 6px 12px;
   border-radius: 8px;
@@ -137,4 +137,66 @@ export const RoleSelect = styled.select`
     background: ${props => props.theme?.colors?.white || '#FFFFFF'};
     color: ${props => props.theme?.colors?.textMain || '#202124'};
   }
+`;
+
+export const HeaderContent = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+`;
+
+export const CenterAlignTh = styled(Th)`
+  text-align: center;
+`;
+
+export const UsernameCell = styled.div`
+  font-weight: 600;
+`;
+
+export const ApprovalButton = styled.button<{ $isApproved: boolean }>`
+  background: ${props =>
+    props.$isApproved
+      ? 'rgba(15, 157, 88, 0.1)'
+      : 'rgba(219, 68, 55, 0.1)'
+  };
+  border: 1px solid ${props =>
+    props.$isApproved
+      ? 'rgba(15, 157, 88, 0.2)'
+      : 'rgba(219, 68, 55, 0.2)'
+  };
+  border-radius: 20px;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: ${props =>
+    props.$isApproved
+      ? '#0F9D58'
+      : '#DB4437'
+  };
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+export const DateCell = styled.span`
+  color: #888;
+`;
+
+export const ActionsCell = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+`;
+
+export const EmptyCell = styled(Td)`
+  text-align: center;
+  padding: 40px;
+  color: #888;
 `;

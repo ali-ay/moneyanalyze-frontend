@@ -6,6 +6,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { HStack } from '../../components/primitives/Flex';
 import { Trash2, Plus, Eye, Trash } from 'lucide-react';
+import * as S from './Watchlist.styles';
 
 const Table = styled.table`
   width: 100%;
@@ -163,7 +164,7 @@ const Watchlist: React.FC = () => {
                   <Th $sortable onClick={() => requestSort('priceChangePercent')}>
                     Değişim (Günlük){getSortIndicator('priceChangePercent')}
                   </Th>
-                  <Th style={{ textAlign: 'right' }}>İşlem</Th>
+                  <S.RightAlignTh>İşlem</S.RightAlignTh>
                 </tr>
               </thead>
               <tbody>
@@ -175,32 +176,25 @@ const Watchlist: React.FC = () => {
 
                   return (
                     <Tr key={item.id}>
-                      <Td style={{ fontWeight: 700 }}>{item.symbol}</Td>
+                      <S.SymbolCell>{item.symbol}</S.SymbolCell>
                       <Td>
-                        <span style={{ 
-                          fontSize: '0.6875rem', 
-                          fontWeight: 700, 
-                          background: '#F1F3F4', 
-                          padding: '2px 8px', 
-                          borderRadius: '12px',
-                          textTransform: 'uppercase'
-                        }}>
+                        <S.PeriodBadge>
                           {item.period || 'Manuel'}
-                        </span>
+                        </S.PeriodBadge>
                       </Td>
                       <Td>{currency}{item.entryPrice?.toLocaleString() || '-'}</Td>
                       <Td>{currency}{item.currentPrice?.toLocaleString() || '-'}</Td>
                       <Td>
-                        <ChangeValue $isPositive={isPositiveProfit} style={{ fontSize: '0.875rem' }}>
+                        <S.ChangeValueWithSize $isPositive={isPositiveProfit}>
                           {isPositiveProfit ? '+' : ''}{profit.toFixed(2)}%
-                        </ChangeValue>
+                        </S.ChangeValueWithSize>
                       </Td>
                       <Td>
-                        <span style={{ color: isPositiveDaily ? '#0F9D58' : '#DB4437', fontWeight: 600 }}>
+                        <S.ProfitChangeValue $isPositive={isPositiveDaily}>
                           {isPositiveDaily ? '▲' : '▼'} %{Math.abs(dailyChange).toFixed(2)}
-                        </span>
+                        </S.ProfitChangeValue>
                       </Td>
-                      <Td style={{ textAlign: 'right' }}>
+                      <S.RightAlignTd>
                         <Button
                           $variant="danger"
                           $size="sm"
@@ -208,7 +202,7 @@ const Watchlist: React.FC = () => {
                         >
                           <Trash2 size={14} />
                         </Button>
-                      </Td>
+                      </S.RightAlignTd>
                     </Tr>
                   );
                 })}

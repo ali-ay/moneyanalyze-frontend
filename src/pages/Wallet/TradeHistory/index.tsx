@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import * as S from './TradeHistory.styles';
 import { useTransactionsLogic } from './logic';
 import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState, EmptyState } from '../../../components/ui/Layout.styles';
 import { MetricsGrid, MetricCard, CardHeader, CardTitle, CardIcon, CardValue } from '../../../components/ui/Card.styles';
@@ -46,31 +47,24 @@ const Transactions: React.FC = () => {
 
       {!loading && transactions.length > 0 && (
         <MetricsGrid>
-          <MetricCard style={{ gridColumn: 'span 2' }}>
+          <MetricCard as={S.PerformanceCard}>
             <CardHeader>
               <CardTitle>Genel Performans (Kar / Zarar)</CardTitle>
               <CardIcon $variant={metrics.netProfit >= 0 ? 'success' : 'danger'}>
                 {metrics.netProfit >= 0 ? <ArrowUpRight size={20} /> : <ArrowDownRight size={20} />}
               </CardIcon>
             </CardHeader>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <div style={{ 
-                fontSize: '2rem', 
-                fontWeight: '800', 
-                color: metrics.netProfit >= 0 ? '#0F9D58' : '#DB4437',
-                display: 'flex',
-                alignItems: 'baseline',
-                gap: '10px'
-              }}>
+            <S.PerformanceValueContainer>
+              <S.ProfitDisplay $isProfit={metrics.netProfit >= 0}>
                 {metrics.netProfit >= 0 ? '+' : ''}{metrics.netProfit.toLocaleString('tr-TR', { maximumFractionDigits: 2 })} USDT
-                <span style={{ fontSize: '1.125rem', fontWeight: '600', opacity: 0.8 }}>
+                <S.ProfitPercentage>
                   ({metrics.profitPercentage >= 0 ? '+' : ''}{metrics.profitPercentage.toFixed(2)}%)
-                </span>
-              </div>
-              <div style={{ color: '#5F6368', fontSize: '0.875rem', fontWeight: '500' }}>
+                </S.ProfitPercentage>
+              </S.ProfitDisplay>
+              <S.PerformanceNote>
                 Toplam {metrics.totalCount} adet işlem üzerinden hesaplanmıştır.
-              </div>
-            </div>
+              </S.PerformanceNote>
+            </S.PerformanceValueContainer>
           </MetricCard>
 
           <MetricCard>
@@ -123,20 +117,17 @@ const Transactions: React.FC = () => {
                         {getTypeText(tx.type)}
                       </Badge>
                     </Td>
-                    <Td style={{ fontWeight: 'bold' }}>{tx.symbol}</Td>
+                    <S.SymbolCell>{tx.symbol}</S.SymbolCell>
                     <Td>
-                      <Badge type={tx.origin === 'MANUAL' ? 'secondary' : 'primary'} style={{ fontSize: '0.625rem', background: tx.origin === 'MANUAL' ? '#f1f3f4' : '#e8f0fe', color: tx.origin === 'MANUAL' ? '#5f6368' : '#1a73e8' }}>
+                      <S.OriginBadge as={Badge} type={tx.origin === 'MANUAL' ? 'secondary' : 'primary'} style={{ background: tx.origin === 'MANUAL' ? '#f1f3f4' : '#e8f0fe', color: tx.origin === 'MANUAL' ? '#5f6368' : '#1a73e8' }}>
                         {tx.origin === 'MANUAL' ? 'MANUEL' : 'BOT'}
-                      </Badge>
+                      </S.OriginBadge>
                     </Td>
                     <Td>{tx.amount}</Td>
                     <Td>{currency}{tx.price.toLocaleString('tr-TR')}</Td>
-                    <Td style={{ 
-                      color: tx.type === 'BUY' ? '#ef4444' : '#10b981',
-                      fontWeight: 'bold'
-                    }}>
+                    <S.TotalCell $isBuy={tx.type === 'BUY'}>
                       {tx.type === 'BUY' ? '-' : '+'}{currency}{tx.total.toLocaleString('tr-TR', { maximumFractionDigits: 2 })}
-                    </Td>
+                    </S.TotalCell>
                   </TableRow>
                 );
               })}

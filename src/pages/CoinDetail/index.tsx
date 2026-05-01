@@ -10,6 +10,7 @@ import { BotStatusPanel } from '../../components/panels/BotStatusPanel';
 import { HStack } from '../../components/primitives/Flex';
 import { ArrowLeft, Calendar } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import * as S from './CoinDetail.styles';
 
 const CoinDetail: React.FC = () => {
   const { symbol } = useParams<{ symbol: string }>();
@@ -32,23 +33,22 @@ const CoinDetail: React.FC = () => {
 
   return (
     <PageContainer>
-      <Button
+      <S.BackButtonContainer as={Button}
         $variant="secondary"
         $size="sm"
         onClick={() => navigate(-1)}
-        style={{ marginBottom: '16px', alignSelf: 'flex-start' }}
       >
         <ArrowLeft size={16} /> Geri
-      </Button>
+      </S.BackButtonContainer>
 
       <PageHeader>
         <HStack $justify="space-between" $align="flex-start" $fullWidth>
           <div>
             <HStack $align="center" $gap="md">
               <PageTitle>{symbol}</PageTitle>
-              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1A73E8' }}>
+              <S.PriceDisplay>
                 ${price}
-              </div>
+              </S.PriceDisplay>
             </HStack>
             <PageSubtitle>
               Teknik analiz ve bot yönetimi.

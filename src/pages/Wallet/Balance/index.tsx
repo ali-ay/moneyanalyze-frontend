@@ -29,21 +29,21 @@ const WalletBalance = () => {
   
   const isLive = tradingMode === 'LIVE';
 
-  if (loading && !balance) return <div style={{ padding: '40px', textAlign: 'center' }}>Yükleniyor...</div>;
+  if (loading && !balance) return <S.LoadingContainer>Yükleniyor...</S.LoadingContainer>;
 
   return (
     <PageContainer>
       <PageHeader>
         <PageTitle>
-          Cüzdan 
+          Cüzdan
           {isLive && (
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', verticalAlign: 'middle', marginLeft: 15 }}>
+            <S.LiveBadgeContainer>
               <Badge type={isRealData ? "AL" : "NÖTR"}>BINANCE LIVE</Badge>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: isRealData ? '#0f9d58' : '#db4437' }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: isRealData ? '#0f9d58' : '#db4437' }} />
+              <S.StatusIndicator $isActive={isRealData}>
+                <S.StatusDot $isActive={isRealData} />
                 {isRealData ? 'Bağlantı Aktif' : 'Bağlantı Bekleniyor'}
-              </div>
-            </div>
+              </S.StatusIndicator>
+            </S.LiveBadgeContainer>
           )}
         </PageTitle>
         <PageSubtitle>
@@ -54,22 +54,22 @@ const WalletBalance = () => {
       </PageHeader>
 
       {error && (
-        <div style={{ background: '#fce8e6', color: '#d93025', padding: '16px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #f5c2c7', fontSize: '0.875rem', fontWeight: 500 }}>
+        <S.ErrorAlert>
           ⚠️ {error}
-        </div>
+        </S.ErrorAlert>
       )}
 
       <S.HeaderSection>
         <S.BalanceInfo>
           <h3>{isLive ? 'Toplam Tahmini Değer (TL)' : 'Toplam Bakiyem'}</h3>
-          <div style={{ fontSize: '2.5rem', fontWeight: '800', color: isRealData ? '#1a73e8' : '#9AA0A6' }}>
-            {(balanceTRY ?? 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
-            <span style={{fontSize: '1.2rem', fontWeight: 600, marginLeft: 8, color: '#5F6368'}}>TL</span>
-          </div>
-          <div style={{ marginTop: '8px', fontSize: '1.1rem', color: '#5F6368' }}>
-            ≈ {(balance ?? 0).toLocaleString('tr-TR')} <span style={{fontWeight: 600}}>USDT</span>
-            {usdtTryRate && <span style={{ fontSize: '0.9rem', marginLeft: 12, color: '#9AA0A6' }}>(1 USDT = {usdtTryRate} TL)</span>}
-          </div>
+          <S.BalanceValue $isRealData={isRealData}>
+            {(balanceTRY ?? 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            <S.BalanceUnit>TL</S.BalanceUnit>
+          </S.BalanceValue>
+          <S.BalanceEquivalent>
+            ≈ {(balance ?? 0).toLocaleString('tr-TR')} <S.EquivalentUnit>USDT</S.EquivalentUnit>
+            {usdtTryRate && <S.ExchangeRate>(1 USDT = {usdtTryRate} TL)</S.ExchangeRate>}
+          </S.BalanceEquivalent>
         </S.BalanceInfo>
         
         {!isLive ? (
@@ -77,10 +77,10 @@ const WalletBalance = () => {
             <Plus size={20} /> Bakiye Yükle
           </S.AddButton>
         ) : (
-          <S.AddButton 
-            onClick={handleTestBuy} 
+          <S.AddButton
+            onClick={handleTestBuy}
             disabled={tradeLoading}
-            style={{ background: '#0f9d58' }}
+            style={{ background: '#0f9d58', color: 'white' }}
           >
             <ShoppingCart size={20} /> {tradeLoading ? 'İşleniyor...' : '20 TL ile BTC Al'}
           </S.AddButton>
@@ -88,11 +88,11 @@ const WalletBalance = () => {
       </S.HeaderSection>
 
       {isLive && assets && assets.length > 0 && (
-        <S.HistorySection style={{ marginBottom: '40px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+        <S.HistorySection $marginBottom="40px">
+          <S.AssetsHeaderRow>
             <PieChartIcon size={20} color="#1a73e8" />
-            <h3 style={{ margin: 0 }}>Varlık Bakiyeleri</h3>
-          </div>
+            <S.SectionTitle>Varlık Bakiyeleri</S.SectionTitle>
+          </S.AssetsHeaderRow>
           <TableContainer>
             <Table>
               <thead>
@@ -109,16 +109,16 @@ const WalletBalance = () => {
               <tbody>
                 {assets.map((asset, idx) => (
                   <TableRow key={asset.symbol || idx}>
-                    <Td style={{ fontWeight: 'bold' }}>{asset.symbol}</Td>
+                    <S.SymbolCell>{asset.symbol}</S.SymbolCell>
                     <Td>{(asset.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 8 })}</Td>
-                    <Td style={{ color: '#1a73e8', fontWeight: 600 }}>
+                    <S.PriceCell>
                       {(asset.price || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </Td>
-                    <Td style={{ fontWeight: 'bold' }}>
+                    </S.PriceCell>
+                    <S.ValueCell>
                       {(asset.totalValue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </Td>
-                    <Td style={{ color: '#0f9d58' }}>{(asset.free || 0).toLocaleString(undefined, { maximumFractionDigits: 8 })}</Td>
-                    <Td style={{ color: '#f4b400' }}>{(asset.locked || 0).toLocaleString(undefined, { maximumFractionDigits: 8 })}</Td>
+                    </S.ValueCell>
+                    <S.FreeCell>{(asset.free || 0).toLocaleString(undefined, { maximumFractionDigits: 8 })}</S.FreeCell>
+                    <S.LockedCell>{(asset.locked || 0).toLocaleString(undefined, { maximumFractionDigits: 8 })}</S.LockedCell>
                     <Td><Badge type="NÖTR">{asset.symbol}</Badge></Td>
                   </TableRow>
                 ))}
@@ -129,10 +129,10 @@ const WalletBalance = () => {
       )}
 
       <S.HistorySection>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+        <S.TransactionHeaderRow>
           <WalletIcon size={20} color="#1a73e8" />
-          <h3 style={{ margin: 0 }}>{isLive ? 'Son İşlemler' : 'Hesap Hareketleri'}</h3>
-        </div>
+          <S.SectionTitle>{isLive ? 'Son İşlemler' : 'Hesap Hareketleri'}</S.SectionTitle>
+        </S.TransactionHeaderRow>
         <TableContainer>
           <Table>
             <thead>
@@ -151,15 +151,15 @@ const WalletBalance = () => {
                       {tx.type === 'DEPOSIT' ? 'PARA YATIRMA' : tx.type === 'BUY' ? 'ALIM' : tx.type === 'SELL' ? 'SATIM' : 'ÇEKME'}
                     </Badge>
                   </Td>
-                  <Td style={{ fontWeight: 'bold' }}>{tx.amount.toLocaleString('tr-TR')} {tx.symbol}</Td>
-                  <Td style={{ color: '#5F6368' }}>{tx.description || 'İşlem'}</Td>
+                  <S.AmountCell>{tx.amount.toLocaleString('tr-TR')} {tx.symbol}</S.AmountCell>
+                  <S.DescriptionCell>{tx.description || 'İşlem'}</S.DescriptionCell>
                   <Td>{new Date(tx.createdAt).toLocaleString('tr-TR')}</Td>
                 </TableRow>
               )) : (
                 <TableRow>
-                  <Td colSpan={4} style={{ textAlign: 'center', padding: '40px', color: '#9AA0A6' }}>
+                  <S.EmptyCell colSpan={4}>
                     Henüz bir işlem kaydı bulunmuyor.
-                  </Td>
+                  </S.EmptyCell>
                 </TableRow>
               )}
             </tbody>

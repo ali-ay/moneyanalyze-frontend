@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Search, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -6,6 +6,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { useDashboardData } from '../../features/dashboard/hooks/useDashboardData';
 import { useMarketMode } from '../../context/MarketModeContext';
+import * as S from './StockList.styles';
 
 const PageHeader = styled.div`
   display: flex;
@@ -115,33 +116,40 @@ const LoadingBox = styled.div`
 `;
 
 const StockListPage: React.FC = () => {
+  console.log('🔥 StockListPage komponenti yüklendi!');
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const { mode } = useMarketMode();
   const { marketData, loading, error } = useDashboardData();
 
+  useEffect(() => {
+    console.log('📊 Stock List Data:', marketData);
+    console.log('📈 Total items:', marketData.length);
+    console.log('⚙️ Loading:', loading);
+    console.log('❌ Error:', error);
+  }, [marketData, loading, error]);
+
   const filteredData = marketData.filter(item =>
     item.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
-
   const title = mode === 'stock' ? 'Tüm Borsa Hisseleri' : 'Tüm Kripto Varlıklar';
   const currency = mode === 'stock' ? '₺' : '$';
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px' }}>
+    <S.PageContainer>
       <PageHeader>
-        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-          <Button $variant="secondary" $size="sm" onClick={() => navigate(-1)} style={{ borderRadius: '50%', width: '40px', height: '40px', padding: 0 }}>
+        <S.HeaderLeft>
+          <S.BackButtonStyled $variant="secondary" $size="sm" onClick={() => navigate(-1)}>
             <ArrowLeft size={20} />
-          </Button>
-          <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800 }}>{title}</h2>
-        </div>
-        <p style={{ margin: '4px 0 0', color: '#5F6368', fontSize: '0.8125rem' }}>Piyasadaki tüm varlıkların anlık durumları</p>
+          </S.BackButtonStyled>
+          <S.PageTitle>{title}</S.PageTitle>
+        </S.HeaderLeft>
+        <S.PageSubtitle>Piyasadaki tüm varlıkların anlık durumları</S.PageSubtitle>
       </PageHeader>
 
       <Card>
-        <Card.Header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+        <S.CardHeader as={Card.Header}>
           <SearchContainer>
             <Search size={18} />
             <input
@@ -151,10 +159,10 @@ const StockListPage: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </SearchContainer>
-          <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#5F6368' }}>
+          <S.ItemCount>
             Toplam: {filteredData.length} Varlık
-          </div>
-        </Card.Header>
+          </S.ItemCount>
+        </S.CardHeader>
         <Card.Body $noPadding>
           {loading ? (
             <LoadingBox>
@@ -164,17 +172,17 @@ const StockListPage: React.FC = () => {
           ) : error ? (
             <LoadingBox>
               <AlertCircle size={40} color="#DB4437" />
-              <span style={{ color: '#DB4437', fontWeight: 700 }}>{error}</span>
+              <S.ErrorMessage>{error}</S.ErrorMessage>
             </LoadingBox>
           ) : (
-            <div style={{ overflowX: 'auto' }}>
+            <S.TableWrapper>
               <DataTable>
                 <thead>
                   <tr>
                     <th>VARLIK</th>
                     <th>FİYAT</th>
                     <th>24S DEĞİŞİM</th>
-                    <th style={{ textAlign: 'right' }}>İŞLEM</th>
+                    <S.HeaderCell>İŞLEM</S.HeaderCell>
                   </tr>
                 </thead>
                 <tbody>
@@ -200,19 +208,19 @@ const StockListPage: React.FC = () => {
                             {isUp ? '+' : ''}{item.change || '0.00'}%
                           </ChangeValue>
                         </td>
-                        <td style={{ textAlign: 'right' }}>
+                        <S.ActionCell>
                           <Button $variant="primary" $size="sm">Detay</Button>
-                        </td>
+                        </S.ActionCell>
                       </TableRow>
                     );
                   })}
                 </tbody>
               </DataTable>
-            </div>
+            </S.TableWrapper>
           )}
         </Card.Body>
       </Card>
-    </div>
+    </S.PageContainer>
   );
 };
 

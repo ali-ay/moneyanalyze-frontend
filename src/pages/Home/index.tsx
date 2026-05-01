@@ -13,18 +13,18 @@ const Home = () => {
       <S.HeroSection>
         <S.MainTitle>Kripto Dünyasını <br /> Gerçek Zamanlı Analiz Et</S.MainTitle>
         <S.Description>
-          Piyasadaki tüm trendleri anlık olarak takip et, favori paritelerini listene ekle 
+          Piyasadaki tüm trendleri anlık olarak takip et, favori paritelerini listene ekle
           ve yatırım stratejini Binance verileriyle güçlendir.
         </S.Description>
-        
-        <div style={{ display: 'flex', gap: '15px' }}>
+
+        <S.ButtonGroup>
           <Button $variant="primary" $size="lg" onClick={() => navigate('/register')}>
             Hemen Analize Başla
           </Button>
           <Button $variant="outline" $size="lg" onClick={() => window.scrollTo(0, 800)}>
             Nasıl Çalışır?
           </Button>
-        </div>
+        </S.ButtonGroup>
       </S.HeroSection>
       <Footer />
     </S.HomeContainer>

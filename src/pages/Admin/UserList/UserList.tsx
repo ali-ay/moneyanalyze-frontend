@@ -58,7 +58,7 @@ const UserList = () => {
   return (
     <PageContainer>
       <PageHeader>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
+        <S.HeaderContent>
           <div>
             <PageTitle>Kullanıcı Yönetimi</PageTitle>
             <PageSubtitle>Sistemdeki tüm kullanıcıları görüntüleyin, yetkilerini ve hesap durumlarını yönetin.</PageSubtitle>
@@ -66,7 +66,7 @@ const UserList = () => {
           <S.RefreshButton onClick={fetchUsers} disabled={loading}>
             <RefreshCcw size={18} /> {loading ? 'Yükleniyor...' : 'Listeyi Yenile'}
           </S.RefreshButton>
-        </div>
+        </S.HeaderContent>
       </PageHeader>
 
       <S.TableWrapper>
@@ -78,7 +78,7 @@ const UserList = () => {
               <S.Th>Hesap Durumu</S.Th>
               <S.Th>Kayıt Tarihi</S.Th>
               <S.Th>Rol</S.Th>
-              <S.Th style={{ textAlign: 'center' }}>İşlemler</S.Th>
+              <S.CenterAlignTh>İşlemler</S.CenterAlignTh>
             </tr>
           </thead>
           <tbody>
@@ -86,37 +86,22 @@ const UserList = () => {
               users.map((user) => (
                 <S.Tr key={user.id}>
                   <S.Td>
-                    <div style={{ fontWeight: 600 }}>{user.username}</div>
+                    <S.UsernameCell>{user.username}</S.UsernameCell>
                   </S.Td>
                   <S.Td>
-                    <button 
+                    <S.ApprovalButton
+                      $isApproved={user.isApproved}
                       onClick={() => handleUpdate(user.id, { isApproved: !user.isApproved })}
-                      style={{
-                        background: user.isApproved ? 'rgba(15, 157, 88, 0.1)' : 'rgba(219, 68, 55, 0.1)',
-                        border: '1px solid',
-                        borderRadius: '20px',
-                        padding: '4px 12px',
-                        cursor: 'pointer',
-                        fontSize: '0.75rem',
-                        fontWeight: '600',
-                        color: user.isApproved ? '#0F9D58' : '#DB4437',
-                        borderColor: user.isApproved ? 'rgba(15, 157, 88, 0.2)' : 'rgba(219, 68, 55, 0.2)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}
                     >
                       {user.isApproved ? <CheckCircle size={14} /> : <XCircle size={14} />}
                       {user.isApproved ? 'Onaylı' : 'Onay Bekliyor'}
-                    </button>
+                    </S.ApprovalButton>
                   </S.Td>
                   <S.Td>
-                    <S.RoleSelect 
-                      value={user.status} 
+                    <S.RoleSelect
+                      $isBanned={user.status === 'BANNED'}
+                      value={user.status}
                       onChange={(e) => handleUpdate(user.id, { status: e.target.value })}
-                      style={{ 
-                        color: user.status === 'BANNED' ? '#DB4437' : 'inherit',
-                      }}
                     >
                       <option value="PENDING">BEKLEMEDE</option>
                       <option value="ACTIVE">AKTİF</option>
@@ -124,13 +109,13 @@ const UserList = () => {
                     </S.RoleSelect>
                   </S.Td>
                   <S.Td>
-                    <span style={{ color: '#888' }}>
+                    <S.DateCell>
                       {new Date(user.createdAt).toLocaleDateString('tr-TR')}
-                    </span>
+                    </S.DateCell>
                   </S.Td>
                   <S.Td>
-                    <S.RoleSelect 
-                      value={user.role} 
+                    <S.RoleSelect
+                      value={user.role}
                       onChange={(e) => handleUpdate(user.id, { role: e.target.value })}
                     >
                       <option value="USER">USER</option>
@@ -139,22 +124,22 @@ const UserList = () => {
                     </S.RoleSelect>
                   </S.Td>
                   <S.Td>
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
+                    <S.ActionsCell>
                       <S.ActionButton $type="detail" onClick={() => setSelectedUserId(user.id)} title="Detaylar">
                         <Eye size={18} />
                       </S.ActionButton>
                       <S.ActionButton $type="delete" onClick={() => handleDelete(user.id)} title="Kullanıcıyı Sil">
                         <Trash2 size={18} />
                       </S.ActionButton>
-                    </div>
+                    </S.ActionsCell>
                   </S.Td>
                 </S.Tr>
               ))
             ) : (
               <S.Tr>
-                <S.Td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
+                <S.EmptyCell colSpan={6}>
                    {loading ? 'Kullanıcı listesi yükleniyor...' : 'Gösterilecek kullanıcı bulunamadı.'}
-                </S.Td>
+                </S.EmptyCell>
               </S.Tr>
             )}
           </tbody>

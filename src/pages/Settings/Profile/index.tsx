@@ -3,6 +3,7 @@ import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState } from
 import { User, Key, Save, CheckCircle, AlertCircle, TrendingUp, Zap } from 'lucide-react';
 import { useMarketMode } from '../../../context/MarketModeContext';
 import styled from 'styled-components';
+import * as S from './Profile.styles';
 
 // ─── Styled Components ─────────────────────────────────
 
@@ -260,63 +261,34 @@ const ProfilePage = () => {
               </InfoValue>
             </InputGroup>
 
-            <div style={{ margin: '24px 0', borderTop: '1px dashed #DADCE0' }} />
+            <S.Divider />
 
-            <SectionHeader style={{ border: 'none', marginBottom: 12 }}>
+            <S.SectionHeaderBorderless>
               <SectionIcon $color="rgba(15, 157, 88, 0.1)">
                 <TrendingUp size={20} color="#0F9D58" />
               </SectionIcon>
               <SectionTitle>Pazar Tercihi</SectionTitle>
-            </SectionHeader>
+            </S.SectionHeaderBorderless>
 
             <InputGroup>
               <Label>Varsayılan Pazar</Label>
-              <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
-                <button
+              <S.MarketModeContainer>
+                <S.MarketModeButton
                   type="button"
                   onClick={() => setMode('stock')}
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    borderRadius: '10px',
-                    border: '2px solid',
-                    borderColor: mode === 'stock' ? '#1A73E8' : '#DADCE0',
-                    background: mode === 'stock' ? 'rgba(26, 115, 232, 0.05)' : 'transparent',
-                    color: mode === 'stock' ? '#1A73E8' : '#5F6368',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8
-                  }}
+                  $active={mode === 'stock'}
                 >
                   <TrendingUp size={16} /> Borsa (BIST)
-                </button>
-                <button
+                </S.MarketModeButton>
+                <S.MarketModeButton
                   type="button"
                   onClick={() => setMode('crypto')}
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    borderRadius: '10px',
-                    border: '2px solid',
-                    borderColor: mode === 'crypto' ? '#F4B400' : '#DADCE0',
-                    background: mode === 'crypto' ? 'rgba(244, 180, 0, 0.05)' : 'transparent',
-                    color: mode === 'crypto' ? '#F4B400' : '#5F6368',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8
-                  }}
+                  $active={mode === 'crypto'}
+                  $color="#F4B400"
                 >
                   <Zap size={16} /> Kripto Para
-                </button>
-              </div>
+                </S.MarketModeButton>
+              </S.MarketModeContainer>
               <KeyHint>Uygulama açıldığında hangi pazarın verilerini görmek istediğinizi seçin.</KeyHint>
             </InputGroup>
           </Section>
@@ -332,52 +304,32 @@ const ProfilePage = () => {
 
             <InputGroup>
               <Label>İşlem Modu</Label>
-              <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
-                <button
+              <S.TradingModeContainer>
+                <S.TradingModeButton
                   type="button"
                   onClick={() => setTradingMode('SIMULATION')}
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    borderRadius: '10px',
-                    border: '2px solid',
-                    borderColor: tradingMode === 'SIMULATION' ? '#1A73E8' : '#DADCE0',
-                    background: tradingMode === 'SIMULATION' ? 'rgba(26, 115, 232, 0.05)' : 'transparent',
-                    color: tradingMode === 'SIMULATION' ? '#1A73E8' : '#5F6368',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
+                  $isSimulation={tradingMode === 'SIMULATION'}
+                  $isLive={false}
                 >
                   Simülasyon Modu
-                </button>
-                <button
+                </S.TradingModeButton>
+                <S.TradingModeButton
                   type="button"
                   onClick={() => setTradingMode('LIVE')}
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    borderRadius: '10px',
-                    border: '2px solid',
-                    borderColor: tradingMode === 'LIVE' ? '#159D58' : '#DADCE0',
-                    background: tradingMode === 'LIVE' ? 'rgba(15, 157, 88, 0.05)' : 'transparent',
-                    color: tradingMode === 'LIVE' ? '#159D58' : '#5F6368',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
+                  $isSimulation={false}
+                  $isLive={tradingMode === 'LIVE'}
                 >
                   Live Mode (Gerçek)
-                </button>
-              </div>
-              <KeyHint style={{ color: tradingMode === 'LIVE' ? '#DB4437' : '#5F6368', fontWeight: tradingMode === 'LIVE' ? '600' : '400' }}>
+                </S.TradingModeButton>
+              </S.TradingModeContainer>
+              <S.TradingModeHint $isLive={tradingMode === 'LIVE'}>
                 {tradingMode === 'LIVE'
                   ? '⚠️ DİKKAT: Live modda işlemler gerçek Binance bakiyeniz ile yapılır!'
                   : 'ℹ️ Simülasyon modunda sanal bakiyeniz (10.000 USDT) kullanılır.'}
               </KeyHint>
             </InputGroup>
 
-            <div style={{ margin: '24px 0', borderTop: '1px dashed #DADCE0' }} />
+            <S.Divider />
 
             <InputGroup>
               <Label>API Key</Label>
@@ -401,9 +353,9 @@ const ProfilePage = () => {
               <KeyHint>Mevcut: {profile?.binanceSecretKey || 'Tanımsız'}</KeyHint>
             </InputGroup>
 
-            <KeyHint style={{ marginTop: 20, fontSize: '0.8125rem', color: '#F4B400' }}>
+            <S.APIWarningHint>
               ⚠️ API Key'leriniz güvenli bir şekilde şifrelenerek saklanır. Sadece yeni bir key girdiğinizde güncellenir.
-            </KeyHint>
+            </S.APIWarningHint>
           </Section>
 
           {/* Yeni: AI Otomasyon Kontrolü */}
@@ -415,60 +367,42 @@ const ProfilePage = () => {
               <SectionTitle>Yapay Zeka Otomasyon Kontrolü</SectionTitle>
             </SectionHeader>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <S.AIAutomationContainer>
               <div>
-                <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#202124', marginBottom: '4px' }}>
+                <S.SectionDescription>
                   Manuel Piyasa Taraması
-                </p>
-                <p style={{ fontSize: '0.8125rem', color: '#5F6368', lineHeight: '1.4' }}>
+                </S.SectionDescription>
+                <S.SectionNote>
                   Tüm BIST hisselerini anlık fiyatlarla tarar. 100+ skor alan hisseleri otomatik olarak İzleme Listenize ekler.
-                </p>
+                </S.SectionNote>
               </div>
 
-              <button
+              <S.AutomationButton
                 type="button"
                 onClick={runAIScan}
                 disabled={saving || (progress?.isRunning ?? false)}
-                style={{
-                  background: (saving || progress?.isRunning) ? '#DADCE0' : '#A76BF5',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px 24px',
-                  borderRadius: '10px',
-                  fontSize: '0.875rem',
-                  fontWeight: '700',
-                  cursor: (saving || progress?.isRunning) ? 'not-allowed' : 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  transition: 'all 0.2s',
-                  boxShadow: (saving || progress?.isRunning) ? 'none' : '0 4px 10px rgba(167, 107, 245, 0.3)'
-                }}
+                $color="#A76BF5"
+                $disabled={saving || (progress?.isRunning ?? false)}
               >
                 <Zap size={16} fill="white" />
                 {progress?.isRunning ? 'Tarama Sürüyor...' : 'Şimdi Taramayı Başlat'}
-              </button>
+              </S.AutomationButton>
 
               {progress?.isRunning && (
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#5F6368', marginBottom: '6px' }}>
+                <S.ProgressSection>
+                  <S.ProgressHeader>
                     <span>{progress.message}</span>
                     <span>%{Math.round((progress.current / (progress.total || 1)) * 100)}</span>
-                  </div>
-                  <div style={{ width: '100%', height: '8px', background: '#F1F3F4', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div
-                      style={{
-                        width: `${(progress.current / (progress.total || 1)) * 100}%`,
-                        height: '100%',
-                        background: 'linear-gradient(90deg, #A76BF5, #1A73E8)',
-                        transition: 'width 0.4s ease'
-                      }}
+                  </S.ProgressHeader>
+                  <S.ProgressBarContainer>
+                    <S.GradientProgressBar
+                      $percent={(progress.current / (progress.total || 1)) * 100}
+                      $color="#A76BF5"
                     />
-                  </div>
-                </div>
+                  </S.ProgressBarContainer>
+                </S.ProgressSection>
               )}
-            </div>
+            </S.AIAutomationContainer>
           </Section>
 
           {/* Yeni: Genel Veri Yönetimi */}
@@ -480,91 +414,59 @@ const ProfilePage = () => {
               <SectionTitle>Genel Veri Yönetimi</SectionTitle>
             </SectionHeader>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <S.AIAutomationContainer>
               <div>
-                <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#202124', marginBottom: '4px' }}>
+                <S.SectionDescription>
                   Tüm Geçmiş Verileri Eşitle (1900+)
-                </p>
-                <p style={{ fontSize: '0.8125rem', color: '#5F6368', lineHeight: '1.4' }}>
+                </S.SectionDescription>
+                <S.SectionNote>
                   Tüm BIST hisselerinin tarihsel verilerini 1900 yılından itibaren tarar ve eksikleri veritabanına kaydeder. Bu işlem uzun sürebilir.
-                </p>
+                </S.SectionNote>
               </div>
 
-              <button
+              <S.AutomationButton
                 type="button"
                 onClick={runFullHistorySync}
                 disabled={saving || (historyProgress?.isSyncing ?? false)}
-                style={{
-                  background: (saving || historyProgress?.isSyncing) ? '#DADCE0' : '#0F9D58',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px 24px',
-                  borderRadius: '10px',
-                  fontSize: '0.875rem',
-                  fontWeight: '700',
-                  cursor: (saving || historyProgress?.isSyncing) ? 'not-allowed' : 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  transition: 'all 0.2s',
-                  boxShadow: (saving || historyProgress?.isSyncing) ? 'none' : '0 4px 10px rgba(15, 157, 88, 0.3)'
-                }}
+                $color="#0F9D58"
+                $disabled={saving || (historyProgress?.isSyncing ?? false)}
               >
                 <TrendingUp size={16} />
                 {historyProgress?.isSyncing ? 'Eşitleniyor...' : 'Tüm Geçmişi Eşitle'}
-              </button>
+              </S.AutomationButton>
 
               {historyProgress?.isSyncing && (
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#5F6368', marginBottom: '6px' }}>
+                <S.ProgressSection>
+                  <S.ProgressHeader>
                     <span>Eşitleniyor: <strong>{historyProgress.currentSymbol}</strong> ({historyProgress.current}/{historyProgress.total})</span>
                     <span>%{historyProgress.percent}</span>
-                  </div>
-                  <div style={{ width: '100%', height: '8px', background: '#F1F3F4', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div
-                      style={{
-                        width: `${historyProgress.percent}%`,
-                        height: '100%',
-                        background: 'linear-gradient(90deg, #0F9D58, #1A73E8)',
-                        transition: 'width 0.4s ease'
-                      }}
+                  </S.ProgressHeader>
+                  <S.ProgressBarContainer>
+                    <S.GradientProgressBar
+                      $percent={historyProgress.percent}
+                      $color="#0F9D58"
                     />
-                  </div>
-                </div>
+                  </S.ProgressBarContainer>
+                </S.ProgressSection>
               )}
-            </div>
+            </S.AIAutomationContainer>
           </Section>
         </ProfileGrid>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '24px' }}>
+        <S.ButtonGroup>
           <SaveButton type="submit" disabled={saving || (progress?.isRunning ?? false)}>
             <Save size={18} />
             {saving && !progress?.isRunning ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
           </SaveButton>
 
-          <button
+          <S.ResetButton
             type="button"
             onClick={resetAccount}
             disabled={saving || (progress?.isRunning ?? false)}
-            style={{
-              background: 'transparent',
-              color: '#DB4437',
-              border: '1px solid #DB4437',
-              padding: '10px 20px',
-              borderRadius: '8px',
-              fontSize: '0.8125rem',
-              fontWeight: '600',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              marginTop: '18px'
-            }}
           >
             <AlertCircle size={16} /> Hesabı Sıfırla
-          </button>
-        </div>
+          </S.ResetButton>
+        </S.ButtonGroup>
       </form>
     </PageContainer>
   );
