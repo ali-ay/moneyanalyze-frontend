@@ -2,16 +2,32 @@ import styled from 'styled-components';
 
 export const RightAlignTh = styled.th`
   text-align: right;
+  padding: 12px 16px;
+  border-bottom: 1px solid ${props => props.theme.colors.border};
+
+  @media (max-width: 768px) {
+    padding: 8px 12px;
+  }
 `;
 
 export const RightAlignTd = styled.td`
   text-align: right;
+  padding: 16px;
+  border-bottom: 1px solid ${props => props.theme.colors.border};
+
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+  }
 `;
 
 export const SymbolCell = styled.td`
   font-weight: 700;
   padding: 12px 16px;
   border-bottom: 1px solid ${props => props.theme.colors.border};
+
+  @media (max-width: 768px) {
+    padding: 8px 12px;
+  }
 
   .symbol {
     font-size: 0.9375rem;

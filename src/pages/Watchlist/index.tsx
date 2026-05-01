@@ -79,7 +79,7 @@ const TableWrapper = styled.div`
 
   @media (max-width: 768px) {
     margin: 0 -12px;
-    padding: 0px;
+    padding: 0 12px 0 0;
   }
 `;
 
