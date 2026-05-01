@@ -113,22 +113,23 @@ export const TooltipBox = styled.div`
   top: 100%;
   right: 0;
   width: 280px;
-  background: #ffffff;
+  background-color: #ffffff !important;
   color: #3C4043;
   padding: 16px;
   border-radius: 12px;
   font-size: 0.875rem;
   line-height: 1.6;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
   border: 1px solid #E8EAED;
   visibility: hidden;
   opacity: 0;
   transform: translateY(10px);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 9999;
+  z-index: 99999;
   pointer-events: none;
   text-align: left;
   margin-top: 8px;
+  backdrop-filter: none !important;
 
   &::after {
     content: '';
@@ -153,11 +154,14 @@ export const TooltipBox = styled.div`
 
   @media (max-width: 768px) {
     width: 240px;
-    right: -20px;
-    bottom: 110%;
+    right: -10px;
+    top: 100%;
+    margin-top: 12px;
     
     &::after {
-      right: 28px;
+      right: 18px;
+      bottom: 100%;
+      border-color: transparent transparent #ffffff transparent;
     }
   }
 `;
