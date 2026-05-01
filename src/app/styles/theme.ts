@@ -16,6 +16,7 @@ export const tokens = {
     danger: '#DB4437',
     warning: '#F4B400',
     glass: 'rgba(255, 255, 255, 0.8)',
+    cardBg: '#FFFFFF',
   },
   shadows: {
     xs: '0 1px 2px 0 rgba(60,64,67,0.3)',

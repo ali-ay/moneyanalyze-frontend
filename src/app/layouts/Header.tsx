@@ -259,7 +259,11 @@ const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
       const fetchStocks = async () => {
         try {
           const res = await api.get('/admin/stocks');
-          setStocks(res.data);
+          if (res.data && Array.isArray(res.data.data)) {
+            setStocks(res.data.data);
+          } else if (Array.isArray(res.data)) {
+            setStocks(res.data);
+          }
         } catch (err) {
           console.error('Stocks fetch error:', err);
         }
@@ -286,8 +290,8 @@ const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
     if (searchQuery.length > 1) {
       const normalizedQuery = normalizeText(searchQuery);
       
-      const filtered = stocks.filter(s => {
-        const normalizedSymbol = normalizeText(s.symbol);
+      const filtered = (stocks || []).filter(s => {
+        const normalizedSymbol = normalizeText(s.symbol || '');
         const normalizedName = s.name ? normalizeText(s.name) : '';
         
         return normalizedSymbol.includes(normalizedQuery) || 

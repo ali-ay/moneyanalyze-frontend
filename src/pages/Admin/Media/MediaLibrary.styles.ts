@@ -47,7 +47,7 @@ export const MediaInfo = styled.div`
 
 export const MediaTitle = styled.div`
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.textMain};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
