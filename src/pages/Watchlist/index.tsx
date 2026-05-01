@@ -164,6 +164,8 @@ const Watchlist: React.FC = () => {
                   <Th $sortable onClick={() => requestSort('priceChangePercent')}>
                     Günlük Değişim{getSortIndicator('priceChangePercent')}
                   </Th>
+                  <Th>AI Hedef (Tahmin)</Th>
+                  <Th>Stop-Loss</Th>
                   <S.RightAlignTh>İşlem</S.RightAlignTh>
                 </tr>
               </thead>
@@ -173,10 +175,14 @@ const Watchlist: React.FC = () => {
                   const profit = item.profitPercent || 0;
                   const isPositiveDaily = dailyChange >= 0;
                   const isPositiveProfit = profit >= 0;
+                  const ai = item.aiData;
 
                   return (
                     <Tr key={item.id}>
-                      <S.SymbolCell>{item.symbol}</S.SymbolCell>
+                      <S.SymbolCell>
+                        <div className="symbol">{item.symbol}</div>
+                        <div className="name">{item.name}</div>
+                      </S.SymbolCell>
                       <Td>
                         <S.PeriodBadge>
                           {item.period || 'Manuel'}
@@ -193,6 +199,25 @@ const Watchlist: React.FC = () => {
                         <S.ProfitChangeValue $isPositive={isPositiveDaily}>
                           {isPositiveDaily ? '▲' : '▼'} %{Math.abs(dailyChange).toFixed(2)}
                         </S.ProfitChangeValue>
+                      </Td>
+                      <Td>
+                        {ai ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <span style={{ fontWeight: 700, color: '#1A73E8' }}>{currency}{ai.targetPrice}</span>
+                            <span style={{ fontSize: '10px', color: '#28a745', fontWeight: 600 }}>
+                              Potansiyel: +%{ai.potentialProfit}
+                            </span>
+                          </div>
+                        ) : (
+                          <span style={{ color: '#999', fontSize: '11px' }}>Analiz Bekleniyor</span>
+                        )}
+                      </Td>
+                      <Td>
+                        {ai ? (
+                          <span style={{ fontWeight: 600, color: '#d32f2f' }}>{currency}{ai.stopLoss}</span>
+                        ) : (
+                          <span style={{ color: '#999' }}>-</span>
+                        )}
                       </Td>
                       <S.RightAlignTd>
                         <Button
