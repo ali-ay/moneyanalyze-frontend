@@ -11,6 +11,7 @@ import * as S from './Watchlist.styles';
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
+  min-width: 800px; /* Mobilde yatay kaydırma için minimum genişlik */
 `;
 
 const Th = styled.th<{ $sortable?: boolean }>`
@@ -22,6 +23,7 @@ const Th = styled.th<{ $sortable?: boolean }>`
   border-bottom: 1px solid ${props => props.theme.colors.border};
   cursor: ${props => props.$sortable ? 'pointer' : 'default'};
   user-select: none;
+  white-space: nowrap;
 `;
 
 const Td = styled.td`
@@ -29,6 +31,7 @@ const Td = styled.td`
   font-size: 0.875rem;
   color: ${props => props.theme.colors.textMain};
   border-bottom: 1px solid ${props => props.theme.colors.border};
+  white-space: nowrap;
 `;
 
 const Tr = styled.tr`
@@ -36,20 +39,6 @@ const Tr = styled.tr`
   &:hover {
     background: ${props => props.theme.colors.surfaceHover};
   }
-`;
-
-const ChangeValue = styled.span<{ $isPositive: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: 700;
-  font-size: 0.8125rem;
-  padding: 4px 10px;
-  border-radius: ${props => props.theme.radius.sm};
-  color: ${props => props.$isPositive ? props.theme.colors.success : props.theme.colors.danger};
-  background: ${props => props.$isPositive
-    ? `${props.theme.colors.success}15`
-    : `${props.theme.colors.danger}15`};
 `;
 
 const SectionTitle = styled.h3`
@@ -60,6 +49,44 @@ const SectionTitle = styled.h3`
   gap: 10px;
   margin: 0 0 16px 0;
   color: ${props => props.theme.colors.textMain};
+`;
+
+const TableWrapper = styled.div`
+  overflow-x: auto;
+  margin: 0 -16px;
+  padding: 0 16px;
+  
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: ${props => props.theme.colors.border};
+    border-radius: 10px;
+  }
+
+  @media (max-width: 768px) {
+    margin: 0 -12px;
+    padding: 0 12px;
+  }
+`;
+
+const ResponsiveHeader = styled(PageHeader)`
+  @media (max-width: 768px) {
+    .header-stack {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    
+    .button-group {
+      width: 100%;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+  }
 `;
 
 const Watchlist: React.FC = () => {
@@ -113,28 +140,28 @@ const Watchlist: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader>
-        <HStack $justify="space-between" $align="center" $fullWidth>
+      <ResponsiveHeader>
+        <HStack className="header-stack" $justify="space-between" $align="center" $fullWidth>
           <div>
             <PageTitle>Takip Listesi</PageTitle>
             <PageSubtitle>
               {mode === 'stock' ? 'BIST hisseleri' : 'Kripto varlıklar'} — anlık takip.
             </PageSubtitle>
           </div>
-          <HStack $gap="sm">
+          <HStack className="button-group" $gap="sm">
             <Button
               $variant="danger"
               onClick={handleClearClick}
               disabled={watchlist.length === 0 || adding}
             >
-              <Trash size={16} /> Listeyi Temizle
+              <Trash size={16} /> <span className="btn-text">Listeyi Temizle</span>
             </Button>
             <Button $variant="primary" onClick={handleAddClick} disabled={adding}>
-              <Plus size={16} /> Sembol Ekle
+              <Plus size={16} /> <span className="btn-text">Sembol Ekle</span>
             </Button>
           </HStack>
         </HStack>
-      </PageHeader>
+      </ResponsiveHeader>
 
       <Card>
         <Card.Body>
@@ -145,7 +172,8 @@ const Watchlist: React.FC = () => {
           {watchlist.length === 0 ? (
             <EmptyState>Henüz takip listesinde sembol bulunmuyor.</EmptyState>
           ) : (
-            <Table>
+            <TableWrapper>
+              <Table>
               <thead>
                 <tr>
                   <Th $sortable onClick={() => requestSort('symbol')}>
@@ -237,7 +265,8 @@ const Watchlist: React.FC = () => {
                 })}
               </tbody>
             </Table>
-          )}
+          </TableWrapper>
+        )}
         </Card.Body>
       </Card>
     </PageContainer>

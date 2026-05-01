@@ -2,6 +2,25 @@ import styled from 'styled-components';
 
 export const TableWrapper = styled.div`
   padding: 0 4px;
+  overflow-x: auto;
+  margin: 0 -16px;
+  padding: 0 16px;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #E8EAED;
+    border-radius: 10px;
+  }
+
+  @media (max-width: 768px) {
+    margin: 0 -12px;
+    padding: 0 12px;
+  }
 `;
 
 export const DateColumn = styled.div`
@@ -120,6 +139,12 @@ export const CleanupButton = styled.button`
   align-items: center;
   gap: 8px;
   transition: all 0.2s;
+  white-space: nowrap;
+
+  @media (max-width: 768px) {
+    flex: 1;
+    justify-content: center;
+  }
 
   &:hover {
     background: #FEECEB;
@@ -136,6 +161,10 @@ export const CleanupButton = styled.button`
 export const SearchContainer = styled.div`
   position: relative;
   width: 280px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 export const SearchInput = styled.input`

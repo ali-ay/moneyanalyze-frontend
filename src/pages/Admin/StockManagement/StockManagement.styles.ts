@@ -195,7 +195,25 @@ export const EmptyState = styled.div`
 
 export const TableWrapper = styled.div`
   overflow-x: auto;
+  margin: 0 -20px;
+  padding: 0 20px;
   -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #E8EAED;
+    border-radius: 10px;
+  }
+
+  @media (max-width: 768px) {
+    margin: 0 -16px;
+    padding: 0 16px;
+  }
 `;
 
 export const Modal = styled.div`

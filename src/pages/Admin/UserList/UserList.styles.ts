@@ -40,14 +40,33 @@ export const TableWrapper = styled.div`
   background: ${props => props.theme?.colors?.surface || '#FFFFFF'};
   border-radius: 16px;
   border: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
-  overflow: hidden;
+  overflow-x: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  margin: 0 -16px;
+  padding: 0 16px;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #E8EAED;
+    border-radius: 10px;
+  }
+
+  @media (min-width: 769px) {
+    margin: 0;
+    padding: 0;
+  }
 `;
 
 export const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  min-width: 800px;
 `;
 
 export const Th = styled.th`
@@ -144,6 +163,12 @@ export const HeaderContent = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   width: 100%;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
 `;
 
 export const CenterAlignTh = styled(Th)`

@@ -90,6 +90,22 @@ const ProfitBadge = styled.span<{ $positive: boolean }>`
   font-size: 0.9375rem;
 `;
 
+const ResponsiveHeader = styled(PageHeader)`
+  @media (max-width: 992px) {
+    .header-stack {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    
+    .actions-stack {
+      width: 100%;
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+`;
+
 const StockActivityPage: React.FC = () => {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -184,8 +200,8 @@ const StockActivityPage: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader>
-        <HStack $justify="space-between" $align="center" style={{ width: '100%' }}>
+      <ResponsiveHeader>
+        <HStack className="header-stack" $justify="space-between" $align="center" style={{ width: '100%' }}>
           <VStack $gap="4px">
             <PageTitle>
               <HStack $gap="12px" $align="center">
@@ -204,7 +220,7 @@ const StockActivityPage: React.FC = () => {
             </PageSubtitle>
           </VStack>
 
-          <HStack $gap="16px" $align="center">
+          <HStack className="actions-stack" $gap="16px" $align="center">
             <S.SearchContainer>
               <S.SearchIconWrapper>
                 <Search size={18} />
@@ -222,7 +238,7 @@ const StockActivityPage: React.FC = () => {
             </S.CleanupButton>
           </HStack>
         </HStack>
-      </PageHeader>
+      </ResponsiveHeader>
 
       <S.TableWrapper>
         {logs.length === 0 ? (

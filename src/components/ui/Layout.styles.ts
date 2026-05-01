@@ -14,16 +14,24 @@ export const PageHeader = styled.div`
 
 export const PageTitle = styled.h2`
   font-size: 1.75rem;
-  font-weight: 700;
+  font-weight: 800;
   color: ${props => props.theme?.colors?.textMain || '#202124'};
   margin: 0;
   letter-spacing: -0.5px;
+
+  @media (max-width: 768px) {
+    font-size: 1.25rem;
+  }
 `;
 
 export const PageSubtitle = styled.p`
   font-size: 0.9375rem;
   color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
   margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 0.8125rem;
+  }
 `;
 
 export const EmptyState = styled.div`

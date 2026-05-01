@@ -16,12 +16,13 @@ const HeaderWrapper = styled.header`
   gap: 20px;
 
   @media (max-width: 768px) {
-    padding: 16px 20px;
+    padding: 16px 12px;
+    gap: 12px;
   }
 `;
 
 const HeaderTitle = styled.h1`
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 700;
   color: ${props => props.theme.colors.textMain};
   margin: 0;
@@ -140,6 +141,10 @@ const HeaderActions = styled.div`
   display: flex;
   align-items: center;
   gap: 24px;
+
+  @media (max-width: 768px) {
+    gap: 12px;
+  }
 `;
 
 const ToolGroup = styled.div`
@@ -164,6 +169,11 @@ const UserProfile = styled.div`
   padding-left: 24px;
   border-left: 1px solid ${props => props.theme.colors.border};
   cursor: pointer;
+
+  @media (max-width: 768px) {
+    padding-left: 0;
+    border-left: none;
+  }
 `;
 
 const UserMeta = styled.div`
@@ -183,6 +193,11 @@ const UserAvatar = styled.div`
   background: ${props => props.theme.colors.border};
   overflow: hidden;
   img { width: 100%; height: 100%; object-fit: cover; }
+
+  @media (max-width: 768px) {
+    width: 32px;
+    height: 32px;
+  }
 `;
 
 const ModeToggleContainer = styled.div`
@@ -204,6 +219,11 @@ const ModeToggleButton = styled.button<{ $active: boolean }>`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+
+  @media (max-width: 480px) {
+    padding: 4px 8px;
+    font-size: 0.6875rem;
+  }
 
   &:hover {
     background: ${props => !props.$active ? props.theme.colors.background : props.theme.colors.primary};
