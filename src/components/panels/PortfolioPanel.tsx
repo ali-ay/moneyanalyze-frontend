@@ -49,7 +49,7 @@ export const PortfolioPanel: React.FC<PortfolioPanelProps> = ({
 
   return (
     <PanelContainer>
-      <Grid $columns={3} $gap="lg">
+      <Grid $columns={3} $gap="lg" className="portfolio-grid">
         <MetricCard
           title="Toplam Değer"
           value={stats.totalValue}
@@ -74,11 +74,17 @@ export const PortfolioPanel: React.FC<PortfolioPanelProps> = ({
       </Grid>
 
       <style>{`
-        @media (max-width: ${props => props.theme?.breakpoints?.tablet || '768px'}) {
-          grid-template-columns: 1fr 1fr !important;
+        @media (max-width: 992px) {
+          .portfolio-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 16px !important;
+          }
         }
-        @media (max-width: ${props => props.theme?.breakpoints?.mobile || '576px'}) {
-          grid-template-columns: 1fr !important;
+        @media (max-width: 600px) {
+          .portfolio-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+          }
         }
       `}</style>
     </PanelContainer>

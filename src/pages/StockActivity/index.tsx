@@ -59,8 +59,9 @@ const Td = styled.td`
   border-bottom: 1px solid #F1F3F4;
 
   @media (max-width: 768px) {
-    padding: 12px 10px;
+    padding: 4px 8px;
     font-size: 0.8125rem;
+    width: 58px;
   }
   
   &:first-child {
@@ -89,8 +90,8 @@ const ActionBadge = styled.span<{ $action: string }>`
 
   @media (max-width: 768px) {
     padding: 6px;
-    width: 28px;
-    height: 28px;
+    width: 48px;
+    height: 20px;
     .btn-text { display: none; }
   }
 `;
@@ -99,6 +100,10 @@ const PriceText = styled.div`
   font-family: 'Roboto Mono', monospace;
   font-weight: 700;
   color: #202124;
+
+  @media (max-width: 768px) {
+    width: 58px;
+  }
 `;
 
 const Label = styled.div`
@@ -118,7 +123,7 @@ const ProfitBadge = styled.span<{ $positive: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.9375rem;
+  font-size: 0.9375rem; 
 `;
 
 const ModalBackdrop = styled.div`
@@ -219,7 +224,7 @@ const StockActivityPage: React.FC = () => {
 
   const handleCleanup = async () => {
     if (!window.confirm('Mükerrer (üst üste gelen) kayıtlar temizlenecektir. Emin misiniz?')) return;
-    
+
     setIsCleaning(true);
     try {
       const response = await api.post('/stock/activity-logs/cleanup');
@@ -300,8 +305,8 @@ const StockActivityPage: React.FC = () => {
               <S.SearchIconWrapper>
                 <Search size={18} />
               </S.SearchIconWrapper>
-              <S.SearchInput 
-                placeholder="Hisse ara (Örn: THYAO)..." 
+              <S.SearchInput
+                placeholder="Hisse ara (Örn: THYAO)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />

@@ -28,9 +28,19 @@ const Th = styled.th<{ $sortable?: boolean }>`
   border-bottom: 1px solid ${props => props.theme.colors.border};
   cursor: ${props => props.$sortable ? 'pointer' : 'default'};
   user-select: none;
+  white-space: nowrap;
 
   &:hover {
     color: ${props => props.$sortable ? props.theme.colors.primary : 'inherit'};
+  }
+
+  @media (max-width: 768px) {
+    padding: 8px 10px;
+    font-size: 0.6875rem;
+
+    &.hide-mobile {
+      display: none;
+    }
   }
 `;
 
@@ -39,6 +49,15 @@ const Td = styled.td`
   font-size: 0.875rem;
   color: ${props => props.theme.colors.textMain};
   border-bottom: 1px solid ${props => props.theme.colors.border};
+
+  @media (max-width: 768px) {
+    padding: 10px 8px;
+    font-size: 0.8125rem;
+
+    &.hide-mobile {
+      display: none;
+    }
+  }
 `;
 
 const Tr = styled.tr`
@@ -53,14 +72,19 @@ const SymbolCell = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  font-weight: 600;
+  font-weight: 700;
+
+  @media (max-width: 768px) {
+    gap: 8px;
+    font-size: 0.875rem;
+  }
 `;
 
 const ProfitText = styled.span<{ $positive?: boolean }>`
   color: ${props => props.$positive
     ? props.theme.colors.success
     : props.theme.colors.danger};
-  font-weight: 600;
+  font-weight: 700;
 `;
 
 const EmptyState = styled.div`
@@ -124,11 +148,11 @@ export const AssetListPanel: React.FC<AssetListPanelProps> = ({
                   <Th $sortable onClick={() => onSort?.('amount')}>
                     Miktar{getSortIndicator('amount', sortConfig)}
                   </Th>
-                  <Th $sortable onClick={() => onSort?.('averagePrice')}>
+                  <Th $sortable className="hide-mobile" onClick={() => onSort?.('averagePrice')}>
                     Ort. Fiyat{getSortIndicator('averagePrice', sortConfig)}
                   </Th>
                   <Th $sortable onClick={() => onSort?.('currentPrice')}>
-                    Güncel Fiyat{getSortIndicator('currentPrice', sortConfig)}
+                    Güncel{getSortIndicator('currentPrice', sortConfig)}
                   </Th>
                   <Th $sortable onClick={() => onSort?.('profit')}>
                     Kâr/Zarar{getSortIndicator('profit', sortConfig)}
@@ -149,9 +173,9 @@ export const AssetListPanel: React.FC<AssetListPanelProps> = ({
                       <Td>
                         <SymbolCell>{asset.symbol}</SymbolCell>
                       </Td>
-                      <Td>{asset.amount.toFixed(6)}</Td>
-                      <Td>{currency}{asset.averagePrice.toFixed(2)}</Td>
-                      <Td>{currency}{currentPrice.toFixed(2)}</Td>
+                      <Td>{asset.amount.toFixed(assets[0]?.symbol?.includes('USDT') ? 4 : 2)}</Td>
+                      <Td className="hide-mobile">{currency}{asset.averagePrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</Td>
+                      <Td>{currency}{currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</Td>
                       <Td>
                         <ProfitText $positive={isPositive}>
                           {isPositive ? '+' : ''}
@@ -164,6 +188,7 @@ export const AssetListPanel: React.FC<AssetListPanelProps> = ({
                             $variant="danger"
                             $size="sm"
                             onClick={() => onSell(asset, currentPrice)}
+                            style={{ padding: '4px 12px', fontSize: '0.75rem' }}
                           >
                             Sat
                           </Button>

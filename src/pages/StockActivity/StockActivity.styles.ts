@@ -41,7 +41,7 @@ export const TimeText = styled.span`
 export const SymbolText = styled.span`
   font-weight: 900;
   color: ${props => props.theme?.colors?.primary || '#1A73E8'};
-  font-size: 1.05rem;
+  font-size: 1rem;
 `;
 
 export const PeriodBadge = styled.div`
@@ -79,6 +79,11 @@ export const ProfitBadgeWithSize = styled.span<{ $positive: boolean }>`
   align-items: center;
   gap: 4px;
   font-size: 1rem;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+    font-size: 0.75rem;
+  }
 `;
 
 export const CalculatingText = styled.span`

@@ -17,12 +17,22 @@ const MetricValue = styled.div<{ $variant?: 'primary' | 'success' | 'danger' }>`
     }
   }};
   margin: 12px 0;
+
+  @media (max-width: 768px) {
+    font-size: 1.25rem;
+    margin: 8px 0;
+  }
 `;
 
 const MetricSubtext = styled.div`
   font-size: 0.8125rem;
   color: ${props => props.theme.colors.textSecondary};
   margin-top: 8px;
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
+    margin-top: 4px;
+  }
 `;
 
 const MetricIcon = styled.div<{ $variant?: 'primary' | 'success' | 'danger' }>`
@@ -54,6 +64,12 @@ const MetricIcon = styled.div<{ $variant?: 'primary' | 'success' | 'danger' }>`
     }
   }};
   flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    width: 32px;
+    height: 32px;
+    svg { width: 16px; height: 16px; }
+  }
 `;
 
 export interface MetricCardProps {
@@ -76,7 +92,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   className,
 }) => (
   <Card className={className}>
-    <Card.Header>
+    <Card.Header style={{ padding: '20px 24px 0 24px' }}>
       <HStack $justify="space-between" $fullWidth>
         <div>
           <div style={{ fontSize: '0.8125rem', color: '#9AA0A6', marginBottom: '4px' }}>
@@ -87,7 +103,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       </HStack>
     </Card.Header>
     <Card.Body $noPadding>
-      <div style={{ padding: '0 24px 24px 24px' }}>
+      <div style={{ padding: '0 24px 20px 24px' }}>
         <MetricValue $variant={variant}>
           {currency}
           {typeof value === 'number' ? value.toLocaleString() : value}
