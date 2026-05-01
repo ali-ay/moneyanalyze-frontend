@@ -79,7 +79,7 @@ const TableWrapper = styled.div`
 
   @media (max-width: 768px) {
     margin: 0 -12px;
-    padding: 0 12px;
+    padding: 0px;
   }
 `;
 
@@ -184,99 +184,99 @@ const Watchlist: React.FC = () => {
           ) : (
             <TableWrapper>
               <Table>
-              <thead>
-                <tr>
-                  <Th $sortable onClick={() => requestSort('symbol')}>
-                    Sembol{getSortIndicator('symbol')}
-                  </Th>
-                  <Th>Periyot</Th>
-                  <Th $sortable onClick={() => requestSort('entryPrice')}>
-                    Sinyal Fiyatı{getSortIndicator('entryPrice')}
-                  </Th>
-                  <Th $sortable onClick={() => requestSort('currentPrice')}>
-                    Anlık Fiyat{getSortIndicator('currentPrice')}
-                  </Th>
-                  <Th $sortable onClick={() => requestSort('profitPercent')}>
-                    Değişim (Girişten){getSortIndicator('profitPercent')}
-                  </Th>
-                  <Th $sortable onClick={() => requestSort('priceChangePercent')}>
-                    Günlük Değişim{getSortIndicator('priceChangePercent')}
-                  </Th>
-                  <Th>AI Hedef (Tahmin)</Th>
-                  <Th>Stop-Loss</Th>
-                  <S.RightAlignTh>İşlem</S.RightAlignTh>
-                </tr>
-              </thead>
-              <tbody>
-                {watchlist.map(item => {
-                  const dailyChange = item.priceChangePercent || 0;
-                  const profit = item.profitPercent || 0;
-                  const isPositiveDaily = dailyChange >= 0;
-                  const isPositiveProfit = profit >= 0;
-                  const ai = item.aiData;
+                <thead>
+                  <tr>
+                    <Th $sortable onClick={() => requestSort('symbol')}>
+                      Sembol{getSortIndicator('symbol')}
+                    </Th>
+                    <Th>Periyot</Th>
+                    <Th $sortable onClick={() => requestSort('entryPrice')}>
+                      Sinyal Fiyatı{getSortIndicator('entryPrice')}
+                    </Th>
+                    <Th $sortable onClick={() => requestSort('currentPrice')}>
+                      Anlık Fiyat{getSortIndicator('currentPrice')}
+                    </Th>
+                    <Th $sortable onClick={() => requestSort('profitPercent')}>
+                      Değişim (Girişten){getSortIndicator('profitPercent')}
+                    </Th>
+                    <Th $sortable onClick={() => requestSort('priceChangePercent')}>
+                      Günlük Değişim{getSortIndicator('priceChangePercent')}
+                    </Th>
+                    <Th>AI Hedef (Tahmin)</Th>
+                    <Th>Stop-Loss</Th>
+                    <S.RightAlignTh>İşlem</S.RightAlignTh>
+                  </tr>
+                </thead>
+                <tbody>
+                  {watchlist.map(item => {
+                    const dailyChange = item.priceChangePercent || 0;
+                    const profit = item.profitPercent || 0;
+                    const isPositiveDaily = dailyChange >= 0;
+                    const isPositiveProfit = profit >= 0;
+                    const ai = item.aiData;
 
-                  return (
-                    <Tr key={item.id}>
-                      <S.SymbolCell>
-                        <div className="symbol">{item.symbol}</div>
-                        <S.SymbolName title={item.name}>
-                          {item.name && item.name.length > 17 
-                            ? `${item.name.substring(0, 17)}...` 
-                            : item.name || '-'}
-                        </S.SymbolName>
-                      </S.SymbolCell>
-                      <Td>
-                        <S.PeriodBadge>
-                          {item.period || 'Manuel'}
-                        </S.PeriodBadge>
-                      </Td>
-                      <Td>{currency}{item.entryPrice?.toLocaleString() || '-'}</Td>
-                      <Td>{currency}{item.currentPrice?.toLocaleString() || '-'}</Td>
-                      <Td>
-                        <S.ChangeValueWithSize $isPositive={isPositiveProfit}>
-                          {isPositiveProfit ? '+' : ''}{profit.toFixed(2)}%
-                        </S.ChangeValueWithSize>
-                      </Td>
-                      <Td>
-                        <S.ProfitChangeValue $isPositive={isPositiveDaily}>
-                          {isPositiveDaily ? '▲' : '▼'} %{Math.abs(dailyChange).toFixed(2)}
-                        </S.ProfitChangeValue>
-                      </Td>
-                      <Td>
-                        {ai ? (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                            <span style={{ fontWeight: 700, color: '#1A73E8' }}>{currency}{ai.targetPrice}</span>
-                            <span style={{ fontSize: '10px', color: '#28a745', fontWeight: 600 }}>
-                              Potansiyel: +%{ai.potentialProfit}
-                            </span>
-                          </div>
-                        ) : (
-                          <span style={{ color: '#999', fontSize: '11px' }}>Analiz Bekleniyor</span>
-                        )}
-                      </Td>
-                      <Td>
-                        {ai ? (
-                          <span style={{ fontWeight: 600, color: '#d32f2f' }}>{currency}{ai.stopLoss}</span>
-                        ) : (
-                          <span style={{ color: '#999' }}>-</span>
-                        )}
-                      </Td>
-                      <S.RightAlignTd>
-                        <Button
-                          $variant="danger"
-                          $size="sm"
-                          onClick={() => handleRemove(item.symbol)}
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </S.RightAlignTd>
-                    </Tr>
-                  );
-                })}
-              </tbody>
-            </Table>
-          </TableWrapper>
-        )}
+                    return (
+                      <Tr key={item.id}>
+                        <S.SymbolCell>
+                          <div className="symbol">{item.symbol}</div>
+                          <S.SymbolName title={item.name}>
+                            {item.name && item.name.length > 17
+                              ? `${item.name.substring(0, 17)}...`
+                              : item.name || '-'}
+                          </S.SymbolName>
+                        </S.SymbolCell>
+                        <Td>
+                          <S.PeriodBadge>
+                            {item.period || 'Manuel'}
+                          </S.PeriodBadge>
+                        </Td>
+                        <Td>{currency}{item.entryPrice?.toLocaleString() || '-'}</Td>
+                        <Td>{currency}{item.currentPrice?.toLocaleString() || '-'}</Td>
+                        <Td>
+                          <S.ChangeValueWithSize $isPositive={isPositiveProfit}>
+                            {isPositiveProfit ? '+' : ''}{profit.toFixed(2)}%
+                          </S.ChangeValueWithSize>
+                        </Td>
+                        <Td>
+                          <S.ProfitChangeValue $isPositive={isPositiveDaily}>
+                            {isPositiveDaily ? '▲' : '▼'} %{Math.abs(dailyChange).toFixed(2)}
+                          </S.ProfitChangeValue>
+                        </Td>
+                        <Td>
+                          {ai ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                              <span style={{ fontWeight: 700, color: '#1A73E8' }}>{currency}{ai.targetPrice}</span>
+                              <span style={{ fontSize: '10px', color: '#28a745', fontWeight: 600 }}>
+                                Potansiyel: +%{ai.potentialProfit}
+                              </span>
+                            </div>
+                          ) : (
+                            <span style={{ color: '#999', fontSize: '11px' }}>Analiz Bekleniyor</span>
+                          )}
+                        </Td>
+                        <Td>
+                          {ai ? (
+                            <span style={{ fontWeight: 600, color: '#d32f2f' }}>{currency}{ai.stopLoss}</span>
+                          ) : (
+                            <span style={{ color: '#999' }}>-</span>
+                          )}
+                        </Td>
+                        <S.RightAlignTd>
+                          <Button
+                            $variant="danger"
+                            $size="sm"
+                            onClick={() => handleRemove(item.symbol)}
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </S.RightAlignTd>
+                      </Tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+            </TableWrapper>
+          )}
         </Card.Body>
       </Card>
     </PageContainer>

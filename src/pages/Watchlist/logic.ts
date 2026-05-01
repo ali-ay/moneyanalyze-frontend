@@ -13,6 +13,11 @@ export interface WatchlistItem {
   priceChangePercent?: number;
   name: string;
   createdAt: string;
+  aiData?: {
+    targetPrice: number;
+    stopLoss: number;
+    potentialProfit: number;
+  };
 }
 
 export const useWatchlistLogic = () => {
