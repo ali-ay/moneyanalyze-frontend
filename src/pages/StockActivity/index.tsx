@@ -38,10 +38,17 @@ const Th = styled.th`
 const Tr = styled.tr`
   background: white;
   transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
   
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    z-index: 10;
+  }
+
+  /* Tooltip açıldığında satırı en üste çıkar */
+  &:has(${S.TooltipContainer}:hover) {
+    z-index: 9999;
   }
 `;
 
