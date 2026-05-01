@@ -15,13 +15,27 @@ const GlobalSettings = () => {
     recaptchaSiteKey: '',
     recaptchaSecretKey: ''
   });
+  const [emailTemplates, setEmailTemplates] = useState<any[]>([]);
+  const [emailSaving, setEmailSaving] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
     fetchSettings();
+    fetchEmailTemplates();
   }, []);
+
+  const fetchEmailTemplates = async () => {
+    try {
+      const res = await api.get('/admin/email-templates');
+      if (res.data.success) {
+        setEmailTemplates(res.data.data);
+      }
+    } catch (err) {
+      console.error("Email templates fetch error:", err);
+    }
+  };
 
   const fetchSettings = async () => {
     try {
@@ -53,6 +67,22 @@ const GlobalSettings = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleEmailTemplateSave = async (id: string, subject: string, content: string) => {
+    setEmailSaving(id);
+    try {
+      await api.put(`/admin/email-templates/${id}`, { subject, content });
+      alert('Email şablonu güncellendi.');
+    } catch (err) {
+      alert('Hata oluştu.');
+    } finally {
+      setEmailSaving(null);
+    }
+  };
+
+  const handleTemplateChange = (id: string, field: 'subject' | 'content', value: string) => {
+    setEmailTemplates(prev => prev.map(t => t.id === id ? { ...t, [field]: value } : t));
   };
 
   if (loading) return <LoadingState>Yükleniyor...</LoadingState>;
@@ -139,6 +169,71 @@ const GlobalSettings = () => {
 
         </S.SettingsForm>
       </MetricCard>
+
+      <PageHeader style={{ marginTop: '40px' }}>
+        <PageTitle>Email Şablonları</PageTitle>
+        <PageSubtitle>Sistem tarafından gönderilen maillerin içeriğini buradan düzenleyin.</PageSubtitle>
+      </PageHeader>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '40px' }}>
+        {emailTemplates.length === 0 ? (
+          <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', textAlign: 'center' }}>
+            Şablonlar yükleniyor veya henüz oluşturulmamış...
+            <button 
+              onClick={() => handleEmailTemplateSave('WELCOME', 'Hoş Geldiniz', '<h1>Merhaba {{username}}</h1>')}
+              style={{ display: 'block', margin: '10px auto', padding: '8px 16px', background: '#1A73E8', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              Hoş Geldiniz Şablonu Oluştur
+            </button>
+            <button 
+              onClick={() => handleEmailTemplateSave('PASSWORD_RESET', 'Şifre Sıfırlama', '<h1>Şifre Sıfırla: {{resetUrl}}</h1>')}
+              style={{ display: 'block', margin: '10px auto', padding: '8px 16px', background: '#1A73E8', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              Şifre Sıfırlama Şablonu Oluştur
+            </button>
+          </div>
+        ) : (
+          emailTemplates.map(template => (
+            <MetricCard key={template.id} style={{ padding: '24px' }}>
+              <S.SectionTitle style={{ marginBottom: '16px' }}>
+                {template.id === 'WELCOME' ? 'Hoş Geldiniz Maili' : 'Şifre Sıfırlama Maili'}
+              </S.SectionTitle>
+              
+              <div style={{ marginBottom: '12px', fontSize: '13px', color: '#666', background: '#fdf3e8', padding: '8px 12px', borderRadius: '6px', border: '1px solid #ffcc80' }}>
+                <strong>Kullanılabilir Değişkenler:</strong> {template.id === 'WELCOME' ? '{{username}}' : '{{resetUrl}}'}
+                <br />
+                <span style={{ fontSize: '11px' }}>* Bu değişkenleri şablon içinde istediğiniz yere ekleyebilirsiniz.</span>
+              </div>
+
+              <InputGroup style={{ marginBottom: '16px' }}>
+                <label>Konu (Subject)</label>
+                <input
+                  value={template.subject}
+                  onChange={(e) => handleTemplateChange(template.id, 'subject', e.target.value)}
+                />
+              </InputGroup>
+
+              <InputGroup>
+                <label>İçerik (HTML)</label>
+                <S.TextArea
+                  style={{ height: '300px', fontFamily: 'monospace' }}
+                  value={template.content}
+                  onChange={(e) => handleTemplateChange(template.id, 'content', e.target.value)}
+                />
+              </InputGroup>
+
+              <SubmitButton 
+                onClick={() => handleEmailTemplateSave(template.id, template.subject, template.content)}
+                disabled={emailSaving === template.id}
+                style={{ marginTop: '16px', width: 'auto', padding: '10px 30px' }}
+                as="button"
+              >
+                {emailSaving === template.id ? 'Kaydediliyor...' : 'Şablonu Güncelle'}
+              </SubmitButton>
+            </MetricCard>
+          ))
+        )}
+      </div>
     </PageContainer>
   );
 };
