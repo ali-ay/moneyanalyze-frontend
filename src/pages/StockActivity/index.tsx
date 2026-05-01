@@ -12,6 +12,11 @@ const LogTable = styled.table`
   border-collapse: separate;
   border-spacing: 0 8px;
   margin-top: -8px;
+
+  @media (max-width: 768px) {
+    border-spacing: 0 4px;
+    min-width: 700px; /* Force scroll but keep rows thin */
+  }
 `;
 
 const Th = styled.th`
@@ -22,6 +27,11 @@ const Th = styled.th`
   color: #5F6368;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+    font-size: 0.6875rem;
+  }
 `;
 
 const Tr = styled.tr`
@@ -39,6 +49,11 @@ const Td = styled.td`
   font-size: 0.9375rem;
   border-top: 1px solid #F1F3F4;
   border-bottom: 1px solid #F1F3F4;
+
+  @media (max-width: 768px) {
+    padding: 12px 10px;
+    font-size: 0.8125rem;
+  }
   
   &:first-child {
     border-left: 1px solid #F1F3F4;

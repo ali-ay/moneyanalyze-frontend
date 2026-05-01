@@ -24,6 +24,11 @@ const Th = styled.th<{ $sortable?: boolean }>`
   cursor: ${props => props.$sortable ? 'pointer' : 'default'};
   user-select: none;
   white-space: nowrap;
+
+  @media (max-width: 768px) {
+    padding: 8px 12px;
+    font-size: 0.6875rem;
+  }
 `;
 
 const Td = styled.td`
@@ -32,6 +37,11 @@ const Td = styled.td`
   color: ${props => props.theme.colors.textMain};
   border-bottom: 1px solid ${props => props.theme.colors.border};
   white-space: nowrap;
+
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+    font-size: 0.8125rem;
+  }
 `;
 
 const Tr = styled.tr`

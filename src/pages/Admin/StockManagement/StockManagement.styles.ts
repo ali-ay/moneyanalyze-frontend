@@ -117,6 +117,11 @@ export const StockTable = styled.table`
     border-bottom: 1px solid #F1F3F4;
     font-weight: 600;
     text-transform: uppercase;
+
+    @media (max-width: 768px) {
+      padding: 8px 10px;
+      font-size: 0.6875rem;
+    }
   }
 
   td {
@@ -124,6 +129,11 @@ export const StockTable = styled.table`
     border-bottom: 1px solid #F1F3F4;
     font-size: 0.875rem;
     color: ${props => props.theme?.colors?.textMain || '#202124'};
+
+    @media (max-width: 768px) {
+      padding: 8px 10px;
+      font-size: 0.8125rem;
+    }
   }
 
   tr:hover {

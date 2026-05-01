@@ -78,6 +78,10 @@ export const Th = styled.th`
   text-transform: uppercase;
   letter-spacing: 1px;
   border-bottom: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
+
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+  }
 `;
 
 export const Td = styled.td`
@@ -85,6 +89,11 @@ export const Td = styled.td`
   border-bottom: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
   font-size: 0.875rem;
   color: ${props => props.theme?.colors?.textMain || '#202124'};
+
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+    font-size: 0.8125rem;
+  }
 `;
 
 export const Tr = styled.tr`

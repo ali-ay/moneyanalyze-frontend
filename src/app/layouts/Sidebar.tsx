@@ -66,8 +66,9 @@ const SidebarFooter = styled.div`
   margin-top: 16px;
 
   @media (max-width: 768px) {
-    padding-bottom: 24px;
-    margin-top: 8px;
+    padding-top: 16px;
+    padding-bottom: 0px;
+    margin-top: 12px;
   }
 `;
 

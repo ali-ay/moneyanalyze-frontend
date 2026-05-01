@@ -41,6 +41,10 @@ const CardTitle = styled.h3`
 const CardBody = styled.div<{ $noPadding?: boolean }>`
   padding: ${props => props.$noPadding ? '0' : '24px'};
   flex: 1;
+
+  @media (max-width: 768px) {
+    padding: ${props => props.$noPadding ? '0' : '12px'};
+  }
 `;
 
 const CardFooter = styled.div`
