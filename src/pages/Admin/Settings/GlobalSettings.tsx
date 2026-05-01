@@ -73,6 +73,7 @@ const GlobalSettings = () => {
     setEmailSaving(id);
     try {
       await api.put(`/admin/email-templates/${id}`, { subject, content });
+      await fetchEmailTemplates(); // Listeyi güncelle
       alert('Email şablonu güncellendi.');
     } catch (err) {
       alert('Hata oluştu.');
