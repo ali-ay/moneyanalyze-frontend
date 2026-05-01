@@ -26,7 +26,6 @@ const SidebarAside = styled.aside<{ $isOpen: boolean }>`
   border-right: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
   display: flex;
   flex-direction: column;
-  padding: 32px 0;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -37,6 +36,33 @@ const SidebarAside = styled.aside<{ $isOpen: boolean }>`
     transition: all 0.3s ease;
     box-shadow: ${props => props.$isOpen ? '0 0 40px rgba(0,0,0,0.1)' : 'none'};
   }
+`;
+
+const SidebarScrollArea = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 24px;
+
+  /* Custom Scrollbar Styles */
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: ${props => props.theme?.colors?.border || '#DADCE0'};
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: ${props => props.theme?.colors?.primary || '#1A73E8'};
+  }
+`;
+
+const SidebarFooter = styled.div`
+  border-top: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
+  padding-bottom: 32px;
+  background: ${props => props.theme?.colors?.white || '#FFFFFF'};
 `;
 
 const Backdrop = styled.div<{ $show: boolean }>`
@@ -65,12 +91,13 @@ const MobileClose = styled.div`
 `;
 
 const LogoSection = styled.div`
-  padding: 0 24px;
-  margin-bottom: 48px;
+  padding: 32px 24px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   gap: 12px;
   cursor: pointer;
+  background: ${props => props.theme?.colors?.white || '#FFFFFF'};
   
   .logo-icon {
     width: 32px;
@@ -91,7 +118,6 @@ const LogoSection = styled.div`
 `;
 
 const NavList = styled.nav`
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -126,7 +152,7 @@ const NavGroupLabel = styled.div`
 `;
 
 const AccountBadge = styled.div`
-  margin: 24px;
+  margin: 16px 24px;
   padding: 16px;
   background: ${props => props.theme?.colors?.surfaceHover || '#F8F9FA'};
   border-radius: ${props => props.theme?.radius?.lg || '16px'};
@@ -152,6 +178,7 @@ const AccountBadge = styled.div`
 
 const LogoutButton = styled.button`
   margin: 0 24px;
+  width: calc(100% - 48px);
   background: rgba(219, 68, 55, 0.05);
   color: ${props => props.theme?.colors?.danger || '#DB4437'};
   border: 1px solid rgba(219, 68, 55, 0.1);
@@ -194,60 +221,66 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, o
           <span>MoneyAnalyze</span>
         </LogoSection>
 
-        <NavList>
-          <NavGroupLabel>Ana Menü</NavGroupLabel>
-          <NavItem $active={location.pathname === '/dashboard'} onClick={() => handleNav('/dashboard')}>
-            <LayoutDashboard size={18} /> Analiz Paneli
-          </NavItem>
-          <NavItem $active={location.pathname === '/dashboard/ai-analysis'} onClick={() => handleNav('/dashboard/ai-analysis')}>
-            <Zap size={18} color="#F4B400" fill="#F4B400" /> Yapay Zeka Analizi
-          </NavItem>
-          <NavItem $active={location.pathname === '/dashboard/wallet'} onClick={() => handleNav('/dashboard/wallet')}>
-            <Briefcase size={18} /> Varlıklarım
-          </NavItem>
-          <NavItem $active={location.pathname === '/watchlist'} onClick={() => handleNav('/watchlist')}>
-            <Wallet size={18} /> Cüzdan Takibi
-          </NavItem>
-          <NavItem $active={location.pathname === '/dashboard/stock-activity'} onClick={() => handleNav('/dashboard/stock-activity')}>
-            <History size={18} /> Hisse Hareket Kaydı
-          </NavItem>
-          <NavItem $active={location.pathname === '/bots'} onClick={() => handleNav('/bots')}>
-            <Bot size={18} /> Bot Yönetimi
-          </NavItem>
+        <SidebarScrollArea>
+          <NavList>
+            <NavGroupLabel>Ana Menü</NavGroupLabel>
+            <NavItem $active={location.pathname === '/dashboard'} onClick={() => handleNav('/dashboard')}>
+              <LayoutDashboard size={18} /> Analiz Paneli
+            </NavItem>
+            <NavItem $active={location.pathname === '/dashboard/ai-analysis'} onClick={() => handleNav('/dashboard/ai-analysis')}>
+              <Zap size={18} color="#F4B400" fill="#F4B400" /> Yapay Zeka Analizi
+            </NavItem>
+            <NavItem $active={location.pathname === '/dashboard/wallet'} onClick={() => handleNav('/dashboard/wallet')}>
+              <Briefcase size={18} /> Varlıklarım
+            </NavItem>
+            <NavItem $active={location.pathname === '/watchlist'} onClick={() => handleNav('/watchlist')}>
+              <Wallet size={18} /> Cüzdan Takibi
+            </NavItem>
+            <NavItem $active={location.pathname === '/dashboard/stock-activity'} onClick={() => handleNav('/dashboard/stock-activity')}>
+              <History size={18} /> Hisse Hareket Kaydı
+            </NavItem>
+            <NavItem $active={location.pathname === '/bots'} onClick={() => handleNav('/bots')}>
+              <Bot size={18} /> Bot Yönetimi
+            </NavItem>
 
-          {isAdmin && (
-            <>
-              <NavGroupLabel>Yönetim</NavGroupLabel>
-              <NavItem $active={location.pathname.startsWith('/admin/userlist')} onClick={() => handleNav('/admin/userlist')}>
-                <Users size={18} /> Kullanıcılar
-              </NavItem>
-              <NavItem $active={location.pathname.startsWith('/admin/settings')} onClick={() => handleNav('/admin/settings')}>
-                <Settings size={18} /> Sistem Ayarları
-              </NavItem>
-              <NavItem $active={location.pathname.startsWith('/admin/stocks')} onClick={() => handleNav('/admin/stocks')}>
-                <BarChart3 size={18} /> Hisse Yönetimi
-              </NavItem>
-              <NavItem $active={location.pathname.startsWith('/admin/media')} onClick={() => handleNav('/admin/media')}>
-                <ImageIcon size={18} /> Medya Kütüphanesi
-              </NavItem>
-            </>
-          )}
-        </NavList>
+            {isAdmin && (
+              <>
+                <NavGroupLabel>Yönetim</NavGroupLabel>
+                <NavItem $active={location.pathname.startsWith('/admin/userlist')} onClick={() => handleNav('/admin/userlist')}>
+                  <Users size={18} /> Kullanıcılar
+                </NavItem>
+                <NavItem $active={location.pathname.startsWith('/admin/settings')} onClick={() => handleNav('/admin/settings')}>
+                  <Settings size={18} /> Sistem Ayarları
+                </NavItem>
+                <NavItem $active={location.pathname.startsWith('/admin/stocks')} onClick={() => handleNav('/admin/stocks')}>
+                  <BarChart3 size={18} /> Hisse Yönetimi
+                </NavItem>
+                <NavItem $active={location.pathname.startsWith('/admin/media')} onClick={() => handleNav('/admin/media')}>
+                  <ImageIcon size={18} /> Medya Kütüphanesi
+                </NavItem>
+              </>
+            )}
+          </NavList>
+        </SidebarScrollArea>
 
-        <AccountBadge>
-          <div className="label">HESAP DURUMU</div>
-          <div className="type">
-            {isAdmin ? <ShieldCheck size={14} /> : null}
-            {isAdmin ? 'Administrator' : 'Institutional Pro'}
-          </div>
-        </AccountBadge>
+        <SidebarFooter>
+          <AccountBadge>
+            <div className="label">HESAP DURUMU</div>
+            <div className="type">
+              {isAdmin ? <ShieldCheck size={14} /> : null}
+              {isAdmin ? 'Administrator' : 'Institutional Pro'}
+            </div>
+          </AccountBadge>
 
-        <LogoutButton onClick={() => logout()}>
-          <LogOut size={18} /> Güvenli Çıkış
-        </LogoutButton>
+          <LogoutButton onClick={() => logout()}>
+            <LogOut size={18} /> Güvenli Çıkış
+          </LogoutButton>
+        </SidebarFooter>
       </SidebarAside>
     </>
   );
 };
+
+export default Sidebar;
 
 export default Sidebar;
