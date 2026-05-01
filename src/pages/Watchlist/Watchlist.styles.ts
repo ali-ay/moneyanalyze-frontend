@@ -10,14 +10,14 @@ export const RightAlignTd = styled.td`
 
 export const SymbolCell = styled.td`
   font-weight: 700;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
   padding: 12px 16px;
+  border-bottom: 1px solid ${props => props.theme.colors.border};
 
   .symbol {
     font-size: 0.9375rem;
     color: ${props => props.theme.colors.textMain};
+    display: block;
+    margin-bottom: 2px;
   }
 `;
 
