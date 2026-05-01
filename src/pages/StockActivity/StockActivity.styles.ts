@@ -90,8 +90,15 @@ export const NotesContainer = styled.div`
 `;
 
 export const NotesIcon = styled.div`
-  margin-top: 2px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: rgba(26, 115, 232, 0.2) !important;
+    transform: scale(1.1);
+  }
 `;
 
 export const NotesText = styled.span`

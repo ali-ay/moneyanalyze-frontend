@@ -387,25 +387,26 @@ const StockActivityPage: React.FC = () => {
                         </VStack>
                       </Td>
                       <Td>
-                        <HStack 
-                          $gap="8px" 
-                          $align="flex-start" 
-                          as={S.NotesContainer}
+                        <div 
                           onClick={() => setSelectedNote(log.description)}
-                          style={{ cursor: 'pointer' }}
+                          style={{ 
+                            cursor: 'pointer', 
+                            display: 'flex', 
+                            justifyContent: 'center', 
+                            alignItems: 'center',
+                            width: '100%'
+                          }}
                         >
-                          <S.NotesIcon as="div">
-                            <Info size={16} color="#9AA0A6" />
+                          <S.NotesIcon as="div" style={{ 
+                            background: 'rgba(26, 115, 232, 0.1)', 
+                            padding: '10px', 
+                            borderRadius: '50%',
+                            display: 'flex',
+                            transition: 'all 0.2s'
+                          }}>
+                            <Info size={22} color="#1A73E8" />
                           </S.NotesIcon>
-                          <S.NotesText>
-                            <span className="full-text">{log.description}</span>
-                            <span className="short-text">
-                              {log.description.length > 20 
-                                ? `${log.description.substring(0, 20)}...` 
-                                : log.description}
-                            </span>
-                          </S.NotesText>
-                        </HStack>
+                        </div>
                       </Td>
                     </Tr>
                   );
