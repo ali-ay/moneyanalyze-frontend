@@ -8,11 +8,8 @@ const Navbar = () => {
     <S.Navbar>
         <S.Logo onClick={() => navigate('/')}>MoneyAnalyze</S.Logo>
         <S.NavButtons>
-            <S.LoginLink onClick={() => navigate('/login')}>
+            <S.ActionButton onClick={() => navigate('/login')}>
               Giriş Yap
-            </S.LoginLink>
-            <S.ActionButton onClick={() => navigate('/register')}>
-              Hemen Başla
             </S.ActionButton>
         </S.NavButtons>
     </S.Navbar>)};

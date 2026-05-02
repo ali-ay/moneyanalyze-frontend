@@ -15,7 +15,8 @@ export const Navbar = styled.nav`
 
   @media (max-width: 768px) {
     padding: 0 20px;
-    height: 80px;
+    height: 72px;
+    background-color: #ffffff;
   }
 `;
 

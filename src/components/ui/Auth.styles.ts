@@ -5,31 +5,43 @@ export const AuthContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: ${props => props.theme?.colors?.background || '#080c14'};
+  background: #ffb3c7;
+  padding: 20px;
 `;
 
 export const AuthBox = styled.div`
-  background: ${props => props.theme?.colors?.surface || '#0f172a'};
-  padding: 2.5rem;
-  border-radius: ${props => props.theme?.radius?.lg || '16px'};
+  background: #ffffff;
+  padding: 3.5rem;
+  border-radius: 48px;
   width: 100%;
-  max-width: 400px;
-  box-shadow: ${props => props.theme?.shadows?.lg || '0 10px 25px rgba(0,0,0,0.3)'};
-  border: 1px solid ${props => props.theme?.colors?.border || '#2D2D2D'};
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 480px) {
+    padding: 2rem;
+    border-radius: 32px;
+  }
 `;
 
 export const AuthTitle = styled.h2`
-  color: ${props => props.theme?.colors?.textMain || '#FFFFFF'};
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
+  color: #171717;
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
   text-align: center;
+  letter-spacing: -2px;
+  line-height: 1;
 `;
 
 export const AuthSubtitle = styled.p`
-  color: ${props => props.theme?.colors?.textSecondary || '#94a3b8'};
-  font-size: 1rem;
-  margin-bottom: 2rem;
+  color: #171717;
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-bottom: 3rem;
   text-align: center;
+  opacity: 0.7;
 `;
 
 export const AuthForm = styled.form`
@@ -41,28 +53,29 @@ export const AuthForm = styled.form`
 export const InputGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 8px;
 
   label {
-    color: ${props => props.theme?.colors?.textSecondary || '#94a3b8'};
-    font-size: 0.85rem;
-    font-weight: 500;
+    color: #171717;
+    font-size: 0.875rem;
+    font-weight: 800;
+    margin-left: 4px;
   }
 
   input {
-    padding: 0.85rem;
-    background: transparent;
-    border: 1px solid ${props => props.theme?.colors?.border || '#2D2D2D'};
-    border-radius: ${props => props.theme?.radius?.md || '12px'};
-    color: ${props => props.theme?.colors?.textMain || '#FFFFFF'};
+    padding: 1.25rem;
+    background: #f7f7f7;
+    border: 2px solid transparent;
+    border-radius: 20px;
+    color: #171717;
     font-size: 1rem;
-    transition: ${props => props.theme?.transitions?.fast || '0.2s'};
+    font-weight: 500;
+    transition: all 0.2s ease;
 
     &:focus {
-      border-color: ${props => props.theme?.colors?.primary || '#3D6BFF'};
+      border-color: #171717;
+      background: #ffffff;
       outline: none;
-      background: ${props => props.theme?.colors?.surfaceHover || '#1C1C1C'};
-      box-shadow: 0 0 0 2px rgba(61, 107, 255, 0.2);
     }
 
     &::placeholder {
@@ -77,20 +90,19 @@ export const InputGroup = styled.div`
 `;
 
 export const SubmitButton = styled.button`
-  background: ${props => props.theme?.colors?.primary || '#3D6BFF'};
+  background: #171717;
   color: #fff;
-  padding: 0.9rem;
+  padding: 1.25rem;
   border: none;
-  border-radius: ${props => props.theme?.radius?.md || '12px'};
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 99px;
+  font-size: 1.125rem;
+  font-weight: 800;
   cursor: pointer;
-  transition: ${props => props.theme?.transitions?.fast || '0.2s'};
+  transition: transform 0.2s;
+  margin-top: 1rem;
 
   &:hover {
-    background: ${props => props.theme?.colors?.primaryHover || '#5C85FF'};
-    box-shadow: ${props => props.theme?.shadows?.sm || '0 2px 8px rgba(0,0,0,0.2)'};
-    transform: translateY(-1px);
+    transform: scale(1.02);
   }
 
   &:active {
@@ -98,49 +110,48 @@ export const SubmitButton = styled.button`
   }
 
   &:disabled {
-    background: ${props => props.theme?.colors?.border || '#2D2D2D'};
+    background: #ccc;
     cursor: not-allowed;
   }
 `;
 
 export const ErrorMessage = styled.div`
-  color: ${props => props.theme?.colors?.danger || '#FF4D4D'};
-  background: rgba(255, 77, 77, 0.1);
-  padding: 0.8rem;
-  border-radius: ${props => props.theme?.radius?.md || '12px'};
+  color: #DB4437;
+  background: rgba(219, 68, 55, 0.05);
+  padding: 1rem;
+  border-radius: 20px;
   font-size: 0.9rem;
+  font-weight: 600;
   text-align: center;
-  border: 1px solid rgba(255, 77, 77, 0.2);
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 `;
 
 export const SuccessMessage = styled.div`
-  color: ${props => props.theme?.colors?.success || '#00C853'};
-  background: rgba(0, 200, 83, 0.1);
-  padding: 0.8rem;
-  border-radius: ${props => props.theme?.radius?.md || '12px'};
+  color: #0F9D58;
+  background: rgba(15, 157, 88, 0.05);
+  padding: 1rem;
+  border-radius: 20px;
   font-size: 0.9rem;
+  font-weight: 600;
   text-align: center;
-  border: 1px solid rgba(0, 200, 83, 0.2);
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 `;
 
 export const FooterText = styled.p`
-  color: ${props => props.theme?.colors?.textSecondary || '#94a3b8'};
-  margin-top: 2rem;
+  color: #171717;
+  margin-top: 2.5rem;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-weight: 500;
 
   a {
-    color: ${props => props.theme?.colors?.primary || '#3D6BFF'};
-    text-decoration: none;
-    font-weight: 600;
+    color: #171717;
+    text-decoration: underline;
+    font-weight: 800;
     margin-left: 0.4rem;
-    transition: ${props => props.theme?.transitions?.fast || '0.2s'};
-
+    
     &:hover {
-      text-decoration: underline;
-      color: ${props => props.theme?.colors?.primaryHover || '#5C85FF'};
+      opacity: 0.7;
     }
   }
 `;
