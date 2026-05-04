@@ -14,6 +14,7 @@ import { HStack } from '../../components/primitives/Flex';
 import { ArrowLeft, TrendingUp, TrendingDown, Zap } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { AIBacktestPanel } from './AIBacktestPanel';
+import { StrategyManagementPanel } from './StrategyManagementPanel';
 
 const PriceDisplay = styled.div`
   display: flex;
@@ -86,8 +87,14 @@ const StockDetail: React.FC = () => {
     backtestLoading,
     backtestPeriod,
     setBacktestPeriod,
+    setBacktestPeriod,
     optimizedData,
-    optimizedLoading
+    optimizedLoading,
+    specificSettings,
+    settingsLoading,
+    saveSpecificSettings,
+    triggerManualAnalysis,
+    isAnalyzing
   } = useStockDetailLogic(symbol);
 
   if (loading && history.length === 0) {
@@ -217,6 +224,17 @@ const StockDetail: React.FC = () => {
           </Card.Body>
         </S.CardWithMargin>
       )}
+
+      <StrategyManagementPanel
+        symbol={symbol || ''}
+        period={backtestPeriod}
+        setPeriod={setBacktestPeriod}
+        specificSettings={specificSettings}
+        loading={settingsLoading}
+        onSave={(s) => saveSpecificSettings(backtestPeriod, s)}
+        onAnalyze={() => triggerManualAnalysis(backtestPeriod)}
+        isAnalyzing={isAnalyzing}
+      />
 
       <AIBacktestPanel 
         data={backtestData} 

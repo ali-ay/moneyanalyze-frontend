@@ -42,8 +42,68 @@ export const useStockDetailLogic = (symbol?: string) => {
   const [backtestPeriod, setBacktestPeriod] = useState('weekly');
   const [optimizedData, setOptimizedData] = useState<any>(null);
   const [optimizedLoading, setOptimizedLoading] = useState(false);
+  
+  // Specific Settings States
+  const [specificSettings, setSpecificSettings] = useState<any>(null);
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const abortRef = useRef<AbortController | null>(null);
+
+  const fetchSpecificSettings = useCallback(async (period: string) => {
+    if (!symbol) return;
+    try {
+      setSettingsLoading(true);
+      const cleanSymbol = symbol.replace('.IS', '');
+      const res = await apiClient.get(`/stock/specific-settings?symbol=${cleanSymbol}&period=${period}`);
+      if (res.data.success) {
+        setSpecificSettings(res.data.data);
+      }
+    } catch (err) {
+      console.error("Fetch settings error:", err);
+    } finally {
+      setSettingsLoading(false);
+    }
+  }, [symbol]);
+
+  const saveSpecificSettings = async (period: string, settings: any) => {
+    if (!symbol) return;
+    try {
+      setSettingsLoading(true);
+      const cleanSymbol = symbol.replace('.IS', '');
+      await apiClient.post('/stock/specific-settings', {
+        symbol: cleanSymbol,
+        period,
+        settings
+      });
+      await fetchSpecificSettings(period);
+    } catch (err) {
+      console.error("Save settings error:", err);
+      throw err;
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
+
+  const triggerManualAnalysis = async (period: string) => {
+    if (!symbol) return;
+    try {
+      setIsAnalyzing(true);
+      const cleanSymbol = symbol.replace('.IS', '');
+      await apiClient.post('/stock/manual-analyze', {
+        symbol: cleanSymbol,
+        period
+      });
+      // Yenile
+      fetchHistory();
+      fetchBacktest(period);
+    } catch (err) {
+      console.error("Manual analysis error:", err);
+      throw err;
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const fetchBacktest = useCallback(async (period: string) => {
     if (!symbol) return;
@@ -76,7 +136,8 @@ export const useStockDetailLogic = (symbol?: string) => {
   useEffect(() => {
     fetchBacktest(backtestPeriod);
     fetchOptimization(backtestPeriod);
-  }, [backtestPeriod, fetchBacktest, fetchOptimization]);
+    fetchSpecificSettings(backtestPeriod);
+  }, [backtestPeriod, fetchBacktest, fetchOptimization, fetchSpecificSettings]);
 
   const fetchHistory = useCallback(async () => {
     if (!symbol) return;
@@ -167,10 +228,16 @@ export const useStockDetailLogic = (symbol?: string) => {
     setBacktestPeriod,
     optimizedData,
     optimizedLoading,
+    specificSettings,
+    settingsLoading,
+    saveSpecificSettings,
+    triggerManualAnalysis,
+    isAnalyzing,
     refreshAll: () => {
       fetchHistory();
       fetchBacktest(backtestPeriod);
       fetchOptimization(backtestPeriod);
+      fetchSpecificSettings(backtestPeriod);
     }
   };
 };
