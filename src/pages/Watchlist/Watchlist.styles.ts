@@ -67,3 +67,41 @@ export const ProfitChangeValue = styled.span<{ $isPositive: boolean }>`
   color: ${props => props.$isPositive ? '#0F9D58' : '#DB4437'};
   font-weight: 600;
 `;
+
+export const FilterWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 0 4px;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+`;
+
+export const FilterLabel = styled.span`
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: ${props => props.theme.colors.textSecondary};
+`;
+
+export const FilterSelect = styled.select`
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid ${props => props.theme.colors.border};
+  background: ${props => props.theme.colors.surface};
+  color: ${props => props.theme.colors.textMain};
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  min-width: 140px;
+  transition: all 0.2s ease;
+
+  &:focus {
+    border-color: ${props => props.theme.colors.primary};
+    box-shadow: 0 0 0 2px ${props => props.theme.colors.primary}20;
+  }
+`;

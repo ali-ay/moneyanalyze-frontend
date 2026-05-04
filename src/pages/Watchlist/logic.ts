@@ -104,10 +104,19 @@ export const useWatchlistLogic = () => {
     setSortConfig({ key, direction });
   };
 
-  const sortedData = useMemo(() => {
-    let sortable = [...watchlist];
+  const [filterPeriod, setFilterPeriod] = useState<string>('ALL');
+
+  const filteredAndSortedData = useMemo(() => {
+    let data = [...watchlist];
+    
+    // Filter by period
+    if (filterPeriod !== 'ALL') {
+      data = data.filter(item => item.period === filterPeriod);
+    }
+
+    // Sort
     if (sortConfig !== null) {
-      sortable.sort((a, b) => {
+      data.sort((a, b) => {
         const aVal = a[sortConfig.key as keyof WatchlistItem];
         const bVal = b[sortConfig.key as keyof WatchlistItem];
 
@@ -118,11 +127,17 @@ export const useWatchlistLogic = () => {
         return 0;
       });
     }
-    return sortable;
-  }, [watchlist, sortConfig]);
+    return data;
+  }, [watchlist, sortConfig, filterPeriod]);
+
+  // Mevcut benzersiz periyotları bul (Filtre menüsü için)
+  const availablePeriods = useMemo(() => {
+    const periods = new Set(watchlist.map(item => item.period || 'Manuel'));
+    return Array.from(periods).sort();
+  }, [watchlist]);
 
   return {
-    watchlist: sortedData,
+    watchlist: filteredAndSortedData,
     loading,
     sortConfig,
     requestSort,
@@ -131,6 +146,9 @@ export const useWatchlistLogic = () => {
     handleClearAll,
     fetchWatchlist,
     mode,
-    currency: (mode === 'stock' ? '₺' : '$') as '$' | '₺'
+    currency: (mode === 'stock' ? '₺' : '$') as '$' | '₺',
+    filterPeriod,
+    setFilterPeriod,
+    availablePeriods
   };
 };

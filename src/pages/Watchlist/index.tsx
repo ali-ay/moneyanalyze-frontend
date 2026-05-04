@@ -115,6 +115,9 @@ const Watchlist: React.FC = () => {
     handleClearAll,
     mode,
     currency,
+    filterPeriod,
+    setFilterPeriod,
+    availablePeriods
   } = useWatchlistLogic();
 
   const [adding, setAdding] = useState(false);
@@ -185,6 +188,19 @@ const Watchlist: React.FC = () => {
           <SectionTitle>
             <Eye size={20} /> Takip Listem
           </SectionTitle>
+
+          <S.FilterWrapper>
+            <S.FilterLabel>Periyot Filtresi:</S.FilterLabel>
+            <S.FilterSelect 
+              value={filterPeriod} 
+              onChange={(e) => setFilterPeriod(e.target.value)}
+            >
+              <option value="ALL">Tümü (Hepsi)</option>
+              {availablePeriods.map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </S.FilterSelect>
+          </S.FilterWrapper>
 
           {watchlist.length === 0 ? (
             <EmptyState>Henüz takip listesinde sembol bulunmuyor.</EmptyState>
