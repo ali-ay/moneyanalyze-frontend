@@ -74,6 +74,7 @@ const UserList = () => {
           <thead>
             <tr>
               <S.Th>Kullanıcı Adı</S.Th>
+              <S.Th>E-posta</S.Th>
               <S.Th>Onay Durumu</S.Th>
               <S.Th>Hesap Durumu</S.Th>
               <S.Th>Kayıt Tarihi</S.Th>
@@ -87,6 +88,9 @@ const UserList = () => {
                 <S.Tr key={user.id}>
                   <S.Td>
                     <S.UsernameCell>{user.username}</S.UsernameCell>
+                  </S.Td>
+                  <S.Td>
+                    <S.EmailCell>{user.email}</S.EmailCell>
                   </S.Td>
                   <S.Td>
                     <S.ApprovalButton

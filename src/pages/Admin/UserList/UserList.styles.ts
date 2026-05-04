@@ -188,6 +188,11 @@ export const UsernameCell = styled.div`
   font-weight: 600;
 `;
 
+export const EmailCell = styled.div`
+  color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
+  font-size: 0.8125rem;
+`;
+
 export const ApprovalButton = styled.button<{ $isApproved: boolean }>`
   background: ${props =>
     props.$isApproved

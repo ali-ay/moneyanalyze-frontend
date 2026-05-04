@@ -302,13 +302,99 @@ export const SearchIconWrapper = styled.div`
 `;
 
 export const StatsBadge = styled.div`
-  background: #E8F0FE;
-  color: #1967D2;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
+  background: rgba(26, 115, 232, 0.08);
+  color: #1A73E8;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  border: 1px solid rgba(26, 115, 232, 0.1);
+`;
+
+export const SummaryCards = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+`;
+
+export const StatCard = styled.div`
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #F1F3F4;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+export const StatLabel = styled.div`
+  font-size: 0.75rem;
+  color: #5F6368;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+export const StatValue = styled.div<{ $positive?: boolean; $negative?: boolean }>`
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: ${props => {
+    if (props.$positive) return '#0F9D58';
+    if (props.$negative) return '#DB4437';
+    return '#202124';
+  }};
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const StatSubValue = styled.div`
+  font-size: 0.8125rem;
+  color: #80868B;
+  font-weight: 500;
+`;
+
+export const FilterWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+`;
+
+export const FilterLabel = styled.span`
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #5F6368;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+export const FilterSelect = styled.select`
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid #DADCE0;
+  background: white;
+  color: #3C4043;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  min-width: 140px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    border-color: #1A73E8;
+    background: #F8F9FA;
+  }
+
+  &:focus {
+    border-color: #1A73E8;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+  }
 `;

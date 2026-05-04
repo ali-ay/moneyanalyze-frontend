@@ -105,13 +105,32 @@ export const useWatchlistLogic = () => {
   };
 
   const [filterPeriod, setFilterPeriod] = useState<string>('ALL');
+  const [filterProfit, setFilterProfit] = useState<'ALL' | 'PROFIT' | 'LOSS' | 'NEUTRAL'>('ALL');
+  const [filterSymbol, setFilterSymbol] = useState<string>('');
 
   const filteredAndSortedData = useMemo(() => {
     let data = [...watchlist];
-    
+
     // Filter by period
     if (filterPeriod !== 'ALL') {
       data = data.filter(item => item.period === filterPeriod);
+    }
+
+    // Filter by symbol/name search
+    if (filterSymbol.trim()) {
+      const q = filterSymbol.trim().toLowerCase();
+      data = data.filter(item =>
+        item.symbol.toLowerCase().includes(q) || (item.name || '').toLowerCase().includes(q)
+      );
+    }
+
+    // Filter by profit status
+    if (filterProfit === 'PROFIT') {
+      data = data.filter(i => (i.profitPercent || 0) > 0);
+    } else if (filterProfit === 'LOSS') {
+      data = data.filter(i => (i.profitPercent || 0) < 0);
+    } else if (filterProfit === 'NEUTRAL') {
+      data = data.filter(i => (i.profitPercent || 0) === 0);
     }
 
     // Sort
@@ -128,13 +147,27 @@ export const useWatchlistLogic = () => {
       });
     }
     return data;
-  }, [watchlist, sortConfig, filterPeriod]);
+  }, [watchlist, sortConfig, filterPeriod, filterProfit, filterSymbol]);
 
   // Mevcut benzersiz periyotları bul (Filtre menüsü için)
   const availablePeriods = useMemo(() => {
     const periods = new Set(watchlist.map(item => item.period || 'Manuel'));
     return Array.from(periods).sort();
   }, [watchlist]);
+
+  // Kümülatif kar/zarar özeti hesapla
+  const summaryStats = useMemo(() => {
+    const items = filteredAndSortedData.filter(i => i.entryPrice && i.currentPrice > 0);
+    if (items.length === 0) return null;
+    const totalProfit = items.reduce((sum, i) => sum + (i.profitPercent || 0), 0);
+    return {
+      total: items.length,
+      avgProfit: parseFloat((totalProfit / items.length).toFixed(2)),
+      profitable: items.filter(i => (i.profitPercent || 0) > 0).length,
+      losing: items.filter(i => (i.profitPercent || 0) < 0).length,
+      neutral: items.filter(i => (i.profitPercent || 0) === 0).length,
+    };
+  }, [filteredAndSortedData]);
 
   return {
     watchlist: filteredAndSortedData,
@@ -149,6 +182,11 @@ export const useWatchlistLogic = () => {
     currency: (mode === 'stock' ? '₺' : '$') as '$' | '₺',
     filterPeriod,
     setFilterPeriod,
-    availablePeriods
+    filterProfit,
+    setFilterProfit,
+    filterSymbol,
+    setFilterSymbol,
+    availablePeriods,
+    summaryStats
   };
 };

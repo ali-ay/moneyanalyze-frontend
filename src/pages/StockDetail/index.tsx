@@ -87,7 +87,6 @@ const StockDetail: React.FC = () => {
     backtestLoading,
     backtestPeriod,
     setBacktestPeriod,
-    setBacktestPeriod,
     optimizedData,
     optimizedLoading,
     specificSettings,

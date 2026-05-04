@@ -245,7 +245,7 @@ const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { mode, setMode } = useMarketMode();
-  const isAdmin = user?.role === 'ADMIN';
+  const isAdmin = user?.role?.toUpperCase() === 'ADMIN';
 
   const [searchQuery, setSearchQuery] = useState('');
   const [stocks, setStocks] = useState<any[]>([]);

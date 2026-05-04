@@ -117,7 +117,12 @@ const Watchlist: React.FC = () => {
     currency,
     filterPeriod,
     setFilterPeriod,
-    availablePeriods
+    filterProfit,
+    setFilterProfit,
+    filterSymbol,
+    setFilterSymbol,
+    availablePeriods,
+    summaryStats
   } = useWatchlistLogic();
 
   const [adding, setAdding] = useState(false);
@@ -190,17 +195,54 @@ const Watchlist: React.FC = () => {
           </SectionTitle>
 
           <S.FilterWrapper>
-            <S.FilterLabel>Periyot Filtresi:</S.FilterLabel>
-            <S.FilterSelect 
-              value={filterPeriod} 
+            <S.FilterLabel>Filtrele:</S.FilterLabel>
+            <S.SearchInput
+              placeholder="Sembol veya şirket ara..."
+              value={filterSymbol}
+              onChange={(e) => setFilterSymbol(e.target.value)}
+            />
+            <S.FilterSelect
+              value={filterPeriod}
               onChange={(e) => setFilterPeriod(e.target.value)}
             >
-              <option value="ALL">Tümü (Hepsi)</option>
+              <option value="ALL">Periyot: Tümü</option>
               {availablePeriods.map(p => (
-                <option key={p} value={p}>{p}</option>
+                <option key={p} value={p}>Periyot: {p}</option>
               ))}
             </S.FilterSelect>
+            <S.FilterSelect
+              value={filterProfit}
+              onChange={(e) => setFilterProfit(e.target.value as any)}
+            >
+              <option value="ALL">Durum: Tümü</option>
+              <option value="PROFIT">Durum: Kârda ✓</option>
+              <option value="LOSS">Durum: Zararda ✗</option>
+              <option value="NEUTRAL">Durum: Nötr</option>
+            </S.FilterSelect>
           </S.FilterWrapper>
+
+          {summaryStats && (
+            <S.SummaryWrapper>
+              <S.SummaryCard>
+                <S.SummaryLabel>Toplam Hisse</S.SummaryLabel>
+                <S.SummaryValue>{summaryStats.total}</S.SummaryValue>
+              </S.SummaryCard>
+              <S.SummaryCard>
+                <S.SummaryLabel>Ort. Değişim</S.SummaryLabel>
+                <S.SummaryValue color={summaryStats.avgProfit >= 0 ? 'green' : 'red'}>
+                  {summaryStats.avgProfit > 0 ? '+' : ''}{summaryStats.avgProfit}%
+                </S.SummaryValue>
+              </S.SummaryCard>
+              <S.SummaryCard>
+                <S.SummaryLabel>Kârda</S.SummaryLabel>
+                <S.SummaryValue color="green">{summaryStats.profitable}</S.SummaryValue>
+              </S.SummaryCard>
+              <S.SummaryCard>
+                <S.SummaryLabel>Zararda</S.SummaryLabel>
+                <S.SummaryValue color="red">{summaryStats.losing}</S.SummaryValue>
+              </S.SummaryCard>
+            </S.SummaryWrapper>
+          )}
 
           {watchlist.length === 0 ? (
             <EmptyState>Henüz takip listesinde sembol bulunmuyor.</EmptyState>

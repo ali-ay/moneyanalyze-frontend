@@ -42,7 +42,8 @@ export const StrategyManagementPanel: React.FC<StrategyManagementPanelProps> = (
         smaShort: specificSettings.smaShort || 20,
         smaLong: specificSettings.smaLong || 50,
         strategyId: specificSettings.strategyId || 'TREND_FOLLOWING',
-        useTrendFilter: specificSettings.useTrendFilter ?? true
+        useTrendFilter: specificSettings.useTrendFilter ?? true,
+        stopLossMultiplier: specificSettings.stopLossMultiplier || 2.0
       });
     } else {
       // Default reset
@@ -51,7 +52,8 @@ export const StrategyManagementPanel: React.FC<StrategyManagementPanelProps> = (
         smaShort: 20,
         smaLong: 50,
         strategyId: 'TREND_FOLLOWING',
-        useTrendFilter: true
+        useTrendFilter: true,
+        stopLossMultiplier: 2.0
       });
     }
   }, [specificSettings]);
@@ -60,7 +62,7 @@ export const StrategyManagementPanel: React.FC<StrategyManagementPanelProps> = (
     const { name, value, type } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'number' ? parseInt(value) : value
+      [name]: type === 'number' ? parseFloat(value) : value
     }));
   };
 
@@ -100,7 +102,7 @@ export const StrategyManagementPanel: React.FC<StrategyManagementPanelProps> = (
             <S.PeriodSelector>
               {periods.map(p => (
                 <S.PeriodBtn 
-                  key={p.id} 
+                   key={p.id} 
                   $active={period === p.id}
                   onClick={() => setPeriod(p.id)}
                 >
@@ -121,7 +123,21 @@ export const StrategyManagementPanel: React.FC<StrategyManagementPanelProps> = (
                 <option value="TREND_FOLLOWING">Trend Takibi (SMA/MACD)</option>
                 <option value="MEAN_REVERSION">Aşırı Satım Dönüşü (RSI)</option>
                 <option value="MOMENTUM">Momentum Patlaması</option>
+                <option value="VOLATILITY_BREAKOUT">Volatilite Patlaması (Bollinger)</option>
+                <option value="SUPERTREND_FOLLOW">SuperTrend Takibi</option>
               </S.Select>
+            </S.ParamCard>
+
+            <S.ParamCard>
+              <S.Label>Stop-Loss Çarpanı (ATR)</S.Label>
+              <S.Input 
+                type="number" 
+                name="stopLossMultiplier" 
+                value={formData.stopLossMultiplier} 
+                onChange={handleChange}
+                step={0.1}
+                min={0.5} max={10}
+              />
             </S.ParamCard>
 
             <S.ParamCard>

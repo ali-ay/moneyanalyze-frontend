@@ -105,3 +105,68 @@ export const FilterSelect = styled.select`
     box-shadow: 0 0 0 2px ${props => props.theme.colors.primary}20;
   }
 `;
+
+export const SummaryWrapper = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+`;
+
+export const SummaryCard = styled.div`
+  background: ${props => props.theme.colors.background};
+  border: 1px solid ${props => props.theme.colors.border};
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+export const SummaryLabel = styled.span`
+  font-size: 12px;
+  color: ${props => props.theme.colors.textSecondary};
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+interface SummaryValueProps {
+  color?: 'green' | 'red' | 'gray';
+}
+
+export const SummaryValue = styled.span<SummaryValueProps>`
+  font-size: 24px;
+  font-weight: 600;
+  color: ${props => {
+    switch (props.color) {
+      case 'green':
+        return props.theme.colors.success;
+      case 'red':
+        return props.theme.colors.danger;
+      default:
+        return props.theme.colors.text;
+    }
+  }};
+`;
+
+export const SearchInput = styled.input`
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid ${props => props.theme.colors.border};
+  background: ${props => props.theme.colors.surface};
+  color: ${props => props.theme.colors.textMain};
+  font-size: 0.8125rem;
+  outline: none;
+  min-width: 160px;
+  transition: all 0.2s ease;
+
+  &:focus {
+    border-color: ${props => props.theme.colors.primary};
+    box-shadow: 0 0 0 2px ${props => props.theme.colors.primary}20;
+  }
+
+  &::placeholder {
+    color: ${props => props.theme.colors.textSecondary};
+  }
+`;

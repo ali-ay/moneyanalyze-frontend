@@ -3,17 +3,18 @@ import * as S from './AIBacktestPanel.styles';
 import styled from 'styled-components';
 import api from '../../services/apiClient';
 import { Card } from '../../components/ui/Card';
-import { 
-  Zap, 
-  TrendingUp, 
-  CheckCircle2, 
-  Target, 
-  History, 
-  Loader2, 
+import {
+  Zap,
+  TrendingUp,
+  CheckCircle2,
+  Target,
+  History,
+  Loader2,
   AlertCircle,
   Sparkles,
   Info
 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const PanelContainer = styled(Card)`
   margin-bottom: 24px;
@@ -173,6 +174,54 @@ const InfoIconWrapper = styled.div`
   }
 `;
 
+const ChartWrapper = styled.div`
+  margin-top: 24px;
+  padding: 16px;
+  background: #F8FBFF;
+  border-radius: 12px;
+  border: 1px solid #E8F0FE;
+`;
+
+const ChartTitle = styled.div`
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #202124;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const RulesContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+`;
+
+const RuleTag = styled.span`
+  padding: 4px 10px;
+  background: #E8F0FE;
+  color: #1A73E8;
+  border-radius: 12px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  white-space: nowrap;
+`;
+
+const RULE_LABELS: Record<string, string> = {
+  ABOVE_SMA200: 'Fiyat SMA200 üzerinde',
+  SMA_BULLISH_STACK: 'Kısa SMA > Uzun SMA',
+  MACD_POSITIVE: 'MACD sinyal çizgisinin üzerinde',
+  VOLUME_CONFIRMED: 'Hacim onayı ✓',
+  OVERSOLD_RSI: 'RSI aşırı satım',
+  PRICE_STRETCHED_LOW: 'Fiyat düşük',
+  EXTREME_OVERSOLD: 'Aşırı satım (RSI<30)',
+  EXPLOSIVE_VOLUME: 'Patlayıcı hacim',
+  MOMENTUM_ACCELERATING: 'Momentum güçleniyor',
+  PRICE_BREAKOUT: 'Fiyat kırılması',
+};
+
 export const AIBacktestPanel: React.FC<Props> = ({ 
   data, 
   loading, 
@@ -303,10 +352,54 @@ export const AIBacktestPanel: React.FC<Props> = ({
                 </S.StatValue>
               </StatItem>
               <StatItem>
+                <div className="label"><CheckCircle2 size={12} /> Risk/Reward</div>
+                <S.StatValue as="div" className="value" $positive={data.riskReward ? data.riskReward > 1 : false}>
+                  {data.riskReward ? data.riskReward.toFixed(2) : '-'}
+                </S.StatValue>
+              </StatItem>
+              <StatItem>
                 <div className="label"><CheckCircle2 size={12} /> Sinyal Sayısı</div>
                 <div className="value">{data.totalSignals}</div>
               </StatItem>
             </StatsGrid>
+
+            {data.recentSignals && data.recentSignals.length > 5 && (
+              <ChartWrapper>
+                <ChartTitle>
+                  <TrendingUp size={16} /> Son 15 Sinyal Kâr/Zarar Dağılımı
+                </ChartTitle>
+                <ResponsiveContainer width="100%" height={280}>
+                  <BarChart data={data.recentSignals.slice(-15)} margin={{ top: 10, right: 30, left: 10, bottom: 50 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8F0FE" />
+                    <XAxis
+                      dataKey="date"
+                      tick={{ fontSize: 11, fill: '#5F6368' }}
+                      angle={-45}
+                      textAnchor="end"
+                      height={100}
+                      formatter={(date: string) => new Date(date).toLocaleDateString('tr-TR', { month: '2-digit', day: '2-digit' })}
+                    />
+                    <YAxis tick={{ fontSize: 12, fill: '#5F6368' }} label={{ value: 'Kâr/Zarar (%)', angle: -90, position: 'insideLeft' }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#202124',
+                        border: 'none',
+                        borderRadius: '8px',
+                        color: 'white',
+                        fontSize: '12px'
+                      }}
+                      formatter={(value: any) => `${value > 0 ? '+' : ''}${value.toFixed(2)}%`}
+                      labelFormatter={(label: any) => new Date(label).toLocaleDateString('tr-TR')}
+                    />
+                    <Bar
+                      dataKey="profit"
+                      fill="#1A73E8"
+                      radius={[8, 8, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartWrapper>
+            )}
 
             {data.recentSignals && data.recentSignals.length > 0 && (
               <SignalHistory>
@@ -324,8 +417,18 @@ export const AIBacktestPanel: React.FC<Props> = ({
                       <InfoIconWrapper>
                         <Info size={14} />
                         <div className="tooltip">
-                          <S.TooltipLabel>AI ANALİZİ</S.TooltipLabel>
-                          {getSignalAnalysis(sig.date, sig.profit)}
+                          <S.TooltipLabel>TETIKLENEN KURALLAR</S.TooltipLabel>
+                          {sig.rules && sig.rules.length > 0 ? (
+                            <RulesContainer>
+                              {sig.rules.map((rule: string, rIdx: number) => (
+                                <RuleTag key={rIdx} title={rule}>
+                                  {RULE_LABELS[rule] || rule}
+                                </RuleTag>
+                              ))}
+                            </RulesContainer>
+                          ) : (
+                            <span>Kural verisi bulunamadı</span>
+                          )}
                         </div>
                       </InfoIconWrapper>
                     </S.SignalRow>

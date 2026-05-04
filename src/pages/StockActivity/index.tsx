@@ -80,13 +80,25 @@ const ActionBadge = styled.span<{ $action: string }>`
   border-radius: 8px;
   font-size: 0.75rem;
   font-weight: 800;
-  background: ${props => props.$action === 'ADD' ? 'rgba(15, 157, 88, 0.1)' : 'rgba(219, 68, 55, 0.1)'};
-  color: ${props => props.$action === 'ADD' ? '#0F9D58' : '#DB4437'};
+  background: ${props => {
+    if (props.$action === 'ADD') return 'rgba(15, 157, 88, 0.1)';
+    if (props.$action === 'REMOVE') return 'rgba(219, 68, 55, 0.1)';
+    return 'rgba(26, 115, 232, 0.1)'; // INFO
+  }};
+  color: ${props => {
+    if (props.$action === 'ADD') return '#0F9D58';
+    if (props.$action === 'REMOVE') return '#DB4437';
+    return '#1A73E8'; // INFO
+  }};
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  border: 1px solid ${props => props.$action === 'ADD' ? 'rgba(15, 157, 88, 0.2)' : 'rgba(219, 68, 55, 0.2)'};
+  border: 1px solid ${props => {
+    if (props.$action === 'ADD') return 'rgba(15, 157, 88, 0.2)';
+    if (props.$action === 'REMOVE') return 'rgba(219, 68, 55, 0.2)';
+    return 'rgba(26, 115, 232, 0.2)'; // INFO
+  }};
 
   @media (max-width: 768px) {
     padding: 6px;
@@ -195,13 +207,27 @@ const StockActivityPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [total, setTotal] = useState(0);
   const [selectedNote, setSelectedNote] = useState<string | null>(null);
+  const [filterAction, setFilterAction] = useState<'ALL' | 'ADD' | 'REMOVE'>('ALL');
+  const [filterProfit, setFilterProfit] = useState<'ALL' | 'PROFIT' | 'LOSS' | 'NEUTRAL'>('ALL');
+  const [filterPeriod, setFilterPeriod] = useState<string>('ALL');
+  const [stats, setStats] = useState({
+    totalProfit: 0,
+    avgProfit: 0,
+    successRate: 0,
+    completedTrades: 0
+  });
 
-  const fetchLogs = async (pageNum: number, append: boolean = false, search: string = searchTerm) => {
+  const fetchLogs = async (pageNum: number, append: boolean = false, search: string = searchTerm, period: string = filterPeriod) => {
     try {
-      const response = await api.get(`/stock/activity-logs?page=${pageNum}&search=${search}`);
+      const response = await api.get(`/stock/activity-logs?page=${pageNum}&search=${search}&period=${period}`);
       if (response.data.success) {
         const newLogs = response.data.data;
         setTotal(response.data.total || 0);
+        
+        if (response.data.stats) {
+          setStats(response.data.stats);
+        }
+
         if (newLogs.length < 50) {
           setHasMore(false);
         } else {
@@ -251,30 +277,49 @@ const StockActivityPage: React.FC = () => {
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       setPage(1);
-      fetchLogs(1, false, searchTerm);
+      fetchLogs(1, false, searchTerm, filterPeriod);
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm]);
+  }, [searchTerm, filterPeriod]);
 
   useEffect(() => {
     // Canlı fiyatları güncellemek için interval
-    // Sadece 1. sayfadayken ve arama yokken çalışır
+    // Sadece 1. sayfadayken, arama yokken ve periyot seçili değilken (veya ALL iken) daha güvenli çalışır
+    // Ancak kullanıcı bir filtre seçmişse de o filtreye göre güncellenmesi iyidir
     const interval = setInterval(() => {
-      if (page === 1 && !loadingMore && !isCleaning && !searchTerm) {
-        fetchLogs(1);
+      if (page === 1 && !loadingMore && !isCleaning) {
+        fetchLogs(1, false, searchTerm, filterPeriod);
       }
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [page, loadingMore, isCleaning, searchTerm]);
+  }, [page, loadingMore, isCleaning, searchTerm, filterPeriod]);
 
   const handleLoadMore = () => {
     setLoadingMore(true);
     const nextPage = page + 1;
     setPage(nextPage);
-    fetchLogs(nextPage, true, searchTerm);
+    fetchLogs(nextPage, true, searchTerm, filterPeriod);
   };
+
+  const filteredLogs = React.useMemo(() => {
+    let data = [...logs];
+
+    if (filterAction !== 'ALL') {
+      data = data.filter(log => log.action === filterAction);
+    }
+
+    if (filterProfit !== 'ALL') {
+      const getProfitValue = (log: any) =>
+        log.action === 'REMOVE' ? (log.profit || 0) : (log.liveProfit || 0);
+      if (filterProfit === 'PROFIT') data = data.filter(log => getProfitValue(log) > 0);
+      else if (filterProfit === 'LOSS') data = data.filter(log => getProfitValue(log) < 0);
+      else if (filterProfit === 'NEUTRAL') data = data.filter(log => getProfitValue(log) === 0);
+    }
+
+    return data;
+  }, [logs, filterAction, filterProfit]);
 
   if (loading) return <LoadingState>Kayıtlar yükleniyor...</LoadingState>;
 
@@ -322,9 +367,75 @@ const StockActivityPage: React.FC = () => {
         </HStack>
       </ResponsiveHeader>
 
+      <S.SummaryCards>
+        <S.StatCard>
+          <S.StatLabel>Kümülatif Kâr/Zarar</S.StatLabel>
+          <S.StatValue $positive={stats.totalProfit > 0} $negative={stats.totalProfit < 0}>
+            {stats.totalProfit > 0 ? '+' : ''}{stats.totalProfit.toFixed(2)}%
+          </S.StatValue>
+          <S.StatSubValue>Tamamlanan tüm işlemlerin toplamı</S.StatSubValue>
+        </S.StatCard>
+
+        <S.StatCard>
+          <S.StatLabel>Başarı Oranı</S.StatLabel>
+          <S.StatValue style={{ color: stats.successRate >= 50 ? '#0F9D58' : '#DB4437' }}>
+            %{stats.successRate.toFixed(1)}
+          </S.StatValue>
+          <S.StatSubValue>{stats.completedTrades} işlemin {Math.round(stats.completedTrades * stats.successRate / 100)} adedi kârlı</S.StatSubValue>
+        </S.StatCard>
+
+        <S.StatCard>
+          <S.StatLabel>Ortalama İşlem Getirisi</S.StatLabel>
+          <S.StatValue $positive={stats.avgProfit > 0} $negative={stats.avgProfit < 0}>
+            {stats.avgProfit > 0 ? '+' : ''}{stats.avgProfit.toFixed(2)}%
+          </S.StatValue>
+          <S.StatSubValue>İşlem başına düşen ortalama kâr</S.StatSubValue>
+        </S.StatCard>
+
+        <S.StatCard>
+          <S.StatLabel>Toplam Aktivite</S.StatLabel>
+          <S.StatValue>{total.toLocaleString()}</S.StatValue>
+          <S.StatSubValue>Filtrelere uygun toplam kayıt</S.StatSubValue>
+        </S.StatCard>
+      </S.SummaryCards>
+
+      <S.FilterWrapper>
+        <S.FilterLabel>Filtrele:</S.FilterLabel>
+        <S.FilterSelect
+          value={filterAction}
+          onChange={e => setFilterAction(e.target.value as any)}
+        >
+          <option value="ALL">İşlem: Tümü</option>
+          <option value="ADD">İşlem: Eklendi ↑</option>
+          <option value="REMOVE">İşlem: Çıkarıldı ↓</option>
+        </S.FilterSelect>
+
+        <S.FilterSelect
+          value={filterPeriod}
+          onChange={e => setFilterPeriod(e.target.value)}
+        >
+          <option value="ALL">Periyot: Tümü</option>
+          <option value="daily">Günlük (Daily)</option>
+          <option value="weekly">Haftalık (Weekly)</option>
+          <option value="monthly">Aylık (Monthly)</option>
+        </S.FilterSelect>
+
+        <S.FilterSelect
+          value={filterProfit}
+          onChange={e => setFilterProfit(e.target.value as any)}
+        >
+          <option value="ALL">Durum: Tümü</option>
+          <option value="PROFIT">Durum: Kârda ✓</option>
+          <option value="LOSS">Durum: Zararda ✗</option>
+          <option value="NEUTRAL">Durum: Nötr</option>
+        </S.FilterSelect>
+      </S.FilterWrapper>
+
       <S.TableWrapper>
         {logs.length === 0 ? (
           <EmptyState>Henüz bir hareket kaydı bulunmuyor. AI analizleri başladığında burada görünecektir.</EmptyState>
+        ) : filteredLogs.length === 0 ? (
+          <EmptyState>Seçilen filtrelere uygun hareket kaydı bulunmuyor.</EmptyState>
         ) : (
           <>
             <LogTable>
@@ -339,9 +450,10 @@ const StockActivityPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {logs.map((log) => {
+                {filteredLogs.map((log) => {
                   const isAdd = log.action === 'ADD';
-                  const profitValue = isAdd ? log.liveProfit : log.profit;
+                  const isInfo = log.action === 'INFO';
+                  const profitValue = isInfo ? null : (isAdd ? log.liveProfit : log.profit);
                   const isPositive = (profitValue || 0) >= 0;
 
                   return (
@@ -368,36 +480,50 @@ const StockActivityPage: React.FC = () => {
                       </Td>
                       <Td>
                         <ActionBadge $action={log.action}>
-                          {isAdd ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                          <span className="btn-text">{isAdd ? 'EKLENDİ' : 'ÇIKARILDI'}</span>
+                          {log.action === 'ADD' ? <TrendingUp size={14} /> : 
+                           log.action === 'REMOVE' ? <TrendingDown size={14} /> : 
+                           <Activity size={14} />}
+                          <span className="btn-text">
+                            {log.action === 'ADD' ? 'EKLENDİ' : 
+                             log.action === 'REMOVE' ? 'ÇIKARILDI' : 
+                             log.action === 'INFO' ? 'BİLGİ' : 'GÜNCELLENDİ'}
+                          </span>
                         </ActionBadge>
                       </Td>
                       <Td>
-                        <HStack $gap="20px">
-                          <VStack>
-                            <Label>{isAdd ? 'Giriş' : 'Alış'}</Label>
-                            <PriceText>₺{log.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</PriceText>
-                          </VStack>
+                        {isInfo ? (
+                          <S.CalculatingText>---</S.CalculatingText>
+                        ) : (
+                          <HStack $gap="20px">
+                            <VStack>
+                              <Label>{isAdd ? 'Giriş' : 'Alış'}</Label>
+                              <PriceText>₺{log.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</PriceText>
+                            </VStack>
 
-                          <VStack>
-                            <Label>{isAdd ? 'Anlık' : 'Çıkış'}</Label>
-                            <S.PriceWithColor $entryPrice={isAdd}>
-                              ₺{(isAdd ? log.currentPrice : log.exitPrice)?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || '---'}
-                            </S.PriceWithColor>
-                          </VStack>
-                        </HStack>
+                            <VStack>
+                              <Label>{isAdd ? 'Anlık' : 'Çıkış'}</Label>
+                              <S.PriceWithColor $entryPrice={isAdd}>
+                                ₺{(isAdd ? log.currentPrice : log.exitPrice)?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || '---'}
+                              </S.PriceWithColor>
+                            </VStack>
+                          </HStack>
+                        )}
                       </Td>
                       <Td>
-                        <VStack $gap="4px">
-                          <Label>{isAdd ? 'Kar/Zarar' : 'Net K/Z'}</Label>
-                          {profitValue !== null && profitValue !== undefined ? (
-                            <S.ProfitBadgeWithSize $positive={isPositive}>
-                              {isPositive ? '+' : ''}{profitValue.toFixed(2)}%
-                            </S.ProfitBadgeWithSize>
-                          ) : (
-                            <S.CalculatingText>Hesaplanıyor...</S.CalculatingText>
-                          )}
-                        </VStack>
+                        {isInfo ? (
+                          <S.CalculatingText>---</S.CalculatingText>
+                        ) : (
+                          <VStack $gap="4px">
+                            <Label>{isAdd ? 'Kar/Zarar' : 'Net K/Z'}</Label>
+                            {profitValue !== null && profitValue !== undefined ? (
+                              <S.ProfitBadgeWithSize $positive={isPositive}>
+                                {isPositive ? '+' : ''}{profitValue.toFixed(2)}%
+                              </S.ProfitBadgeWithSize>
+                            ) : (
+                              <S.CalculatingText>Hesaplanıyor...</S.CalculatingText>
+                            )}
+                          </VStack>
+                        )}
                       </Td>
                       <Td>
                         <S.TooltipContainer>
