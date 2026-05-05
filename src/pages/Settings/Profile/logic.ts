@@ -104,12 +104,9 @@ export const useProfileLogic = () => {
     } catch (err: any) {
       setError(err.response?.data?.message || 'Hesap sıfırlanamadı.');
     } finally {
-      setSaving(false);
-    }
-  };
-
-  const [progress, setProgress] = useState<{ current: number; total: number; isRunning: boolean; message: string } | null>(null);
+    const [progress, setProgress] = useState<{ current: number; total: number; isRunning: boolean; message: string } | null>(null);
   const [historyProgress, setHistoryProgress] = useState<{ current: number; total: number; isSyncing: boolean; percent: number; currentSymbol: string } | null>(null);
+  const [tailscaleSyncProgress, setTailscaleSyncProgress] = useState<{ current: number; total: number; isSyncing: boolean; message: string } | null>(null);
 
   const fetchProgress = useCallback(async () => {
     try {
@@ -135,10 +132,23 @@ export const useProfileLogic = () => {
     }
   }, []);
 
+  const fetchTailscaleProgress = useCallback(async () => {
+    try {
+      const res = await api.get('/stock/sync-status');
+      const data = res.data.data;
+      setTailscaleSyncProgress(data);
+      return data.isSyncing;
+    } catch (err) {
+      console.error('Tailscale progress fetch error:', err);
+      return false;
+    }
+  }, []);
+
   // Eğer sayfa açıldığında zaten çalışan bir analiz veya eşitleme varsa takip et
   useEffect(() => {
     let interval: any;
     let historyInterval: any;
+    let tailscaleInterval: any;
 
     const check = async () => {
       const isRunning = await fetchProgress();
@@ -156,13 +166,22 @@ export const useProfileLogic = () => {
           if (!stillSyncing) clearInterval(historyInterval);
         }, 1500);
       }
+
+      const isTailscaleSyncing = await fetchTailscaleProgress();
+      if (isTailscaleSyncing) {
+        tailscaleInterval = setInterval(async () => {
+          const stillTailscaleSyncing = await fetchTailscaleProgress();
+          if (!stillTailscaleSyncing) clearInterval(tailscaleInterval);
+        }, 1000);
+      }
     };
     check();
     return () => {
       clearInterval(interval);
       clearInterval(historyInterval);
+      clearInterval(tailscaleInterval);
     };
-  }, [fetchProgress, fetchHistoryProgress]);
+  }, [fetchProgress, fetchHistoryProgress, fetchTailscaleProgress]);
 
   const runAIScan = async () => {
     try {
@@ -214,8 +233,33 @@ export const useProfileLogic = () => {
     }
   };
 
+  const runTailscaleSync = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+      setSuccess(null);
+      
+      await api.post('/stock/sync-manual');
+      
+      // Hemen polling başlat
+      const interval = setInterval(async () => {
+        const isSyncing = await fetchTailscaleProgress();
+        if (!isSyncing) {
+          clearInterval(interval);
+          setSaving(false);
+          setSuccess('Fiyatlar başarıyla güncellendi!');
+          setTimeout(() => setSuccess(null), 3000);
+        }
+      }, 1000);
+
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Fiyat senkronizasyonu başarısız oldu.');
+      setSaving(false);
+    }
+  };
+
   return {
-    profile, loading, saving, error, success, progress, historyProgress,
+    profile, loading, saving, error, success, progress, historyProgress, tailscaleSyncProgress,
     firstName, setFirstName,
     lastName, setLastName,
     binanceApiKey, setBinanceApiKey,
@@ -225,5 +269,6 @@ export const useProfileLogic = () => {
     resetAccount,
     runAIScan,
     runFullHistorySync,
+    runTailscaleSync
   };
 };

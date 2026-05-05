@@ -226,8 +226,8 @@ const ProfilePage = () => {
     binanceSecretKey, setBinanceSecretKey,
     tradingMode, setTradingMode,
     updateProfile, resetAccount,
-    runAIScan, runFullHistorySync,
-    progress, historyProgress,
+    runAIScan, runFullHistorySync, runTailscaleSync,
+    progress, historyProgress, tailscaleSyncProgress,
   } = useProfileLogic();
   const { mode, setMode } = useMarketMode();
 
@@ -465,6 +465,45 @@ const ProfilePage = () => {
                 </SectionIcon>
                 <SectionTitle>Genel Veri Yönetimi</SectionTitle>
               </SectionHeader>
+
+              <S.AIAutomationContainer>
+                <div>
+                  <S.SectionDescription>
+                    Manuel Fiyat Senkronizasyonu (Air {'>'} DB)
+                  </S.SectionDescription>
+                  <S.SectionNote>
+                    MacBook Air'den tüm BIST fiyatlarını anlık olarak çeker ve veritabanına kaydeder.
+                  </S.SectionNote>
+                </div>
+
+                <S.AutomationButton
+                  type="button"
+                  onClick={runTailscaleSync}
+                  disabled={saving || (tailscaleSyncProgress?.isSyncing ?? false)}
+                  $color="#1A73E8"
+                  $disabled={saving || (tailscaleSyncProgress?.isSyncing ?? false)}
+                >
+                  <Zap size={16} fill="white" />
+                  {tailscaleSyncProgress?.isSyncing ? 'Güncelleniyor...' : 'Fiyatları Şimdi Güncelle'}
+                </S.AutomationButton>
+
+                {tailscaleSyncProgress?.isSyncing && (
+                  <S.ProgressSection>
+                    <S.ProgressHeader>
+                      <span>{tailscaleSyncProgress.message} ({tailscaleSyncProgress.current}/{tailscaleSyncProgress.total})</span>
+                      <span>%{Math.round((tailscaleSyncProgress.current / (tailscaleSyncProgress.total || 1)) * 100)}</span>
+                    </S.ProgressHeader>
+                    <S.ProgressBarContainer>
+                      <S.GradientProgressBar
+                        $percent={(tailscaleSyncProgress.current / (tailscaleSyncProgress.total || 1)) * 100}
+                        $color="#1A73E8"
+                      />
+                    </S.ProgressBarContainer>
+                  </S.ProgressSection>
+                )}
+              </S.AIAutomationContainer>
+
+              <S.Divider />
 
               <S.AIAutomationContainer>
                 <div>
