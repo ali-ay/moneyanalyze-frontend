@@ -104,7 +104,11 @@ export const useProfileLogic = () => {
     } catch (err: any) {
       setError(err.response?.data?.message || 'Hesap sıfırlanamadı.');
     } finally {
-    const [progress, setProgress] = useState<{ current: number; total: number; isRunning: boolean; message: string } | null>(null);
+      setSaving(false);
+    }
+  };
+
+  const [progress, setProgress] = useState<{ current: number; total: number; isRunning: boolean; message: string } | null>(null);
   const [historyProgress, setHistoryProgress] = useState<{ current: number; total: number; isSyncing: boolean; percent: number; currentSymbol: string } | null>(null);
   const [tailscaleSyncProgress, setTailscaleSyncProgress] = useState<{ current: number; total: number; isSyncing: boolean; message: string } | null>(null);
 
