@@ -223,7 +223,7 @@ const StockActivityPage: React.FC = () => {
       if (response.data.success) {
         const newLogs = response.data.data;
         setTotal(response.data.total || 0);
-        
+
         if (response.data.stats) {
           setStats(response.data.stats);
         }
@@ -480,13 +480,13 @@ const StockActivityPage: React.FC = () => {
                       </Td>
                       <Td>
                         <ActionBadge $action={log.action}>
-                          {log.action === 'ADD' ? <TrendingUp size={14} /> : 
-                           log.action === 'REMOVE' ? <TrendingDown size={14} /> : 
-                           <Activity size={14} />}
+                          {log.action === 'ADD' ? <TrendingUp size={14} /> :
+                            log.action === 'REMOVE' ? <TrendingDown size={14} /> :
+                              <Activity size={14} />}
                           <span className="btn-text">
-                            {log.action === 'ADD' ? 'EKLENDİ' : 
-                             log.action === 'REMOVE' ? 'ÇIKARILDI' : 
-                             log.action === 'INFO' ? 'BİLGİ' : 'GÜNCELLENDİ'}
+                            {log.action === 'ADD' ? 'EKLENDİ' :
+                              log.action === 'REMOVE' ? 'ÇIKARILDI' :
+                                log.action === 'INFO' ? 'BİLGİ' : 'GÜNCELLENDİ'}
                           </span>
                         </ActionBadge>
                       </Td>

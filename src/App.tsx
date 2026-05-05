@@ -78,7 +78,7 @@ const AppContent = () => {
           <title>{settings?.siteTitle || 'MoneyAnalyze'}</title>
           <meta name="description" content={settings?.siteDescription || 'Crypto Analysis Platform'} />
         </Helmet>
-        
+
         <Router>
           <Suspense fallback={<div style={{ padding: '20px', textAlign: 'center', color: '#9AA0A6' }}>Yükleniyor...</div>}>
             <Routes>
@@ -104,7 +104,7 @@ const AppContent = () => {
                 <Route path="/watchlist" element={<Watchlist />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/bots" element={<Bots />} />
-                
+
                 {/* Admin Nested Routes inside MainLayout */}
                 <Route path="/admin">
                   <Route path="userlist" element={<AdminRoute><UserList /></AdminRoute>} />
