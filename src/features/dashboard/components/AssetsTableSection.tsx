@@ -197,8 +197,8 @@ export const AssetsTableSection: React.FC<AssetsTableProps> = ({ data, loading, 
               <tbody>
                 {displayData.map((coin) => {
                   const price = coin.price || '0.00';
-                  const change = parseFloat(coin.change || '0');
-                  const isUp = change >= 0;
+                  const changePercent = parseFloat(coin.changePercent || coin.change || '0');
+                  const isUp = changePercent >= 0;
                   return (
                     <TableRow key={coin.symbol} onClick={() => handleCoinClick(coin.symbol)}>
                       <td>
@@ -215,7 +215,7 @@ export const AssetsTableSection: React.FC<AssetsTableProps> = ({ data, loading, 
                       <td>{currency}{price}</td>
                       <td>
                         <ChangeValue $up={isUp}>
-                          {isUp ? '+' : ''}{coin.change || '0.00'}%
+                          {isUp ? '+' : ''}{changePercent.toFixed(2)}%
                         </ChangeValue>
                       </td>
                       <td style={{ textAlign: 'right' }}>

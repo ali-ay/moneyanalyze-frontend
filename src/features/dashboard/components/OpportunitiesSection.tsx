@@ -149,70 +149,80 @@ export const OpportunitiesSection: React.FC = () => {
 
   if (opportunities.length === 0) return null;
 
+  // Sadece en yüksek skorlu 5 hisseyi alalım
+  const top5 = opportunities.slice(0, 5);
+
   return (
-    <Card style={{ marginBottom: 24 }}>
-      <Card.Header>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Zap size={20} color="#F4B400" fill="#F4B400" />
-          <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>Algoritmik Fırsatlar (Haftalık Takip)</h3>
+    <Card style={{ marginBottom: 24, border: '1px solid #1A73E8', boxShadow: '0 4px 20px rgba(26, 115, 232, 0.1)' }}>
+      <Card.Header style={{ background: 'linear-gradient(90deg, rgba(26, 115, 232, 0.1) 0%, transparent 100%)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Zap size={22} color="#1A73E8" fill="#1A73E8" />
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0, color: '#1A73E8', letterSpacing: '0.5px' }}>
+            ALGORİTMİK LİSTE PERFORMANSLARI 🚀
+          </h3>
         </div>
-        <div style={{ fontSize: '0.75rem', color: '#5F6368' }}>Teknik analiz modellerine göre yükseliş potansiyeli olanlar</div>
+        <div style={{ fontSize: '0.8rem', color: '#5F6368', fontWeight: 600 }}>Yapay Zeka Tarafından En Çok Güvenilen (Top 5) Hisseler</div>
       </Card.Header>
       <Card.Body $noPadding style={{ padding: '0 24px 24px' }}>
         <OpportunitiesGrid>
-          {opportunities.map((opp) => {
+          {top5.map((opp) => {
             const cleanSym = opp.symbol.replace('.IS', '').toUpperCase();
             const currentPrice = livePrices[cleanSym] || (opp.data as any)?.price || 0;
             const entryPrice = opp.entryPrice || 0;
-            const dynamicProfit = entryPrice > 0 
-              ? ((currentPrice - entryPrice) / entryPrice * 100).toFixed(2)
-              : '0.00';
-            const isPositive = parseFloat(dynamicProfit) >= 0;
+            const aiData = (opp.data as any)?.aiPredictions || {};
+            const targetPrice = aiData.targetPrice || 0;
+            const potentialProfit = aiData.potentialProfit || 0;
 
             return (
               <OpportunityCard key={opp.id} onClick={() => navigate(`/dashboard/stock/${opp.symbol}`)}>
-                <Badge $score={opp.strengthScore}>SKOR: {opp.strengthScore}</Badge>
-                <SymbolName>{cleanSym}</SymbolName>
+                <Badge $score={opp.strengthScore}>
+                  GÜVEN: %{opp.strengthScore}
+                </Badge>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                  <SymbolName style={{ margin: 0 }}>{cleanSym}</SymbolName>
+                  {opp.strengthScore >= 85 && <Zap size={14} color="#F4B400" fill="#F4B400" />}
+                </div>
+
                 <SignalType>
-                  {opp.signalType.split(',').map((s: string) => (
-                    <span key={s}>#{s}</span>
+                  {opp.signalType.split(':').slice(0, 1).map((s: string) => (
+                    <span key={s} style={{ background: '#1A73E815', padding: '2px 6px', borderRadius: 4 }}>
+                      {s.replace('_', ' ')}
+                    </span>
                   ))}
                 </SignalType>
 
+                <div style={{ background: 'rgba(15, 157, 88, 0.05)', padding: '10px', borderRadius: '12px', marginBottom: 12, border: '1px solid rgba(15, 157, 88, 0.1)' }}>
+                  <div style={{ fontSize: '0.65rem', color: '#5F6368', marginBottom: 2 }}>POTANSİYEL GETİRİ</div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#0F9D58' }}>
+                    %{potentialProfit.toFixed(2)} 🚀
+                  </div>
+                </div>
+
                 <MetricRow>
-                  <span>Giriş:</span>
-                  <MetricValue>₺{entryPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</MetricValue>
+                  <span>Mevcut Fiyat:</span>
+                  <MetricValue>₺{currentPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</MetricValue>
                 </MetricRow>
+                
                 <MetricRow>
-                  <span>Güncel:</span>
+                  <span>AI Hedefi:</span>
                   <MetricValue style={{ color: '#1A73E8' }}>
-                    ₺{currentPrice > 0 ? currentPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) : '---'}
-                  </MetricValue>
-                </MetricRow>
-                <MetricRow>
-                  <span>Sinyal Başarısı:</span>
-                  <MetricValue style={{ color: (opp.winRate || 0) > 70 ? '#0F9D58' : '#1A73E8', fontWeight: 800 }}>
-                    %{opp.winRate || '0'} 
-                    <span style={{ fontSize: '0.625rem', marginLeft: 4, fontWeight: 400, color: '#5F6368' }}>
-                      ({opp.period === 'weekly' ? 'Haftalık' : 'Aylık'})
-                    </span>
-                  </MetricValue>
-                </MetricRow>
-                <MetricRow>
-                  <span>Ort. Getiri:</span>
-                  <MetricValue style={{ color: (opp.avgProfit || 0) > 0 ? '#0F9D58' : '#DB4437' }}>
-                    %{opp.avgProfit?.toFixed(2) || '0.00'}
-                  </MetricValue>
-                </MetricRow>
-                <MetricRow>
-                  <span>Tarih:</span>
-                  <MetricValue style={{ fontSize: '0.625rem' }}>
-                    {new Date(opp.createdAt).toLocaleDateString('tr-TR')} {new Date(opp.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                    ₺{targetPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                   </MetricValue>
                 </MetricRow>
 
-                <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', color: '#1A73E8', fontSize: '0.6875rem', fontWeight: 700 }}>
-                  DETAYLAR <ChevronRight size={14} />
+                <MetricRow>
+                  <span>Geçmiş Win Rate:</span>
+                  <MetricValue style={{ color: (opp.winRate || 0) > 70 ? '#0F9D58' : '#1A73E8' }}>
+                    %{opp.winRate || '0'}
+                  </MetricValue>
+                </MetricRow>
+
+                <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #f1f3f4', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '0.6rem', color: '#9AA0A6' }}>{opp.period === 'weekly' ? 'HAFTALIK' : 'AYLIK'} ANALİZ</span>
+                  <div style={{ color: '#1A73E8', fontSize: '0.6875rem', fontWeight: 800 }}>
+                    ANALİZİ GÖR <ChevronRight size={14} />
+                  </div>
                 </div>
               </OpportunityCard>
             );

@@ -15,7 +15,7 @@ export interface TechnicalSummary {
   signal: string;
   score: number;
   color: string;
-  signals: string[];
+  indicators: any;
   pivots: {
     p: number;
     r1: number;
@@ -187,9 +187,9 @@ export const useStockDetailLogic = (symbol?: string) => {
 
       const summary: TechnicalSummary = {
         signal: analysisData.signal || 'NÖTR',
-        score: 50,
+        score: analysisData.score || 50,
         color: getSignalColor(analysisData.signal),
-        signals: [],
+        indicators: analysisData.indicators || {},
         pivots: analysisData.pivots || { p: 0, r1: 0, r2: 0, s1: 0, s2: 0 }
       };
 

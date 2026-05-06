@@ -15,6 +15,8 @@ import { ArrowLeft, TrendingUp, TrendingDown, Zap } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { AIBacktestPanel } from './AIBacktestPanel';
 import { StrategyManagementPanel } from './StrategyManagementPanel';
+import { StrategyPerformancePanel } from './StrategyPerformancePanel';
+import { StrategyTimelinePanel } from './StrategyTimelinePanel';
 
 const PriceDisplay = styled.div`
   display: flex;
@@ -224,6 +226,11 @@ const StockDetail: React.FC = () => {
         </S.CardWithMargin>
       )}
 
+      <StrategyPerformancePanel 
+        symbol={symbol || ''} 
+        period={backtestPeriod} 
+      />
+
       <StrategyManagementPanel
         symbol={symbol || ''}
         period={backtestPeriod}
@@ -246,12 +253,14 @@ const StockDetail: React.FC = () => {
 
       {technicalSummary && (
         <TechnicalPanel
-          indicators={null}
+          indicators={technicalSummary.indicators}
           signal={technicalSummary.signal as any}
           score={technicalSummary.score}
           loading={loading}
         />
       )}
+
+      <StrategyTimelinePanel symbol={symbol || ''} />
     </PageContainer>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useWatchlistLogic } from './logic';
 import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState, EmptyState } from '../../components/ui/Layout.styles';
@@ -61,6 +62,38 @@ const SectionTitle = styled.h3`
   color: ${props => props.theme.colors.textMain};
 `;
 
+const ProgressContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 140px;
+`;
+
+const ProgressTrack = styled.div`
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+`;
+
+const ProgressBar = styled.div<{ $percent: number }>`
+  height: 100%;
+  width: ${props => Math.min(Math.max(props.$percent, 0), 100)}%;
+  background: linear-gradient(90deg, #1A73E8 0%, #4285F4 100%);
+  border-radius: 4px;
+  transition: width 0.5s ease-out;
+`;
+
+const ProgressInfo = styled.div`
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 600;
+  color: ${props => props.theme.colors.textSecondary};
+`;
+
 const TableWrapper = styled.div`
   overflow-x: auto;
   margin: 0 -16px;
@@ -103,6 +136,7 @@ import { useAuth } from '../../app/providers/AuthContext';
 
 const Watchlist: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const isAdmin = user?.role === 'ADMIN';
 
   const {
@@ -264,9 +298,7 @@ const Watchlist: React.FC = () => {
                     <Th $sortable onClick={() => requestSort('profitPercent')}>
                       Değişim (Girişten){getSortIndicator('profitPercent')}
                     </Th>
-                    <Th $sortable onClick={() => requestSort('priceChangePercent')}>
-                      Günlük Değişim{getSortIndicator('priceChangePercent')}
-                    </Th>
+                    <Th>Hedef İlerleme</Th>
                     <Th>AI Hedef (Tahmin)</Th>
                     <Th>Stop-Loss</Th>
                     {isAdmin && <S.RightAlignTh>İşlem</S.RightAlignTh>}
@@ -274,15 +306,13 @@ const Watchlist: React.FC = () => {
                 </thead>
                 <tbody>
                   {watchlist.map(item => {
-                    const dailyChange = item.priceChangePercent || 0;
                     const profit = item.profitPercent || 0;
-                    const isPositiveDaily = dailyChange >= 0;
                     const isPositiveProfit = profit >= 0;
                     const ai = item.aiData;
 
                     return (
                       <Tr key={item.id}>
-                        <S.SymbolCell>
+                        <S.SymbolCell onClick={() => navigate(`/dashboard/stock/${item.symbol.replace('.IS', '')}`)} style={{ cursor: 'pointer' }}>
                           <div className="symbol">{item.symbol}</div>
                           <S.SymbolName title={item.name}>
                             {item.name && item.name.length > 17
@@ -303,9 +333,27 @@ const Watchlist: React.FC = () => {
                           </S.ChangeValueWithSize>
                         </Td>
                         <Td>
-                          <S.ProfitChangeValue $isPositive={isPositiveDaily}>
-                            {isPositiveDaily ? '▲' : '▼'} %{Math.abs(dailyChange).toFixed(2)}
-                          </S.ProfitChangeValue>
+                          {ai ? (() => {
+                            const entry = item.entryPrice || 0;
+                            const target = ai.targetPrice || 0;
+                            const current = item.currentPrice || 0;
+                            const totalRange = target - entry;
+                            const progress = totalRange > 0 ? ((current - entry) / totalRange) * 100 : 0;
+                            
+                            return (
+                              <ProgressContainer>
+                                <ProgressTrack>
+                                  <ProgressBar $percent={progress} />
+                                </ProgressTrack>
+                                <ProgressInfo>
+                                  <span>%{Math.max(0, Math.round(progress))}</span>
+                                  <span>Hedefe Kalan: %{Math.max(0, Math.round(100 - progress))}</span>
+                                </ProgressInfo>
+                              </ProgressContainer>
+                            );
+                          })() : (
+                            <span style={{ color: '#999', fontSize: '11px' }}>-</span>
+                          )}
                         </Td>
                         <Td>
                           {ai ? (
