@@ -73,3 +73,9 @@ export const HeaderCell = styled.th`
     text-align: left;
   }
 `;
+
+export const HStack = styled.div<{ $gap?: string }>`
+  display: flex;
+  align-items: center;
+  gap: ${props => props.$gap || '8px'};
+`;

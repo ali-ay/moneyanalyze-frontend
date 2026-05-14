@@ -143,6 +143,7 @@ const StockListPage: React.FC = () => {
   const navigate = useNavigate();
   const { mode } = useMarketMode();
   const { user } = useAuth();
+  const { showNotification } = useNotification();
   const { marketData, loading, error, refreshData } = useDashboardData();
   const isAdmin = user?.role === 'ADMIN';
   
@@ -347,11 +348,6 @@ const StockListPage: React.FC = () => {
                           </AssetInfo>
                         </td>
                         <td>{currency}{price}</td>
-                        <td>
-                          <ChangeValue $up={isUp}>
-                            {isUp ? '+' : ''}{item.change || '0.00'}%
-                          </ChangeValue>
-                        </td>
                         {mode === 'stock' && (
                           <td>
                             {isAdmin ? (
@@ -377,14 +373,21 @@ const StockListPage: React.FC = () => {
                                 <option value="BIST100">BIST 100</option>
                               </select>
                             ) : (
-                              <HStack $gap="4px">
-                                {item.indices?.split(',').map((idx: string) => (
-                                  <IndexBadge key={idx} $type={idx}>{idx}</IndexBadge>
-                                ))}
-                              </HStack>
+                              <S.HStack $gap="4px">
+                                {getHighestIndex(item.indices) && (
+                                  <IndexBadge $type={getHighestIndex(item.indices)}>
+                                    {getHighestIndex(item.indices)}
+                                  </IndexBadge>
+                                )}
+                              </S.HStack>
                             )}
                           </td>
                         )}
+                        <td>
+                          <ChangeValue $up={isUp}>
+                            {isUp ? '+' : ''}{item.change || '0.00'}%
+                          </ChangeValue>
+                        </td>
                         <S.ActionCell>
                           <Button $variant="primary" $size="sm">Detay</Button>
                         </S.ActionCell>
@@ -411,16 +414,18 @@ const StockListPage: React.FC = () => {
                             </AssetInfo>
                           </td>
                           <td style={{ color: '#999' }}>{currency}{item.price || '0.00'}</td>
-                          <td style={{ color: '#999' }}>---</td>
                           {mode === 'stock' && (
-                            <td>
-                              <HStack $gap="4px" style={{ opacity: 0.6 }}>
-                                {item.indices?.split(',').map((idx: string) => (
-                                  <IndexBadge key={idx} $type={idx}>{idx}</IndexBadge>
-                                ))}
-                              </HStack>
-                            </td>
+                             <td>
+                               <S.HStack $gap="4px" style={{ opacity: 0.6 }}>
+                                 {getHighestIndex(item.indices) && (
+                                   <IndexBadge $type={getHighestIndex(item.indices)}>
+                                     {getHighestIndex(item.indices)}
+                                   </IndexBadge>
+                                 )}
+                               </S.HStack>
+                             </td>
                           )}
+                          <td style={{ color: '#999' }}>---</td>
                           <S.ActionCell>
                             <Button $variant="secondary" $size="sm">İncele</Button>
                           </S.ActionCell>
