@@ -151,12 +151,27 @@ const StockListPage: React.FC = () => {
   const [filterIndex, setFilterIndex] = useState<string>('ALL');
   const [updatingSymbol, setUpdatingSymbol] = useState<string | null>(null);
 
-  const handleUpdateIndex = async (symbol: string, newIndices: string) => {
+  const getHighestIndex = (indices: string | null) => {
+    if (!indices) return '';
+    if (indices.includes('BIST30')) return 'BIST30';
+    if (indices.includes('BIST50')) return 'BIST50';
+    if (indices.includes('BIST100')) return 'BIST100';
+    return '';
+  };
+
+  const handleUpdateIndex = async (symbol: string, selectedValue: string) => {
     try {
       setUpdatingSymbol(symbol);
-      const response = await api.patch(`/stock/\${symbol}/admin-update`, { indices: newIndices });
+      
+      // Hiyerarşik etiketleme yapalım
+      let finalIndices = '';
+      if (selectedValue === 'BIST30') finalIndices = 'BIST30,BIST50,BIST100';
+      else if (selectedValue === 'BIST50') finalIndices = 'BIST50,BIST100';
+      else if (selectedValue === 'BIST100') finalIndices = 'BIST100';
+
+      const response = await api.patch(`/stock/${symbol}/admin-update`, { indices: finalIndices });
       if (response.data.success) {
-        showNotification('Hisse endeksi güncellendi', 'success');
+        showNotification(`${symbol} endeksi güncellendi`, 'success');
         refreshData();
       }
     } catch (err: any) {
@@ -341,7 +356,7 @@ const StockListPage: React.FC = () => {
                           <td>
                             {isAdmin ? (
                               <select
-                                value={item.indices || ''}
+                                value={getHighestIndex(item.indices)}
                                 disabled={updatingSymbol === item.symbol}
                                 onChange={(e) => handleUpdateIndex(item.symbol, e.target.value)}
                                 onClick={(e) => e.stopPropagation()}
@@ -357,8 +372,8 @@ const StockListPage: React.FC = () => {
                                 }}
                               >
                                 <option value="">---</option>
-                                <option value="BIST30,BIST50,BIST100">BIST 30</option>
-                                <option value="BIST50,BIST100">BIST 50</option>
+                                <option value="BIST30">BIST 30</option>
+                                <option value="BIST50">BIST 50</option>
                                 <option value="BIST100">BIST 100</option>
                               </select>
                             ) : (
