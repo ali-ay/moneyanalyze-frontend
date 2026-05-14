@@ -95,7 +95,9 @@ const StockDetail: React.FC = () => {
     settingsLoading,
     saveSpecificSettings,
     triggerManualAnalysis,
-    isAnalyzing
+    isAnalyzing,
+    watchlistInfo,
+    updateEntryPrice
   } = useStockDetailLogic(symbol);
 
   if (loading && history.length === 0) {
@@ -117,9 +119,11 @@ const StockDetail: React.FC = () => {
       </S.BackButton>
 
       <PageHeader>
-        <HStack $justify="space-between" $align="flex-start" $fullWidth>
+        <HStack $justify="space-between" $align="flex-start" $fullWidth style={{ flexWrap: 'wrap', gap: '20px' }}>
           <div>
-            <PageTitle>{fundamentals?.name || symbol}</PageTitle>
+            <HStack $gap="sm" $align="center">
+              <PageTitle>{fundamentals?.name || symbol}</PageTitle>
+            </HStack>
             <PageSubtitle>{symbol} • BIST</PageSubtitle>
             <S.PriceDisplayWrapper>
                 <PriceDisplay>
@@ -133,6 +137,48 @@ const StockDetail: React.FC = () => {
                 </PriceDisplay>
             </S.PriceDisplayWrapper>
           </div>
+
+          {watchlistInfo && (
+            <Card style={{ minWidth: '240px', border: '1px solid #1A73E820', background: '#1A73E805' }}>
+              <Card.Body style={{ padding: '12px 16px' }}>
+                <div style={{ fontSize: '0.75rem', color: '#5F6368', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Zap size={14} color="#1A73E8" /> İZLEME LİSTESİ DURUMU
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontSize: '0.65rem', color: '#9AA0A6' }}>Giriş Fiyatı</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800 }}>₺{watchlistInfo.entryPrice.toFixed(2)}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '0.65rem', color: '#9AA0A6' }}>Kâr/Zarar</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: (price - watchlistInfo.entryPrice) >= 0 ? '#0F9D58' : '#DB4437' }}>
+                      %{(((price - watchlistInfo.entryPrice) / watchlistInfo.entryPrice) * 100).toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Bölünme Uyarısı ve Düzeltme */}
+                {Math.abs(((price - watchlistInfo.entryPrice) / watchlistInfo.entryPrice) * 100) > 35 && (
+                   <div style={{ marginTop: '12px', padding: '8px', background: '#F4B40015', borderRadius: '8px', border: '1px solid #F4B40030' }}>
+                      <div style={{ fontSize: '0.65rem', color: '#B08900', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <AlertCircle size={12} /> OLASI BÖLÜNME TESPİT EDİLDİ
+                      </div>
+                      <Button 
+                        $variant="primary" 
+                        $size="sm" 
+                        style={{ width: '100%', marginTop: '6px', fontSize: '10px', height: '24px' }}
+                        onClick={() => {
+                          const newPrice = prompt("Yeni giriş fiyatını (maliyeti) giriniz:", (watchlistInfo.entryPrice / 2).toString());
+                          if (newPrice) updateEntryPrice(parseFloat(newPrice));
+                        }}
+                      >
+                        Maliyeti Düzelt
+                      </Button>
+                   </div>
+                )}
+              </Card.Body>
+            </Card>
+          )}
         </HStack>
       </PageHeader>
 

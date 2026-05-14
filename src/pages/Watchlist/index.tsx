@@ -156,7 +156,9 @@ const Watchlist: React.FC = () => {
     filterSymbol,
     setFilterSymbol,
     availablePeriods,
-    summaryStats
+    summaryStats,
+    filterIndex,
+    setFilterIndex
   } = useWatchlistLogic();
 
   const [adding, setAdding] = useState(false);
@@ -253,6 +255,17 @@ const Watchlist: React.FC = () => {
               <option value="LOSS">Durum: Zararda ✗</option>
               <option value="NEUTRAL">Durum: Nötr</option>
             </S.FilterSelect>
+            {mode === 'stock' && (
+              <S.FilterSelect
+                value={filterIndex}
+                onChange={(e) => setFilterIndex(e.target.value)}
+              >
+                <option value="ALL">Endeks: Tümü</option>
+                <option value="BIST30">Endeks: BIST 30</option>
+                <option value="BIST50">Endeks: BIST 50</option>
+                <option value="BIST100">Endeks: BIST 100</option>
+              </S.FilterSelect>
+            )}
           </S.FilterWrapper>
 
           {summaryStats && (
@@ -313,7 +326,9 @@ const Watchlist: React.FC = () => {
                     return (
                       <Tr key={item.id}>
                         <S.SymbolCell onClick={() => navigate(`/dashboard/stock/${item.symbol.replace('.IS', '')}`)} style={{ cursor: 'pointer' }}>
-                          <div className="symbol">{item.symbol}</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <div className="symbol">{item.symbol}</div>
+                          </div>
                           <S.SymbolName title={item.name}>
                             {item.name && item.name.length > 17
                               ? `${item.name.substring(0, 17)}...`

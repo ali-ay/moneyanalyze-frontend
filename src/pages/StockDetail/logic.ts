@@ -47,6 +47,33 @@ export const useStockDetailLogic = (symbol?: string) => {
   const [specificSettings, setSpecificSettings] = useState<any>(null);
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [watchlistInfo, setWatchlistInfo] = useState<{ entryPrice: number; id: number } | null>(null);
+
+  const fetchWatchlistInfo = useCallback(async () => {
+    if (!symbol) return;
+    try {
+      const cleanSymbol = symbol.replace('.IS', '');
+      const res = await apiClient.get(`/stock/watchlist-info/${cleanSymbol}`);
+      if (res.data.success) {
+        setWatchlistInfo(res.data.data);
+      }
+    } catch (err) {
+      // Sessiz hata (izleme listesinde olmayabilir)
+    }
+  }, [symbol]);
+
+  const updateEntryPrice = async (newPrice: number) => {
+    if (!symbol || !watchlistInfo) return;
+    try {
+      await apiClient.post('/stock/update-entry-price', {
+        symbol: symbol.replace('.IS', ''),
+        newPrice
+      });
+      fetchWatchlistInfo();
+    } catch (err) {
+      console.error("Entry price update error:", err);
+    }
+  };
 
   const abortRef = useRef<AbortController | null>(null);
 
@@ -137,7 +164,8 @@ export const useStockDetailLogic = (symbol?: string) => {
     fetchBacktest(backtestPeriod);
     fetchOptimization(backtestPeriod);
     fetchSpecificSettings(backtestPeriod);
-  }, [backtestPeriod, fetchBacktest, fetchOptimization, fetchSpecificSettings]);
+    fetchWatchlistInfo();
+  }, [backtestPeriod, fetchBacktest, fetchOptimization, fetchSpecificSettings, fetchWatchlistInfo]);
 
   const fetchHistory = useCallback(async () => {
     if (!symbol) return;
@@ -159,7 +187,8 @@ export const useStockDetailLogic = (symbol?: string) => {
         dividendYield: quote.dividendYield,
         high52w: quote.fiftyTwoWeekHigh,
         low52w: quote.fiftyTwoWeekLow,
-        name: quote.name
+        name: quote.name,
+        indices: quote.indices
       });
 
       const analysisRes = await apiClient.post('/stock/analyze', {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Search, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Search, Loader2, AlertCircle, ArrowLeft, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -59,6 +59,11 @@ const DataTable = styled.table`
     text-transform: uppercase;
     letter-spacing: 1px;
     border-bottom: 1px solid #F1F3F4;
+    cursor: pointer;
+    transition: background 0.2s;
+    &:hover {
+      background: #F8F9FA;
+    }
   }
   td {
     padding: 16px;
@@ -95,9 +100,24 @@ const AssetInfo = styled.div`
   .label-box {
     display: flex;
     flex-direction: column;
+    .name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
     .name { font-weight: 700; color: #202124; }
     .symbol { font-size: 0.6875rem; color: #5F6368; }
   }
+`;
+
+const IndexBadge = styled.span<{ $type: string }>`
+  font-size: 0.625rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 800;
+  background: ${props => props.$type === 'BIST30' ? '#E8F0FE' : '#F1F3F4'};
+  color: ${props => props.$type === 'BIST30' ? '#1A73E8' : '#5F6368'};
+  border: 1px solid ${props => props.$type === 'BIST30' ? '#1A73E820' : '#DADCE0'};
 `;
 
 const ChangeValue = styled.span<{ $up?: boolean }>`
@@ -116,25 +136,70 @@ const LoadingBox = styled.div`
 `;
 
 const StockListPage: React.FC = () => {
-  console.log('🔥 StockListPage komponenti yüklendi!');
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const { mode } = useMarketMode();
   const { marketData, loading, error } = useDashboardData();
+  
+  const [sortKey, setSortKey] = useState<string>('symbol');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [filterIndex, setFilterIndex] = useState<string>('ALL');
 
   useEffect(() => {
     console.log('📊 Stock List Data:', marketData);
-    console.log('📈 Total items:', marketData.length);
-    console.log('⚙️ Loading:', loading);
-    console.log('❌ Error:', error);
-  }, [marketData, loading, error]);
+  }, [marketData]);
 
-  const filteredData = marketData.filter(item =>
-    item.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const handleSort = (key: string) => {
+    if (sortKey === key) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortKey(key);
+      setSortDirection('asc');
+    }
+  };
+
+  const getSortedData = () => {
+    let filtered = marketData.filter(item =>
+      item.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+
+    if (filterIndex !== 'ALL') {
+      filtered = filtered.filter(item => item.indices?.includes(filterIndex));
+    }
+
+    return [...filtered].sort((a, b) => {
+      let valA: any = a[sortKey as keyof typeof a];
+      let valB: any = b[sortKey as keyof typeof b];
+
+      // Özel durumlar için düzeltme
+      if (sortKey === 'price' || sortKey === 'change' || sortKey === 'changePercent') {
+        valA = parseFloat(valA || '0');
+        valB = parseFloat(valB || '0');
+      } else if (typeof valA === 'string') {
+        valA = valA.toLowerCase();
+        valB = valB.toLowerCase();
+      }
+
+      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  };
+
+  const sortedData = getSortedData();
+
+  const SortIcon = ({ column }: { column: string }) => {
+    if (sortKey !== column) return <ArrowUpDown size={12} style={{ marginLeft: 4, opacity: 0.3 }} />;
+    return sortDirection === 'asc' ? 
+      <ChevronUp size={12} style={{ marginLeft: 4, color: '#1A73E8' }} /> : 
+      <ChevronDown size={12} style={{ marginLeft: 4, color: '#1A73E8' }} />;
+  };
   const title = mode === 'stock' ? 'Tüm Borsa Hisseleri' : 'Tüm Kripto Varlıklar';
   const currency = mode === 'stock' ? '₺' : '$';
+
+  const activeStocks = sortedData.filter(s => s.isActive !== false);
+  const backlogStocks = sortedData.filter(s => s.isActive === false);
 
   return (
     <S.PageContainer>
@@ -158,9 +223,32 @@ const StockListPage: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+            {mode === 'stock' && (
+              <select 
+                value={filterIndex}
+                onChange={(e) => setFilterIndex(e.target.value)}
+                style={{
+                  padding: '4px 8px',
+                  marginLeft: '8px',
+                  borderRadius: '6px',
+                  border: '1px solid #DADCE0',
+                  outline: 'none',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  color: '#3C4043',
+                  cursor: 'pointer',
+                  background: '#F8F9FA'
+                }}
+              >
+                <option value="ALL">Tümü</option>
+                <option value="BIST30">BIST 30</option>
+                <option value="BIST50">BIST 50</option>
+                <option value="BIST100">BIST 100</option>
+              </select>
+            )}
           </SearchContainer>
           <S.ItemCount>
-            Toplam: {filteredData.length} Varlık
+            Aktif: {activeStocks.length} | Backlog: {backlogStocks.length}
           </S.ItemCount>
         </S.CardHeader>
         <Card.Body $noPadding>
@@ -179,14 +267,26 @@ const StockListPage: React.FC = () => {
               <DataTable>
                 <thead>
                   <tr>
-                    <th>VARLIK</th>
-                    <th>FİYAT</th>
-                    <th>24S DEĞİŞİM</th>
+                    <th onClick={() => handleSort('symbol')}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        VARLIK <SortIcon column="symbol" />
+                      </div>
+                    </th>
+                    <th onClick={() => handleSort('price')}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        FİYAT <SortIcon column="price" />
+                      </div>
+                    </th>
+                    <th onClick={() => handleSort('change')}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        24S DEĞİŞİM <SortIcon column="change" />
+                      </div>
+                    </th>
                     <S.HeaderCell>İŞLEM</S.HeaderCell>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredData.map((item) => {
+                  {activeStocks.map((item) => {
                     const price = item.price || '0.00';
                     const change = parseFloat(item.change || '0');
                     const isUp = change >= 0;
@@ -197,7 +297,9 @@ const StockListPage: React.FC = () => {
                           <AssetInfo>
                             <div className="icon">{item.symbol.substring(0, 3)}</div>
                             <div className="label-box">
-                              <div className="name">{item.symbol}</div>
+                              <div className="name-row">
+                                <div className="name">{item.symbol}</div>
+                              </div>
                               <div className="symbol">{mode === 'stock' ? item.name : `${item.symbol}/USDT`}</div>
                             </div>
                           </AssetInfo>
@@ -214,6 +316,34 @@ const StockListPage: React.FC = () => {
                       </TableRow>
                     );
                   })}
+
+                  {backlogStocks.length > 0 && (
+                    <>
+                      <tr style={{ background: '#F1F3F4' }}>
+                        <td colSpan={4} style={{ padding: '10px 16px', fontSize: '0.65rem', fontWeight: 800, color: '#5F6368', letterSpacing: '1px' }}>
+                          PASİF / VERİSİ GÜNCELLENMEYEN HİSSELER (BACKLOG)
+                        </td>
+                      </tr>
+                      {backlogStocks.map((item) => (
+                        <TableRow key={item.symbol} style={{ opacity: 0.5 }} onClick={() => navigate(mode === 'stock' ? `/dashboard/stock/${item.symbol}` : `/dashboard/coin/${item.symbol}`)}>
+                          <td>
+                            <AssetInfo>
+                              <div className="icon" style={{ background: '#eee', color: '#999' }}>{item.symbol.substring(0, 3)}</div>
+                              <div className="label-box">
+                                <div className="name" style={{ color: '#666' }}>{item.symbol}</div>
+                                <div className="symbol">{mode === 'stock' ? item.name : `${item.symbol}/USDT`}</div>
+                              </div>
+                            </AssetInfo>
+                          </td>
+                          <td style={{ color: '#999' }}>{currency}{item.price || '0.00'}</td>
+                          <td style={{ color: '#999' }}>---</td>
+                          <S.ActionCell>
+                            <Button $variant="secondary" $size="sm">İncele</Button>
+                          </S.ActionCell>
+                        </TableRow>
+                      ))}
+                    </>
+                  )}
                 </tbody>
               </DataTable>
             </S.TableWrapper>

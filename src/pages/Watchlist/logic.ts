@@ -12,6 +12,7 @@ export interface WatchlistItem {
   profitPercent: number;
   priceChangePercent?: number;
   name: string;
+  indices?: string;
   createdAt: string;
   aiData?: {
     targetPrice: number;
@@ -107,6 +108,7 @@ export const useWatchlistLogic = () => {
   const [filterPeriod, setFilterPeriod] = useState<string>('ALL');
   const [filterProfit, setFilterProfit] = useState<'ALL' | 'PROFIT' | 'LOSS' | 'NEUTRAL'>('ALL');
   const [filterSymbol, setFilterSymbol] = useState<string>('');
+  const [filterIndex, setFilterIndex] = useState<string>('ALL');
 
   const filteredAndSortedData = useMemo(() => {
     let data = [...watchlist];
@@ -114,6 +116,11 @@ export const useWatchlistLogic = () => {
     // Filter by period
     if (filterPeriod !== 'ALL') {
       data = data.filter(item => item.period === filterPeriod);
+    }
+
+    // Filter by index
+    if (filterIndex !== 'ALL') {
+      data = data.filter(item => (item as any).indices?.includes(filterIndex));
     }
 
     // Filter by symbol/name search
@@ -186,6 +193,8 @@ export const useWatchlistLogic = () => {
     setFilterProfit,
     filterSymbol,
     setFilterSymbol,
+    filterIndex,
+    setFilterIndex,
     availablePeriods,
     summaryStats
   };

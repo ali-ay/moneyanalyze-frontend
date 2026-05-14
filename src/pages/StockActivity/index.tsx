@@ -210,16 +210,18 @@ const StockActivityPage: React.FC = () => {
   const [filterAction, setFilterAction] = useState<'ALL' | 'ADD' | 'REMOVE'>('ALL');
   const [filterProfit, setFilterProfit] = useState<'ALL' | 'PROFIT' | 'LOSS' | 'NEUTRAL'>('ALL');
   const [filterPeriod, setFilterPeriod] = useState<string>('ALL');
+  const [filterIndex, setFilterIndex] = useState<string>('ALL');
   const [stats, setStats] = useState({
     totalProfit: 0,
     avgProfit: 0,
     successRate: 0,
     completedTrades: 0
   });
+  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'createdAt', direction: 'desc' });
 
-  const fetchLogs = async (pageNum: number, append: boolean = false, search: string = searchTerm, period: string = filterPeriod) => {
+  const fetchLogs = async (pageNum: number, append: boolean = false, search: string = searchTerm, period: string = filterPeriod, index: string = filterIndex, sKey: string = sortConfig.key, sDir: string = sortConfig.direction) => {
     try {
-      const response = await api.get(`/stock/activity-logs?page=${pageNum}&search=${search}&period=${period}`);
+      const response = await api.get(`/stock/activity-logs?page=${pageNum}&search=${search}&period=${period}&index=${index}&sortKey=${sKey}&sortOrder=${sDir}`);
       if (response.data.success) {
         const newLogs = response.data.data;
         setTotal(response.data.total || 0);
@@ -273,15 +275,31 @@ const StockActivityPage: React.FC = () => {
     fetchLogs(1);
   }, []);
 
-  // Arama değiştiğinde debounced fetch
+  // Sadece arama (Search) için gecikme (debounce) kullanalım
   useEffect(() => {
+    if (!searchTerm.trim()) return;
+
     const delayDebounceFn = setTimeout(() => {
       setPage(1);
-      fetchLogs(1, false, searchTerm, filterPeriod);
+      fetchLogs(1, false, searchTerm, filterPeriod, filterIndex, sortConfig.key, sortConfig.direction);
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm, filterPeriod]);
+  }, [searchTerm]);
+
+  // Dropdown filtreleri veya Sıralama değiştiğinde ANINDA fetch yap
+  useEffect(() => {
+    setPage(1);
+    fetchLogs(1, false, searchTerm, filterPeriod, filterIndex, sortConfig.key, sortConfig.direction);
+  }, [filterPeriod, filterIndex, filterAction, filterProfit, sortConfig]);
+
+  const requestSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
 
   useEffect(() => {
     // Canlı fiyatları güncellemek için interval
@@ -289,18 +307,18 @@ const StockActivityPage: React.FC = () => {
     // Ancak kullanıcı bir filtre seçmişse de o filtreye göre güncellenmesi iyidir
     const interval = setInterval(() => {
       if (page === 1 && !loadingMore && !isCleaning) {
-        fetchLogs(1, false, searchTerm, filterPeriod);
+        fetchLogs(1, false, searchTerm, filterPeriod, filterIndex, sortConfig.key, sortConfig.direction);
       }
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [page, loadingMore, isCleaning, searchTerm, filterPeriod]);
+  }, [page, loadingMore, isCleaning, searchTerm, filterPeriod, filterIndex, sortConfig]);
 
   const handleLoadMore = () => {
     setLoadingMore(true);
     const nextPage = page + 1;
     setPage(nextPage);
-    fetchLogs(nextPage, true, searchTerm, filterPeriod);
+    fetchLogs(nextPage, true, searchTerm, filterPeriod, filterIndex, sortConfig.key, sortConfig.direction);
   };
 
   const filteredLogs = React.useMemo(() => {
@@ -429,6 +447,16 @@ const StockActivityPage: React.FC = () => {
           <option value="LOSS">Durum: Zararda ✗</option>
           <option value="NEUTRAL">Durum: Nötr</option>
         </S.FilterSelect>
+
+        <S.FilterSelect
+          value={filterIndex}
+          onChange={e => setFilterIndex(e.target.value)}
+        >
+          <option value="ALL">Endeks: Tümü</option>
+          <option value="BIST30">Endeks: BIST 30</option>
+          <option value="BIST50">Endeks: BIST 50</option>
+          <option value="BIST100">Endeks: BIST 100</option>
+        </S.FilterSelect>
       </S.FilterWrapper>
 
       <S.TableWrapper>
@@ -441,11 +469,19 @@ const StockActivityPage: React.FC = () => {
             <LogTable>
               <thead>
                 <tr>
-                  <Th>İşlem Tarihi</Th>
-                  <Th>Varlık / Periyot</Th>
-                  <Th>İşlem Tipi</Th>
+                  <Th style={{ cursor: 'pointer' }} onClick={() => requestSort('createdAt')}>
+                    İşlem Tarihi {sortConfig.key === 'createdAt' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                  </Th>
+                  <Th style={{ cursor: 'pointer' }} onClick={() => requestSort('symbol')}>
+                    Varlık / Periyot {sortConfig.key === 'symbol' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                  </Th>
+                  <Th style={{ cursor: 'pointer' }} onClick={() => requestSort('action')}>
+                    İşlem Tipi {sortConfig.key === 'action' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                  </Th>
                   <Th>Birim Fiyatlar</Th>
-                  <Th>Performans</Th>
+                  <Th style={{ cursor: 'pointer' }} onClick={() => requestSort('profit')}>
+                    Performans {sortConfig.key === 'profit' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                  </Th>
                   <Th>Analiz Notu</Th>
                 </tr>
               </thead>
@@ -471,7 +507,9 @@ const StockActivityPage: React.FC = () => {
                       </Td>
                       <Td>
                         <VStack $gap="4px">
-                          <S.SymbolText>{log.symbol.replace('.IS', '')}</S.SymbolText>
+                          <HStack $gap="6px" $align="center">
+                            <S.SymbolText>{log.symbol.replace('.IS', '')}</S.SymbolText>
+                          </HStack>
                           <S.PeriodBadge>
                             <span className="full-text">{log.period?.toUpperCase()} TARAMASI</span>
                             <span className="short-text">{log.period?.toUpperCase()}</span>
@@ -501,8 +539,8 @@ const StockActivityPage: React.FC = () => {
                             </VStack>
 
                             <VStack>
-                              <Label>{isAdd ? 'Anlık' : 'Çıkış'}</Label>
-                              <S.PriceWithColor $entryPrice={isAdd}>
+                              <Label>{isAdd ? (log.displayLabel || 'Anlık') : 'Çıkış'}</Label>
+                              <S.PriceWithColor $entryPrice={isAdd} style={{ color: log.isClosed ? '#5F6368' : undefined }}>
                                 ₺{(isAdd ? log.currentPrice : log.exitPrice)?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || '---'}
                               </S.PriceWithColor>
                             </VStack>
@@ -514,7 +552,7 @@ const StockActivityPage: React.FC = () => {
                           <S.CalculatingText>---</S.CalculatingText>
                         ) : (
                           <VStack $gap="4px">
-                            <Label>{isAdd ? 'Kar/Zarar' : 'Net K/Z'}</Label>
+                            <Label>{isAdd ? (log.isClosed ? 'Net Sonuç' : 'Kar/Zarar') : 'Net K/Z'}</Label>
                             {profitValue !== null && profitValue !== undefined ? (
                               <S.ProfitBadgeWithSize $positive={isPositive}>
                                 {isPositive ? '+' : ''}{profitValue.toFixed(2)}%
