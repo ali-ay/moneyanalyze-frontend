@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Search, Loader2, AlertCircle, ArrowLeft, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react';
+import { Search, Loader2, AlertCircle, ArrowLeft, ArrowUpDown, ChevronUp, ChevronDown, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { useAuth } from '../../app/providers/AuthContext';
+import { useNotification } from '../../app/providers/NotificationContext';
+import api from '../../services/apiClient';
 import { useDashboardData } from '../../features/dashboard/hooks/useDashboardData';
 import { useMarketMode } from '../../context/MarketModeContext';
 import * as S from './StockList.styles';
@@ -139,11 +142,29 @@ const StockListPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const { mode } = useMarketMode();
-  const { marketData, loading, error } = useDashboardData();
+  const { user } = useAuth();
+  const { marketData, loading, error, refreshData } = useDashboardData();
+  const isAdmin = user?.role === 'ADMIN';
   
   const [sortKey, setSortKey] = useState<string>('symbol');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [filterIndex, setFilterIndex] = useState<string>('ALL');
+  const [updatingSymbol, setUpdatingSymbol] = useState<string | null>(null);
+
+  const handleUpdateIndex = async (symbol: string, newIndices: string) => {
+    try {
+      setUpdatingSymbol(symbol);
+      const response = await api.patch(`/stock/\${symbol}/admin-update`, { indices: newIndices });
+      if (response.data.success) {
+        showNotification('Hisse endeksi güncellendi', 'success');
+        refreshData();
+      }
+    } catch (err: any) {
+      showNotification(err.response?.data?.message || 'Güncelleme başarısız', 'error');
+    } finally {
+      setUpdatingSymbol(null);
+    }
+  };
 
   useEffect(() => {
     console.log('📊 Stock List Data:', marketData);
@@ -223,30 +244,29 @@ const StockListPage: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            {mode === 'stock' && (
-              <select 
-                value={filterIndex}
-                onChange={(e) => setFilterIndex(e.target.value)}
-                style={{
-                  padding: '4px 8px',
-                  marginLeft: '8px',
-                  borderRadius: '6px',
-                  border: '1px solid #DADCE0',
-                  outline: 'none',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  color: '#3C4043',
-                  cursor: 'pointer',
-                  background: '#F8F9FA'
-                }}
-              >
-                <option value="ALL">Tümü</option>
-                <option value="BIST30">BIST 30</option>
-                <option value="BIST50">BIST 50</option>
-                <option value="BIST100">BIST 100</option>
-              </select>
-            )}
           </SearchContainer>
+          {mode === 'stock' && (
+            <select 
+              value={filterIndex}
+              onChange={(e) => setFilterIndex(e.target.value)}
+              style={{
+                padding: '8px 12px',
+                borderRadius: '8px',
+                border: '1px solid #DADCE0',
+                outline: 'none',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                color: '#3C4043',
+                cursor: 'pointer',
+                background: '#F8F9FA'
+              }}
+            >
+              <option value="ALL">Tüm Endeksler</option>
+              <option value="BIST30">BIST 30</option>
+              <option value="BIST50">BIST 50</option>
+              <option value="BIST100">BIST 100</option>
+            </select>
+          )}
           <S.ItemCount>
             Aktif: {activeStocks.length} | Backlog: {backlogStocks.length}
           </S.ItemCount>
@@ -277,6 +297,13 @@ const StockListPage: React.FC = () => {
                         FİYAT <SortIcon column="price" />
                       </div>
                     </th>
+                    {mode === 'stock' && (
+                      <th onClick={() => handleSort('indices')}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          ENDEKS {isAdmin && <Settings size={12} style={{ marginLeft: 4 }} />} <SortIcon column="indices" />
+                        </div>
+                      </th>
+                    )}
                     <th onClick={() => handleSort('change')}>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
                         24S DEĞİŞİM <SortIcon column="change" />
@@ -310,6 +337,39 @@ const StockListPage: React.FC = () => {
                             {isUp ? '+' : ''}{item.change || '0.00'}%
                           </ChangeValue>
                         </td>
+                        {mode === 'stock' && (
+                          <td>
+                            {isAdmin ? (
+                              <select
+                                value={item.indices || ''}
+                                disabled={updatingSymbol === item.symbol}
+                                onChange={(e) => handleUpdateIndex(item.symbol, e.target.value)}
+                                onClick={(e) => e.stopPropagation()}
+                                style={{
+                                  padding: '4px 8px',
+                                  fontSize: '0.75rem',
+                                  borderRadius: '6px',
+                                  border: '1px solid #DADCE0',
+                                  background: updatingSymbol === item.symbol ? '#F1F3F4' : '#FFF',
+                                  color: '#3C4043',
+                                  fontWeight: 600,
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                <option value="">---</option>
+                                <option value="BIST30,BIST50,BIST100">BIST 30</option>
+                                <option value="BIST50,BIST100">BIST 50</option>
+                                <option value="BIST100">BIST 100</option>
+                              </select>
+                            ) : (
+                              <HStack $gap="4px">
+                                {item.indices?.split(',').map((idx: string) => (
+                                  <IndexBadge key={idx} $type={idx}>{idx}</IndexBadge>
+                                ))}
+                              </HStack>
+                            )}
+                          </td>
+                        )}
                         <S.ActionCell>
                           <Button $variant="primary" $size="sm">Detay</Button>
                         </S.ActionCell>
@@ -320,7 +380,7 @@ const StockListPage: React.FC = () => {
                   {backlogStocks.length > 0 && (
                     <>
                       <tr style={{ background: '#F1F3F4' }}>
-                        <td colSpan={4} style={{ padding: '10px 16px', fontSize: '0.65rem', fontWeight: 800, color: '#5F6368', letterSpacing: '1px' }}>
+                        <td colSpan={mode === 'stock' ? 5 : 4} style={{ padding: '10px 16px', fontSize: '0.65rem', fontWeight: 800, color: '#5F6368', letterSpacing: '1px' }}>
                           PASİF / VERİSİ GÜNCELLENMEYEN HİSSELER (BACKLOG)
                         </td>
                       </tr>
@@ -337,6 +397,15 @@ const StockListPage: React.FC = () => {
                           </td>
                           <td style={{ color: '#999' }}>{currency}{item.price || '0.00'}</td>
                           <td style={{ color: '#999' }}>---</td>
+                          {mode === 'stock' && (
+                            <td>
+                              <HStack $gap="4px" style={{ opacity: 0.6 }}>
+                                {item.indices?.split(',').map((idx: string) => (
+                                  <IndexBadge key={idx} $type={idx}>{idx}</IndexBadge>
+                                ))}
+                              </HStack>
+                            </td>
+                          )}
                           <S.ActionCell>
                             <Button $variant="secondary" $size="sm">İncele</Button>
                           </S.ActionCell>
