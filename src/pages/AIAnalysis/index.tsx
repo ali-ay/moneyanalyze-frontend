@@ -173,6 +173,43 @@ const Metric = styled.div`
   }
 `;
 
+const DetailLink = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1A73E8;
+  margin-top: 16px;
+  text-decoration: none;
+`;
+
+const ProgressBarContainer = styled.div`
+  width: 100%;
+  height: 6px;
+  background-color: #F1F3F4;
+  border-radius: 4px;
+  margin: 8px 0;
+  overflow: hidden;
+  display: flex;
+`;
+
+const ProgressFill = styled.div<{ $percent: number }>`
+  height: 100%;
+  background-color: #0F9D58;
+  width: ${props => props.$percent}%;
+  transition: width 0.3s ease;
+`;
+
+const ProgressTextRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #5F6368;
+`;
+
 const periods = [
   { id: 'weekly', label: 'Haftalık' },
   { id: 'monthly', label: 'Aylık' },
@@ -231,12 +268,34 @@ const AIAnalysis: React.FC = () => {
         <>
           {opportunities.length > 0 ? (
             <Grid>
-              {opportunities.map(opp => {
+              {[...opportunities].sort((a, b) => {
+                const getIndexWeight = (indices: string | null) => {
+                  if (!indices) return 0;
+                  if (indices.includes('BIST30')) return 4;
+                  if (indices.includes('BIST50')) return 3;
+                  if (indices.includes('BIST100')) return 2;
+                  return 1;
+                };
+                const weightA = getIndexWeight(a.indices);
+                const weightB = getIndexWeight(b.indices);
+                if (weightA !== weightB) return weightB - weightA;
+                return b.strengthScore - a.strengthScore;
+              }).map(opp => {
                 const cleanSym = opp.symbol.replace('.IS', '').toUpperCase();
                 const currentPrice = livePrices[cleanSym] || (opp.data as any)?.price || 0;
                 const entryPrice = opp.entryPrice || 0;
                 const profit = entryPrice > 0 ? ((currentPrice - entryPrice) / entryPrice * 100).toFixed(2) : '0.00';
                 const isPositive = parseFloat(profit) >= 0;
+                
+                const targetPrice = opp.data?.aiPredictions?.targetPrice || 0;
+                let progressPercent = 0;
+                
+                if (entryPrice > 0 && targetPrice > entryPrice) {
+                  const totalExpectedProfit = targetPrice - entryPrice;
+                  const currentProfit = currentPrice - entryPrice;
+                  progressPercent = Math.max(0, Math.min(100, (currentProfit / totalExpectedProfit) * 100));
+                }
+                const remainingPercent = 100 - progressPercent;
 
                 let starColor = null;
                 if (opp.indices?.includes('BIST30')) starColor = '#FFD700'; // Gold
@@ -257,6 +316,16 @@ const AIAnalysis: React.FC = () => {
                     </SignalTags>
 
                     <Metric>
+                      <span className="label">Eklendiği Tarih:</span>
+                      <span className="value">{new Date(opp.createdAt).toLocaleDateString('tr-TR')}</span>
+                    </Metric>
+                    <Metric>
+                      <span className="label">Son Tarama:</span>
+                      <S.LastScanDate className="value">
+                        {new Date(opp.updatedAt).toLocaleDateString('tr-TR')}
+                      </S.LastScanDate>
+                    </Metric>
+                    <Metric>
                       <span className="label">Analiz Fiyatı:</span>
                       <span className="value">₺{entryPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</span>
                     </Metric>
@@ -267,21 +336,33 @@ const AIAnalysis: React.FC = () => {
                       </S.CurrentPriceValue>
                     </Metric>
                     <Metric>
+                      <span className="label">AI Hedef (Tahmin):</span>
+                      <span className="value" style={{ color: '#0F9D58', fontWeight: 800 }}>
+                        ₺{targetPrice > 0 ? targetPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) : '---'}
+                      </span>
+                    </Metric>
+                    <Metric>
                       <span className="label">Potansiyel Getiri:</span>
                       <S.ProfitValue className="value" $positive={isPositive}>
                         {isPositive ? '+' : ''}{profit}%
                       </S.ProfitValue>
                     </Metric>
-                    <Metric>
-                      <span className="label">Son Tarama:</span>
-                      <S.LastScanDate className="value">
-                        {new Date(opp.updatedAt).toLocaleDateString('tr-TR')}
-                      </S.LastScanDate>
-                    </Metric>
 
-                    <S.DetailLink>
+                    {targetPrice > 0 && (
+                      <div style={{ marginTop: '16px', padding: '12px', background: '#F8F9FA', borderRadius: '12px' }}>
+                        <ProgressTextRow>
+                          <span style={{ color: '#0F9D58' }}>İlerleme: %{progressPercent.toFixed(0)}</span>
+                          <span>Hedefe Kalan: %{remainingPercent.toFixed(0)}</span>
+                        </ProgressTextRow>
+                        <ProgressBarContainer>
+                          <ProgressFill $percent={progressPercent} />
+                        </ProgressBarContainer>
+                      </div>
+                    )}
+
+                    <DetailLink>
                       DETAYLI ANALİZ <ChevronRight size={14} />
-                    </S.DetailLink>
+                    </DetailLink>
                   </OpportunityCard>
                 );
               })}
