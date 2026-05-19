@@ -108,6 +108,23 @@ export const useProfileLogic = () => {
     }
   };
 
+  const resetAiData = async () => {
+    if (!window.confirm('Tüm yapay zeka analiz geçmişiniz ve izleme listeniz KALICI olarak silinecektir. Bu işlem geri alınamaz! Devam etmek istiyor musunuz?')) {
+      return;
+    }
+
+    try {
+      setSaving(true);
+      await api.post('/users/reset-ai-data');
+      setSuccess('Yapay Zeka Analiz geçmişiniz başarıyla sıfırlandı.');
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Yapay Zeka verileri sıfırlanamadı.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const [progress, setProgress] = useState<{ current: number; total: number; isRunning: boolean; message: string } | null>(null);
   const [historyProgress, setHistoryProgress] = useState<{ current: number; total: number; isSyncing: boolean; percent: number; currentSymbol: string } | null>(null);
   const [tailscaleSyncProgress, setTailscaleSyncProgress] = useState<{ current: number; total: number; isSyncing: boolean; message: string } | null>(null);
@@ -271,6 +288,7 @@ export const useProfileLogic = () => {
     tradingMode, setTradingMode,
     updateProfile,
     resetAccount,
+    resetAiData,
     runAIScan,
     runFullHistorySync,
     runTailscaleSync

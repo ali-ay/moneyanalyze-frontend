@@ -225,7 +225,7 @@ const ProfilePage = () => {
     binanceApiKey, setBinanceApiKey,
     binanceSecretKey, setBinanceSecretKey,
     tradingMode, setTradingMode,
-    updateProfile, resetAccount,
+    updateProfile, resetAccount, resetAiData,
     runAIScan, runFullHistorySync, runTailscaleSync,
     progress, historyProgress, tailscaleSyncProgress,
   } = useProfileLogic();
@@ -553,10 +553,19 @@ const ProfilePage = () => {
 
           <S.ResetButton
             type="button"
+            onClick={resetAiData}
+            disabled={saving || (progress?.isRunning ?? false)}
+            style={{ marginLeft: 'auto', background: 'rgba(244, 180, 0, 0.1)', color: '#F4B400', border: '1px solid rgba(244, 180, 0, 0.3)' }}
+          >
+            <Zap size={16} /> AI Geçmişini Temizle
+          </S.ResetButton>
+
+          <S.ResetButton
+            type="button"
             onClick={resetAccount}
             disabled={saving || (progress?.isRunning ?? false)}
           >
-            <AlertCircle size={16} /> Hesabı Sıfırla
+            <AlertCircle size={16} /> Tüm Hesabı Sıfırla
           </S.ResetButton>
         </S.ButtonGroup>
       </form>
