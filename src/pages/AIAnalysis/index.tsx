@@ -8,7 +8,8 @@ import {
   Loader2,
   TrendingUp,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  Star
 } from 'lucide-react';
 import { PageContainer, PageHeader, PageTitle, PageSubtitle } from '../../components/ui/Layout.styles';
 import { Card } from '../../components/ui/Card';
@@ -121,6 +122,9 @@ const Symbol = styled.div`
   font-weight: 800;
   color: #202124;
   margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 
   @media (max-width: 768px) {
     font-size: 1.125rem;
@@ -234,10 +238,18 @@ const AIAnalysis: React.FC = () => {
                 const profit = entryPrice > 0 ? ((currentPrice - entryPrice) / entryPrice * 100).toFixed(2) : '0.00';
                 const isPositive = parseFloat(profit) >= 0;
 
+                let starColor = null;
+                if (opp.indices?.includes('BIST30')) starColor = '#FFD700'; // Gold
+                else if (opp.indices?.includes('BIST50')) starColor = '#C0C0C0'; // Silver
+                else if (opp.indices?.includes('BIST100')) starColor = '#CD7F32'; // Bronze
+
                 return (
                   <OpportunityCard key={opp.id} onClick={() => navigate(`/dashboard/stock/${opp.symbol}`)}>
                     <ScoreBadge $score={opp.strengthScore}>SKOR: {opp.strengthScore}</ScoreBadge>
-                    <Symbol>{cleanSym}</Symbol>
+                    <Symbol>
+                      {cleanSym}
+                      {starColor && <Star size={18} fill={starColor} color={starColor} />}
+                    </Symbol>
                     <SignalTags>
                       {opp.signalType.split(',').map((s: string) => (
                         <Tag key={s}>#{s}</Tag>
