@@ -14,6 +14,7 @@ const StockManagement: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newStock, setNewStock] = useState({ symbol: '', name: '' });
   const [syncing, setSyncing] = useState(false);
+  const [updatingSymbol, setUpdatingSymbol] = useState<string | null>(null);
 
   useEffect(() => {
     fetchStocks();
@@ -26,6 +27,34 @@ const StockManagement: React.FC = () => {
       setStocks(res.data);
     } catch (e) {}
     setLoading(false);
+  };
+
+  const getHighestIndex = (indices: string | null) => {
+    if (!indices) return '';
+    if (indices.includes('BIST30')) return 'BIST30';
+    if (indices.includes('BIST50')) return 'BIST50';
+    if (indices.includes('BIST100')) return 'BIST100';
+    return '';
+  };
+
+  const handleUpdateIndex = async (symbol: string, selectedValue: string) => {
+    try {
+      setUpdatingSymbol(symbol);
+      let finalIndices = '';
+      if (selectedValue === 'BIST30') finalIndices = 'BIST30,BIST50,BIST100';
+      else if (selectedValue === 'BIST50') finalIndices = 'BIST50,BIST100';
+      else if (selectedValue === 'BIST100') finalIndices = 'BIST100';
+
+      const response = await api.patch(`/stock/${symbol}/admin-update`, { indices: finalIndices });
+      if (response.data.success) {
+        alert(`${symbol} endeksi güncellendi`);
+        fetchStocks();
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Güncelleme başarısız');
+    } finally {
+      setUpdatingSymbol(null);
+    }
   };
 
   const handleAdd = async () => {
@@ -114,6 +143,7 @@ const StockManagement: React.FC = () => {
                   <tr>
                     <th>SEMBOL</th>
                     <th>İSİM (OPSİYONEL)</th>
+                    <th>ENDEKS</th>
                     <th>EKLEME TARİHİ</th>
                     <S.TableHeaderCell $textAlign="right">İŞLEMLER</S.TableHeaderCell>
                   </tr>
@@ -127,6 +157,28 @@ const StockManagement: React.FC = () => {
                         </S.StockSymbol>
                       </td>
                       <td>{stock.name || '-'}</td>
+                      <td>
+                        <select
+                          value={getHighestIndex(stock.indices)}
+                          disabled={updatingSymbol === stock.symbol}
+                          onChange={(e) => handleUpdateIndex(stock.symbol, e.target.value)}
+                          style={{
+                            padding: '6px 10px',
+                            fontSize: '0.8125rem',
+                            borderRadius: '8px',
+                            border: '1px solid #DADCE0',
+                            background: updatingSymbol === stock.symbol ? '#F1F3F4' : '#FFF',
+                            color: '#3C4043',
+                            fontWeight: 600,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <option value="">Endeks Yok (---)</option>
+                          <option value="BIST30">BIST 30</option>
+                          <option value="BIST50">BIST 50</option>
+                          <option value="BIST100">BIST 100</option>
+                        </select>
+                      </td>
                       <S.CreatedAtCell>
                         {new Date(stock.createdAt).toLocaleDateString('tr-TR')}
                       </S.CreatedAtCell>
