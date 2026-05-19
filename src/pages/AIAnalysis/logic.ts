@@ -3,6 +3,7 @@ import api from '../../services/apiClient';
 
 export const useAIAnalysisLogic = () => {
   const [opportunities, setOpportunities] = useState<any[]>([]);
+  const [historyLogs, setHistoryLogs] = useState<any[]>([]);
   const [livePrices, setLivePrices] = useState<{ [key: string]: number }>({});
   const [loading, setLoading] = useState(true);
   const [activePeriod, setActivePeriod] = useState('weekly');
@@ -27,13 +28,20 @@ export const useAIAnalysisLogic = () => {
   const fetchOpportunities = useCallback(async (period: string) => {
     try {
       setLoading(true);
-      const response = await api.get(`/stock/opportunities?period=${period}`);
-      setOpportunities(response.data);
+      const [oppRes, logsRes] = await Promise.all([
+        api.get(`/stock/opportunities?period=${period}`),
+        api.get(`/stock/activity-logs?period=${period}`)
+      ]);
       
-      const symbols = response.data.map((o: any) => o.symbol);
+      setOpportunities(oppRes.data);
+      if (logsRes.data && logsRes.data.data) {
+        setHistoryLogs(logsRes.data.data.slice(0, 50)); // Son 50 işlemi göster
+      }
+      
+      const symbols = oppRes.data.map((o: any) => o.symbol);
       fetchLivePrices(symbols);
     } catch (error) {
-      console.error('Fırsatlar yüklenirken hata:', error);
+      console.error('Veriler yüklenirken hata:', error);
     } finally {
       setLoading(false);
     }
@@ -45,6 +53,7 @@ export const useAIAnalysisLogic = () => {
 
   return {
     opportunities,
+    historyLogs,
     livePrices,
     loading,
     activePeriod,

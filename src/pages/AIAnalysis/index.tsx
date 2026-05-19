@@ -180,7 +180,8 @@ const periods = [
 const AIAnalysis: React.FC = () => {
   const navigate = useNavigate();
   const { 
-    opportunities, 
+    opportunities,
+    historyLogs,
     livePrices, 
     loading, 
     activePeriod, 
@@ -278,8 +279,52 @@ const AIAnalysis: React.FC = () => {
               <S.EmptyStateIcon as="div">
                 <AlertCircle size={48} />
               </S.EmptyStateIcon>
-              <p>Bu periyot için henüz güçlü bir sinyal oluşmamış.</p>
+              <p>Bu periyot için henüz aktif güçlü bir sinyal oluşmamış.</p>
             </S.EmptyState>
+          )}
+
+          {historyLogs.length > 0 && (
+            <div style={{ marginTop: '40px' }}>
+              <PageSubtitle style={{ marginBottom: '16px', color: '#202124', fontWeight: 700, fontSize: '1.1rem' }}>
+                Geçmiş AI Kararları ({activePeriod.toUpperCase()})
+              </PageSubtitle>
+              <div style={{ overflowX: 'auto', background: '#fff', borderRadius: '16px', border: '1px solid #DADCE0' }}>
+                <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid #DADCE0', background: '#F8F9FA', textAlign: 'left' }}>
+                      <th style={{ padding: '12px 16px', color: '#5F6368' }}>Tarih</th>
+                      <th style={{ padding: '12px 16px', color: '#5F6368' }}>Sembol</th>
+                      <th style={{ padding: '12px 16px', color: '#5F6368' }}>İşlem</th>
+                      <th style={{ padding: '12px 16px', color: '#5F6368' }}>Fiyat</th>
+                      <th style={{ padding: '12px 16px', color: '#5F6368' }}>Durum/Kar</th>
+                      <th style={{ padding: '12px 16px', color: '#5F6368' }}>Açıklama</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {historyLogs.map((log: any) => (
+                      <tr key={log.id} style={{ borderBottom: '1px solid #F1F3F4' }}>
+                        <td style={{ padding: '12px 16px' }}>{new Date(log.createdAt).toLocaleString('tr-TR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })}</td>
+                        <td style={{ padding: '12px 16px', fontWeight: 600 }}>{log.symbol.replace('.IS', '')}</td>
+                        <td style={{ padding: '12px 16px' }}>
+                          <span style={{ 
+                            padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700,
+                            background: log.action === 'ADD' ? '#E6F4EA' : '#FCE8E6',
+                            color: log.action === 'ADD' ? '#137333' : '#C5221F'
+                          }}>
+                            {log.action === 'ADD' ? 'LİSTEYE ALINDI' : 'LİSTEDEN ÇIKARILDI'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px 16px' }}>₺{log.price?.toFixed(2)}</td>
+                        <td style={{ padding: '12px 16px', fontWeight: 700, color: (log.profit || log.liveProfit) > 0 ? '#137333' : (log.profit || log.liveProfit) < 0 ? '#C5221F' : '#5F6368' }}>
+                          {(log.profit || log.liveProfit) ? `${(log.profit || log.liveProfit) > 0 ? '+' : ''}${(log.profit || log.liveProfit).toFixed(2)}%` : '---'}
+                        </td>
+                        <td style={{ padding: '12px 16px', color: '#5F6368', fontSize: '0.8125rem' }}>{log.description}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           )}
         </>
       )}
