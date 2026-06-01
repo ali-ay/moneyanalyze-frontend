@@ -2,19 +2,22 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useAIAnalysisLogic } from './logic';
 import { useNavigate } from 'react-router-dom';
+
+declare module 'styled-components' {
+  export interface DefaultTheme {
+    colors?: any;
+  }
+}
 import {
   Zap,
   ChevronRight,
   ChevronDown,
   ChevronUp,
   Loader2,
-  TrendingUp,
-  Calendar,
   AlertCircle,
   Star
 } from 'lucide-react';
 import { PageContainer, PageHeader, PageTitle, PageSubtitle } from '../../components/ui/Layout.styles';
-import { Card } from '../../components/ui/Card';
 import * as S from './AIAnalysis.styles';
 
 const TabsContainer = styled.div`
