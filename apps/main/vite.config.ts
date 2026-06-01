@@ -5,6 +5,7 @@ import federation from '@originjs/vite-plugin-federation';
 export default defineConfig(({ mode }) => {
   const isProd = mode === 'production';
   return {
+  base: isProd ? '/main/' : '/',
   plugins: [
     react(),
     federation({
