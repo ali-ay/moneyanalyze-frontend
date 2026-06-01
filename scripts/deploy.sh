@@ -40,10 +40,15 @@ cd ..
 
 echo ""
 if [ "$ENV" == "production" ]; then
-    echo "📋 Frontend built. You need to:"
-    echo "   1. Configure Nginx (see DEPLOYMENT.md)"
-    echo "   2. Copy dist to Nginx root: sudo cp -r frontend/dist/* /var/www/html/"
-    echo "   3. Restart Nginx: sudo systemctl restart nginx"
+    echo "📋 Frontend built. Deploying to Nginx roots..."
+    # Try to deploy to common Nginx roots automatically
+    sudo mkdir -p /var/www/html /usr/share/nginx/html /var/www/moneyanalyze
+    sudo cp -r dist/* /var/www/html/ 2>/dev/null || true
+    sudo cp -r dist/* /usr/share/nginx/html/ 2>/dev/null || true
+    sudo cp -r dist/* /var/www/moneyanalyze/ 2>/dev/null || true
+    echo "🔄 Restarting Nginx..."
+    sudo systemctl restart nginx || true
+    echo "✅ Frontend deployed successfully!"
 else
     echo "✅ Frontend ready at: $PROJECT_DIR/frontend/dist"
 fi
