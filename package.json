@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "concurrently -n \"host-w,host-p,auth-w,auth-p,main-w,main-p,admin-w,admin-p\" -c \"bgBlue,blue,bgGreen,green,bgMagenta,magenta,bgCyan,cyan\" \"npm run build:watch -w apps/host\" \"npm run preview -w apps/host\" \"npm run build:watch -w apps/auth\" \"npm run preview -w apps/auth\" \"npm run build:watch -w apps/main\" \"npm run preview -w apps/main\" \"npm run build:watch -w apps/admin\" \"npm run preview -w apps/admin\"",
     "build": "npm run build -w apps/auth && npm run build -w apps/main && npm run build -w apps/admin && npm run build -w apps/host",
-    "postbuild": "rm -rf /var/www/moneyanalyze/* && cp -r apps/host/dist/* /var/www/moneyanalyze/ || true",
+    "postbuild": "rm -rf dist && mkdir -p dist/main dist/auth dist/admin && cp -r apps/host/dist/* dist/ && cp -r apps/main/dist/* dist/main/ && cp -r apps/auth/dist/* dist/auth/ && cp -r apps/admin/dist/* dist/admin/",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
