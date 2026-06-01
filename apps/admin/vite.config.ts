@@ -33,7 +33,6 @@ export default defineConfig(({ mode }) => {
   build: {
     modulePreload: false,
     target: 'esnext',
-    minify: false,
     cssCodeSplit: false
   },
   server: {
