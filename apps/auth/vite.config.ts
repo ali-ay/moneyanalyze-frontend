@@ -2,10 +2,26 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import federation from '@originjs/vite-plugin-federation';
 
+const fixFederationCssBug = () => ({
+  name: 'fix-federation-css-bug',
+  enforce: 'post' as const,
+  generateBundle(options: any, bundle: any) {
+    Object.keys(bundle).forEach((fileName) => {
+      if (fileName.includes('remoteEntry.js')) {
+        const chunk = bundle[fileName];
+        if (chunk.type === 'chunk') {
+          chunk.code = chunk.code.replace(/([`"'])__v__css__[^`"']+\1/g, '[]');
+        }
+      }
+    });
+  }
+});
+
 export default defineConfig(({ mode }) => {
   const isProd = mode === 'production';
   return {
   plugins: [
+    fixFederationCssBug(),
     react(),
     federation({
       name: 'auth',
