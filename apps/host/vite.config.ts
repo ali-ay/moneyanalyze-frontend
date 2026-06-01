@@ -18,7 +18,7 @@ const fixFederationCssBug = () => ({
 });
 
 export default defineConfig(({ mode }) => {
-  const isProd = mode === 'production';
+  const isProd = mode === 'production' && !process.env.VITE_LOCAL_DEV;
   return {
   plugins: [
     fixFederationCssBug(),
