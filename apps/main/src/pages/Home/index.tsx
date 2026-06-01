@@ -10,16 +10,16 @@ const Home = () => {
   return (
     <S.HomeContainer>
       <Navbar />
-      
+
       {/* Hero Section */}
       <S.HeroSection>
         <S.MainTitle>
-          Yatırımda <br /> 
+          Yatırımda <br />
           Yeni Standart.
         </S.MainTitle>
         <S.Description>
-          MoneyAnalyze ile finansal dünyanızı pürüzsüzleştirin. 
-          Kripto ve borsa verilerini en akıllı ve en şık 
+          MoneyAnalyze ile finansal dünyanızı pürüzsüzleştirin.
+          Kripto ve borsa verilerini en akıllı ve en şık
           yolla yönetmeye başlayın.
         </S.Description>
 
@@ -31,10 +31,6 @@ const Home = () => {
             Keşfet <ArrowRight size={20} style={{ marginLeft: '8px', verticalAlign: 'middle' }} />
           </S.KlarnaButton>
         </S.ButtonGroup>
-
-        <S.HeroImageWrapper>
-          <img src="/klarna-hero.png" alt="MoneyAnalyze Finance" />
-        </S.HeroImageWrapper>
       </S.HeroSection>
 
       {/* Stats Section */}
@@ -66,7 +62,7 @@ const Home = () => {
             <div className="icon">🚀</div>
             <h3>Işık Hızında.</h3>
             <p>
-              Binance ve BIST verilerini saniyeler içinde analiz edin. 
+              Binance ve BIST verilerini saniyeler içinde analiz edin.
               Gecikme olmadan kararlarınızı verin.
             </p>
           </S.FeatureCard>
@@ -75,7 +71,7 @@ const Home = () => {
             <div className="icon">🧠</div>
             <h3>Yapay Zeka.</h3>
             <p>
-              Karmaşık indikatörleri biz sizin için yorumlayalım. 
+              Karmaşık indikatörleri biz sizin için yorumlayalım.
               Basit, net ve aksiyon alınabilir sinyaller.
             </p>
           </S.FeatureCard>
@@ -84,7 +80,7 @@ const Home = () => {
             <div className="icon">💎</div>
             <h3>Pürüzsüz.</h3>
             <p>
-              Karmaşık arayüzlerden kurtulun. Finansal durumunuzu 
+              Karmaşık arayüzlerden kurtulun. Finansal durumunuzu
               hiç olmadığı kadar temiz bir şekilde görün.
             </p>
           </S.FeatureCard>
