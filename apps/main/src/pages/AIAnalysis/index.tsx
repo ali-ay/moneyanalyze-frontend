@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useAIAnalysisLogic } from './logic';
 import { useNavigate } from 'react-router-dom';
 import {
   Zap,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Loader2,
   TrendingUp,
   Calendar,
@@ -218,6 +220,85 @@ const periods = [
   { id: '1y', label: 'Yıllık' },
 ];
 
+const CollapsibleGroup = ({ groupKey, data, activePeriod, defaultOpen }: any) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  return (
+    <div style={{ marginBottom: '32px' }}>
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          marginBottom: isOpen ? '12px' : '0',
+          cursor: 'pointer',
+          padding: '12px 16px',
+          background: '#F8F9FA',
+          borderRadius: '12px',
+          border: '1px solid #DADCE0',
+          transition: 'all 0.2s'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {isOpen ? <ChevronUp size={20} color="#5F6368" /> : <ChevronDown size={20} color="#5F6368" />}
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#202124', margin: 0 }}>{groupKey}</h3>
+        </div>
+        <div style={{ 
+          padding: '6px 12px', 
+          borderRadius: '8px', 
+          background: data.totalProfit > 0 ? '#E6F4EA' : data.totalProfit < 0 ? '#FCE8E6' : '#fff',
+          color: data.totalProfit > 0 ? '#137333' : data.totalProfit < 0 ? '#C5221F' : '#5F6368',
+          fontWeight: 700,
+          fontSize: '0.875rem',
+          border: data.totalProfit === 0 ? '1px solid #DADCE0' : 'none'
+        }}>
+          {activePeriod === 'weekly' ? 'Haftalık' : 'Dönemsel'} Toplam Kar/Zarar: {data.totalProfit > 0 ? '+' : ''}{data.totalProfit.toFixed(2)}%
+        </div>
+      </div>
+      
+      {isOpen && (
+        <div style={{ overflowX: 'auto', background: '#fff', borderRadius: '16px', border: '1px solid #DADCE0' }}>
+          <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid #DADCE0', background: '#F8F9FA', textAlign: 'left' }}>
+                <th style={{ padding: '12px 16px', color: '#5F6368' }}>Tarih</th>
+                <th style={{ padding: '12px 16px', color: '#5F6368' }}>Sembol</th>
+                <th style={{ padding: '12px 16px', color: '#5F6368' }}>İşlem</th>
+                <th style={{ padding: '12px 16px', color: '#5F6368' }}>Fiyat</th>
+                <th style={{ padding: '12px 16px', color: '#5F6368' }}>Durum/Kar</th>
+                <th style={{ padding: '12px 16px', color: '#5F6368' }}>Açıklama</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.logs.map((log: any) => (
+                <tr key={log.id} style={{ borderBottom: '1px solid #F1F3F4' }}>
+                  <td style={{ padding: '12px 16px' }}>{new Date(log.createdAt).toLocaleString('tr-TR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })}</td>
+                  <td style={{ padding: '12px 16px', fontWeight: 600 }}>{log.symbol.replace('.IS', '')}</td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <span style={{ 
+                      padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700,
+                      background: log.action === 'ADD' ? '#E6F4EA' : '#FCE8E6',
+                      color: log.action === 'ADD' ? '#137333' : '#C5221F'
+                    }}>
+                      {log.action === 'ADD' ? 'LİSTEYE ALINDI' : 'LİSTEDEN ÇIKARILDI'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>₺{log.price?.toFixed(2)}</td>
+                  <td style={{ padding: '12px 16px', fontWeight: 700, color: (log.profit || log.liveProfit) > 0 ? '#137333' : (log.profit || log.liveProfit) < 0 ? '#C5221F' : '#5F6368' }}>
+                    {(log.profit || log.liveProfit) ? `${(log.profit || log.liveProfit) > 0 ? '+' : ''}${(log.profit || log.liveProfit).toFixed(2)}%` : '---'}
+                  </td>
+                  <td style={{ padding: '12px 16px', color: '#5F6368', fontSize: '0.8125rem' }}>{log.description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const AIAnalysis: React.FC = () => {
   const navigate = useNavigate();
   const { 
@@ -404,58 +485,17 @@ const AIAnalysis: React.FC = () => {
                   return acc;
                 }, {});
 
-                return Object.entries(grouped).sort((a: any, b: any) => b[0].localeCompare(a[0])).map(([groupKey, data]: any) => (
-                  <div key={groupKey} style={{ marginBottom: '32px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#202124', margin: 0 }}>{groupKey}</h3>
-                      <div style={{ 
-                        padding: '6px 12px', 
-                        borderRadius: '8px', 
-                        background: data.totalProfit > 0 ? '#E6F4EA' : data.totalProfit < 0 ? '#FCE8E6' : '#F8F9FA',
-                        color: data.totalProfit > 0 ? '#137333' : data.totalProfit < 0 ? '#C5221F' : '#5F6368',
-                        fontWeight: 700,
-                        fontSize: '0.875rem'
-                      }}>
-                        {activePeriod === 'weekly' ? 'Haftalık' : 'Dönemsel'} Toplam Kar/Zarar: {data.totalProfit > 0 ? '+' : ''}{data.totalProfit.toFixed(2)}%
-                      </div>
-                    </div>
-                    <div style={{ overflowX: 'auto', background: '#fff', borderRadius: '16px', border: '1px solid #DADCE0' }}>
-                      <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
-                        <thead>
-                          <tr style={{ borderBottom: '1px solid #DADCE0', background: '#F8F9FA', textAlign: 'left' }}>
-                            <th style={{ padding: '12px 16px', color: '#5F6368' }}>Tarih</th>
-                            <th style={{ padding: '12px 16px', color: '#5F6368' }}>Sembol</th>
-                            <th style={{ padding: '12px 16px', color: '#5F6368' }}>İşlem</th>
-                            <th style={{ padding: '12px 16px', color: '#5F6368' }}>Fiyat</th>
-                            <th style={{ padding: '12px 16px', color: '#5F6368' }}>Durum/Kar</th>
-                            <th style={{ padding: '12px 16px', color: '#5F6368' }}>Açıklama</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {data.logs.map((log: any) => (
-                            <tr key={log.id} style={{ borderBottom: '1px solid #F1F3F4' }}>
-                              <td style={{ padding: '12px 16px' }}>{new Date(log.createdAt).toLocaleString('tr-TR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })}</td>
-                              <td style={{ padding: '12px 16px', fontWeight: 600 }}>{log.symbol.replace('.IS', '')}</td>
-                              <td style={{ padding: '12px 16px' }}>
-                                <span style={{ 
-                                  padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700,
-                                  background: log.action === 'ADD' ? '#E6F4EA' : '#FCE8E6',
-                                  color: log.action === 'ADD' ? '#137333' : '#C5221F'
-                                }}>
-                                  {log.action === 'ADD' ? 'LİSTEYE ALINDI' : 'LİSTEDEN ÇIKARILDI'}
-                                </span>
-                              </td>
-                              <td style={{ padding: '12px 16px' }}>₺{log.price?.toFixed(2)}</td>
-                              <td style={{ padding: '12px 16px', fontWeight: 700, color: (log.profit || log.liveProfit) > 0 ? '#137333' : (log.profit || log.liveProfit) < 0 ? '#C5221F' : '#5F6368' }}>
-                                {(log.profit || log.liveProfit) ? `${(log.profit || log.liveProfit) > 0 ? '+' : ''}${(log.profit || log.liveProfit).toFixed(2)}%` : '---'}
-                              </td>
-                              <td style={{ padding: '12px 16px', color: '#5F6368', fontSize: '0.8125rem' }}>{log.description}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
+                return Object.entries(grouped).sort((a: any, b: any) => {
+                  // Custom sort to handle year - week logic properly instead of simple string compare
+                  return b[0].localeCompare(a[0], undefined, { numeric: true, sensitivity: 'base' });
+                }).map(([groupKey, data]: any, index: number) => (
+                  <CollapsibleGroup 
+                    key={groupKey} 
+                    groupKey={groupKey} 
+                    data={data} 
+                    activePeriod={activePeriod} 
+                    defaultOpen={index === 0} 
+                  />
                 ));
               })()}
             </div>
