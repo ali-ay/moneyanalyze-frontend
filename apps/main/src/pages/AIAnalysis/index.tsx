@@ -75,7 +75,7 @@ const Grid = styled.div`
 
 const OpportunityCard = styled.div`
   background: white;
-  border: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
+  border: 1px solid ${props => (props.theme as any)?.colors?.border || '#DADCE0'};
   border-radius: 20px;
   padding: 20px;
   cursor: pointer;
@@ -86,7 +86,7 @@ const OpportunityCard = styled.div`
   &:hover {
     transform: translateY(-6px);
     box-shadow: 0 12px 32px rgba(0,0,0,0.1);
-    border-color: ${props => props.theme?.colors?.primary || '#1A73E8'};
+    border-color: ${props => (props.theme as any)?.colors?.primary || '#1A73E8'};
   }
 
   @media (max-width: 768px) {
