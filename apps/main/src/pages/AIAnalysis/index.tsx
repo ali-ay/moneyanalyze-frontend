@@ -3,11 +3,6 @@ import styled from 'styled-components';
 import { useAIAnalysisLogic } from './logic';
 import { useNavigate } from 'react-router-dom';
 
-declare module 'styled-components' {
-  export interface DefaultTheme {
-    colors?: any;
-  }
-}
 import {
   Zap,
   ChevronRight,
@@ -46,9 +41,9 @@ const TabsContainer = styled.div`
 const TabItem = styled.button<{ $active: boolean }>`
   padding: 10px 20px;
   border-radius: 12px;
-  border: 1px solid ${props => props.$active ? props.theme?.colors?.primary || '#1A73E8' : props.theme?.colors?.border || '#DADCE0'};
-  background: ${props => props.$active ? props.theme?.colors?.secondary || '#E8F0FE' : '#FFFFFF'};
-  color: ${props => props.$active ? props.theme?.colors?.primary || '#1A73E8' : props.theme?.colors?.textSecondary || '#5F6368'};
+  border: 1px solid ${props => props.$active ? (props.theme as any)?.colors?.primary || '#1A73E8' : (props.theme as any)?.colors?.border || '#DADCE0'};
+  background: ${props => props.$active ? (props.theme as any)?.colors?.secondary || '#E8F0FE' : '#FFFFFF'};
+  color: ${props => props.$active ? (props.theme as any)?.colors?.primary || '#1A73E8' : (props.theme as any)?.colors?.textSecondary || '#5F6368'};
   font-weight: 700;
   font-size: 0.875rem;
   cursor: pointer;
@@ -56,8 +51,8 @@ const TabItem = styled.button<{ $active: boolean }>`
   white-space: nowrap;
 
   &:hover {
-    border-color: ${props => props.theme?.colors?.primary || '#1A73E8'};
-    background: ${props => props.$active ? props.theme?.colors?.secondary || '#E8F0FE' : props.theme?.colors?.surfaceHover || '#F8F9FA'};
+    border-color: ${props => (props.theme as any)?.colors?.primary || '#1A73E8'};
+    background: ${props => props.$active ? (props.theme as any)?.colors?.secondary || '#E8F0FE' : (props.theme as any)?.colors?.surfaceHover || '#F8F9FA'};
   }
 
   @media (max-width: 768px) {
