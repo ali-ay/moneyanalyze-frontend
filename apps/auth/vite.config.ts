@@ -1,0 +1,48 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import federation from '@originjs/vite-plugin-federation';
+
+export default defineConfig(({ mode }) => {
+  const isProd = mode === 'production';
+  return {
+  plugins: [
+    react(),
+    federation({
+      name: 'auth',
+      filename: 'remoteEntry.js',
+      remotes: {
+        host: isProd ? '/assets/remoteEntry.js' : 'http://localhost:3000/assets/remoteEntry.js',
+      },
+      exposes: {
+        './Login': './src/pages/Auth/Login',
+        './Register': './src/pages/Auth/Register',
+        './ForgotPassword': './src/pages/Auth/ForgotPassword',
+        './ResetPassword': './src/pages/Auth/ResetPassword',
+      },
+      shared: {
+        react: { singleton: true },
+        'react-dom': { singleton: true },
+        'styled-components': { singleton: true },
+        'react-router-dom': { singleton: true },
+        'react-helmet-async': { singleton: true },
+        'recharts': { singleton: true },
+      } as any
+    }),
+  ],
+  build: {
+    modulePreload: false,
+    target: 'esnext',
+    minify: false,
+    cssCodeSplit: false
+  },
+  server: {
+    port: 3001,
+    strictPort: true
+  },
+  preview: {
+    port: 3001,
+    strictPort: true,
+    cors: true
+  }
+  };
+});

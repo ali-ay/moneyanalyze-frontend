@@ -1,12 +1,15 @@
 {
-  "name": "moneyanalyze",
+  "name": "moneyanalyze-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "postbuild": "rm -rf /var/www/moneyanalyze/* && cp -r dist/* /var/www/moneyanalyze/ || true",
+    "dev": "concurrently -n \"host-w,host-p,auth-w,auth-p,main-w,main-p,admin-w,admin-p\" -c \"bgBlue,blue,bgGreen,green,bgMagenta,magenta,bgCyan,cyan\" \"npm run build:watch -w apps/host\" \"npm run preview -w apps/host\" \"npm run build:watch -w apps/auth\" \"npm run preview -w apps/auth\" \"npm run build:watch -w apps/main\" \"npm run preview -w apps/main\" \"npm run build:watch -w apps/admin\" \"npm run preview -w apps/admin\"",
+    "build": "npm run build -w apps/auth && npm run build -w apps/main && npm run build -w apps/admin && npm run build -w apps/host",
+    "postbuild": "rm -rf /var/www/moneyanalyze/* && cp -r apps/host/dist/* /var/www/moneyanalyze/ || true",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -24,11 +27,13 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@originjs/vite-plugin-federation": "^1.3.6",
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/styled-components": "^5.1.36",
     "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^8.2.2",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",

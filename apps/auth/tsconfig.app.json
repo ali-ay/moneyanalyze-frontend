@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "es2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "esnext",
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "host/AuthContext": ["../host/src/app/providers/AuthContext"],
+      "host/SettingsContext": ["../host/src/app/providers/SettingsContext"],
+      "host/NotificationContext": ["../host/src/app/providers/NotificationContext"],
+      "host/MarketModeContext": ["../host/src/context/MarketModeContext"],
+      "host/theme": ["../host/src/app/styles/theme"],
+      "host/GlobalStyles": ["../host/src/app/styles/GlobalStyles"],
+      "host/apiClient": ["../host/src/services/apiClient"],
+      "host/Button": ["../host/src/components/ui/Button"],
+      "host/Card": ["../host/src/components/ui/Card"],
+      "host/Input": ["../host/src/components/ui/Input"],
+      "host/Badge": ["../host/src/components/ui/Badge"],
+      "host/Switch": ["../host/src/components/ui/Switch"],
+      "host/Modal": ["../host/src/components/ui/Modal"],
+      "host/ErrorBoundary": ["../host/src/components/ErrorBoundary"],
+      "host/LoadingSpinner": ["../host/src/components/LoadingSpinner"],
+      "host/ProtectedRoute": ["../host/src/routes/ProtectedRoute"],
+      "host/AdminRoute": ["../host/src/routes/AdminRoute"]
+    }
+  },
+  "include": ["src"]
+}

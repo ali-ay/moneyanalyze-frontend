@@ -1,0 +1,633 @@
+import React, { useState, useEffect, useRef } from 'react';
+import styled from 'styled-components';
+import api from '../../services/apiClient';
+import { PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState, EmptyState } from '../../components/ui/Layout.styles';
+import { Card } from '../../components/ui/Card';
+import { HStack, VStack } from '../../components/primitives/Flex';
+import { History, TrendingUp, TrendingDown, Clock, Info, ArrowRightLeft, Trash2, Search, Activity, X, ArrowLeft } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
+import { useParams, useNavigate } from 'react-router-dom';
+import * as S from './StockActivity.styles';
+
+const LogTable = styled.table`
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  margin-top: -8px;
+
+  @media (max-width: 768px) {
+    border-spacing: 0 4px;
+    min-width: 700px; /* Force scroll but keep rows thin */
+  }
+`;
+
+const Th = styled.th`
+  text-align: left;
+  padding: 16px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #5F6368;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+    font-size: 0.6875rem;
+  }
+`;
+
+const Tr = styled.tr`
+  background: white;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    z-index: 10;
+  }
+
+  /* Tooltip açıldığında satırı en üste çıkar */
+  &:has(${S.TooltipContainer}:hover) {
+    z-index: 9999;
+  }
+`;
+
+const Td = styled.td`
+  padding: 20px 16px;
+  font-size: 0.9375rem;
+  border-top: 1px solid #F1F3F4;
+  border-bottom: 1px solid #F1F3F4;
+
+  @media (max-width: 768px) {
+    padding: 4px 8px;
+    font-size: 0.8125rem;
+    width: 58px;
+  }
+  
+  &:first-child {
+    border-left: 1px solid #F1F3F4;
+    border-radius: 12px 0 0 12px;
+  }
+  
+  &:last-child {
+    border-right: 1px solid #F1F3F4;
+    border-radius: 0 12px 12px 0;
+  }
+`;
+
+const ActionBadge = styled.span<{ $action: string }>`
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  background: ${props => {
+    if (props.$action === 'ADD') return 'rgba(15, 157, 88, 0.1)';
+    if (props.$action === 'REMOVE') return 'rgba(219, 68, 55, 0.1)';
+    return 'rgba(26, 115, 232, 0.1)'; // INFO
+  }};
+  color: ${props => {
+    if (props.$action === 'ADD') return '#0F9D58';
+    if (props.$action === 'REMOVE') return '#DB4437';
+    return '#1A73E8'; // INFO
+  }};
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid ${props => {
+    if (props.$action === 'ADD') return 'rgba(15, 157, 88, 0.2)';
+    if (props.$action === 'REMOVE') return 'rgba(219, 68, 55, 0.2)';
+    return 'rgba(26, 115, 232, 0.2)'; // INFO
+  }};
+
+  @media (max-width: 768px) {
+    padding: 6px;
+    width: 48px;
+    height: 20px;
+    .btn-text { display: none; }
+  }
+`;
+
+const PriceText = styled.div`
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 700;
+  color: #202124;
+
+  @media (max-width: 768px) {
+    width: 58px;
+  }
+`;
+
+const Label = styled.div`
+  font-size: 0.6875rem;
+  color: #80868B;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+`;
+
+const ProfitBadge = styled.span<{ $positive: boolean }>`
+  color: ${props => props.$positive ? '#0F9D58' : '#DB4437'};
+  background: ${props => props.$positive ? 'rgba(15, 157, 88, 0.1)' : 'rgba(219, 68, 55, 0.1)'};
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9375rem; 
+`;
+
+const ModalBackdrop = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+`;
+
+const ModalContent = styled.div`
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+`;
+
+const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  h4 { margin: 0; color: #202124; }
+`;
+
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #5F6368;
+`;
+
+const ResponsiveHeader = styled(PageHeader)`
+  @media (max-width: 992px) {
+    .header-stack {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    
+    .actions-stack {
+      width: 100%;
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+`;
+
+import { useAuth } from '../../app/providers/AuthContext';
+
+const StockActivityPage: React.FC = () => {
+  const { symbol } = useParams<{ symbol?: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
+
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [isCleaning, setIsCleaning] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(symbol || '');
+  const [total, setTotal] = useState(0);
+  const [selectedNote, setSelectedNote] = useState<string | null>(null);
+  const [filterAction, setFilterAction] = useState<'ALL' | 'ADD' | 'REMOVE'>('ALL');
+  const [filterProfit, setFilterProfit] = useState<'ALL' | 'PROFIT' | 'LOSS' | 'NEUTRAL'>('ALL');
+  const [filterPeriod, setFilterPeriod] = useState<string>('ALL');
+  const [filterIndex, setFilterIndex] = useState<string>('ALL');
+  const [stats, setStats] = useState({
+    totalProfit: 0,
+    avgProfit: 0,
+    successRate: 0,
+    completedTrades: 0
+  });
+  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'createdAt', direction: 'desc' });
+
+  const lastSearchFetchedRef = useRef(symbol || '');
+
+  const fetchLogs = async (pageNum: number, append: boolean = false, search: string = searchTerm, period: string = filterPeriod, index: string = filterIndex, sKey: string = sortConfig.key, sDir: string = sortConfig.direction) => {
+    try {
+      const response = await api.get(`/stock/activity-logs?page=${pageNum}&search=${search}&period=${period}&index=${index}&sortKey=${sKey}&sortOrder=${sDir}`);
+      if (response.data.success) {
+        const newLogs = response.data.data;
+        setTotal(response.data.total || 0);
+
+        if (response.data.stats) {
+          setStats(response.data.stats);
+        }
+
+        if (newLogs.length < 50) {
+          setHasMore(false);
+        } else {
+          setHasMore(true);
+        }
+
+        if (append) {
+          setLogs(prev => [...prev, ...newLogs]);
+        } else {
+          setLogs(newLogs);
+        }
+      }
+    } catch (error) {
+      console.error('Logs fetch error:', error);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const handleCleanup = async () => {
+    if (!window.confirm('Mükerrer (üst üste gelen) kayıtlar temizlenecektir. Emin misiniz?')) return;
+
+    setIsCleaning(true);
+    try {
+      const response = await api.post('/stock/activity-logs/cleanup');
+      if (response.data.success) {
+        alert(response.data.message);
+        // Sayfayı yenile
+        setPage(1);
+        fetchLogs(1, false);
+      }
+    } catch (error) {
+      console.error('Cleanup error:', error);
+      alert('Temizleme işlemi sırasında bir hata oluştu.');
+    } finally {
+      setIsCleaning(false);
+    }
+  };
+
+  // Sync searchTerm when symbol route param changes
+  useEffect(() => {
+    setSearchTerm(symbol || '');
+    lastSearchFetchedRef.current = symbol || '';
+    setPage(1);
+    fetchLogs(1, false, symbol || '');
+  }, [symbol]);
+
+  // Sadece arama (Search) için gecikme (debounce) kullanalım
+  useEffect(() => {
+    if (searchTerm === lastSearchFetchedRef.current) return;
+
+    const delayDebounceFn = setTimeout(() => {
+      setPage(1);
+      fetchLogs(1, false, searchTerm, filterPeriod, filterIndex, sortConfig.key, sortConfig.direction);
+      lastSearchFetchedRef.current = searchTerm;
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm]);
+
+  // Dropdown filtreleri veya Sıralama değiştiğinde ANINDA fetch yap
+  useEffect(() => {
+    setPage(1);
+    fetchLogs(1, false, searchTerm, filterPeriod, filterIndex, sortConfig.key, sortConfig.direction);
+  }, [filterPeriod, filterIndex, filterAction, filterProfit, sortConfig]);
+
+  const requestSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  useEffect(() => {
+    // Canlı fiyatları güncellemek için interval
+    // Sadece 1. sayfadayken, arama yokken ve periyot seçili değilken (veya ALL iken) daha güvenli çalışır
+    // Ancak kullanıcı bir filtre seçmişse de o filtreye göre güncellenmesi iyidir
+    const interval = setInterval(() => {
+      if (page === 1 && !loadingMore && !isCleaning) {
+        fetchLogs(1, false, searchTerm, filterPeriod, filterIndex, sortConfig.key, sortConfig.direction);
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [page, loadingMore, isCleaning, searchTerm, filterPeriod, filterIndex, sortConfig]);
+
+  const handleLoadMore = () => {
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchLogs(nextPage, true, searchTerm, filterPeriod, filterIndex, sortConfig.key, sortConfig.direction);
+  };
+
+  const filteredLogs = React.useMemo(() => {
+    let data = [...logs];
+
+    if (filterAction !== 'ALL') {
+      data = data.filter(log => log.action === filterAction);
+    }
+
+    if (filterProfit !== 'ALL') {
+      const getProfitValue = (log: any) =>
+        log.action === 'REMOVE' ? (log.profit || 0) : (log.liveProfit || 0);
+      if (filterProfit === 'PROFIT') data = data.filter(log => getProfitValue(log) > 0);
+      else if (filterProfit === 'LOSS') data = data.filter(log => getProfitValue(log) < 0);
+      else if (filterProfit === 'NEUTRAL') data = data.filter(log => getProfitValue(log) === 0);
+    }
+
+    return data;
+  }, [logs, filterAction, filterProfit]);
+
+  if (loading) return <LoadingState>Kayıtlar yükleniyor...</LoadingState>;
+
+  return (
+    <PageContainer>
+      {symbol && (
+        <Button
+          $variant="secondary"
+          $size="sm"
+          onClick={() => {
+            // Check if symbol contains USDT, which implies a crypto coin, otherwise stock
+            const isCrypto = symbol.toUpperCase().endsWith('USDT');
+            if (isCrypto) {
+              navigate(`/dashboard/coin/${symbol}`);
+            } else {
+              navigate(`/dashboard/stock/${symbol}`);
+            }
+          }}
+          style={{ marginBottom: '16px', alignSelf: 'flex-start' }}
+        >
+          <ArrowLeft size={16} /> Geri Dön
+        </Button>
+      )}
+
+      <ResponsiveHeader>
+        <HStack className="header-stack" $justify="space-between" $align="center" style={{ width: '100%' }}>
+          <VStack $gap="4px">
+            <PageTitle>
+              <HStack $gap="12px" $align="center">
+                <History size={32} color="#1A73E8" />
+                {symbol ? `${symbol.replace('.IS', '')} İşlem Geçmişi` : 'AI Hisse İşlem Dekontları'}
+                {total > 0 && (
+                  <S.StatsBadge>
+                    <Activity size={14} />
+                    {total.toLocaleString()} Hareket
+                  </S.StatsBadge>
+                )}
+              </HStack>
+            </PageTitle>
+            <PageSubtitle>
+              {symbol
+                ? `${symbol.replace('.IS', '')} varlığına ait otomatik alım-satım ve takip hareketlerinin detaylı dökümü.`
+                : 'Yapay zekanın otomatik alım-satım ve takip hareketlerinin detaylı dökümü.'
+              }
+            </PageSubtitle>
+          </VStack>
+
+          <HStack className="actions-stack" $gap="16px" $align="center">
+            <S.SearchContainer>
+              <S.SearchIconWrapper>
+                <Search size={18} />
+              </S.SearchIconWrapper>
+              <S.SearchInput
+                placeholder="Hisse ara (Örn: THYAO)..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </S.SearchContainer>
+
+            {isAdmin && (
+              <S.CleanupButton onClick={handleCleanup} disabled={isCleaning}>
+                <Trash2 size={16} />
+                {isCleaning ? 'Temizleniyor...' : 'Mükerrer Temizlik'}
+              </S.CleanupButton>
+            )}
+          </HStack>
+        </HStack>
+      </ResponsiveHeader>
+
+      <S.SummaryCards>
+        <S.StatCard>
+          <S.StatLabel>Kümülatif Kâr/Zarar</S.StatLabel>
+          <S.StatValue $positive={stats.totalProfit > 0} $negative={stats.totalProfit < 0}>
+            {stats.totalProfit > 0 ? '+' : ''}{stats.totalProfit.toFixed(2)}%
+          </S.StatValue>
+          <S.StatSubValue>Tamamlanan tüm işlemlerin toplamı</S.StatSubValue>
+        </S.StatCard>
+
+        <S.StatCard>
+          <S.StatLabel>Başarı Oranı</S.StatLabel>
+          <S.StatValue style={{ color: stats.successRate >= 50 ? '#0F9D58' : '#DB4437' }}>
+            %{stats.successRate.toFixed(1)}
+          </S.StatValue>
+          <S.StatSubValue>{stats.completedTrades} işlemin {Math.round(stats.completedTrades * stats.successRate / 100)} adedi kârlı</S.StatSubValue>
+        </S.StatCard>
+
+        <S.StatCard>
+          <S.StatLabel>Ortalama İşlem Getirisi</S.StatLabel>
+          <S.StatValue $positive={stats.avgProfit > 0} $negative={stats.avgProfit < 0}>
+            {stats.avgProfit > 0 ? '+' : ''}{stats.avgProfit.toFixed(2)}%
+          </S.StatValue>
+          <S.StatSubValue>İşlem başına düşen ortalama kâr</S.StatSubValue>
+        </S.StatCard>
+
+        <S.StatCard>
+          <S.StatLabel>Toplam Aktivite</S.StatLabel>
+          <S.StatValue>{total.toLocaleString()}</S.StatValue>
+          <S.StatSubValue>Filtrelere uygun toplam kayıt</S.StatSubValue>
+        </S.StatCard>
+      </S.SummaryCards>
+
+      <S.FilterWrapper>
+        <S.FilterLabel>Filtrele:</S.FilterLabel>
+        <S.FilterSelect
+          value={filterAction}
+          onChange={e => setFilterAction(e.target.value as any)}
+        >
+          <option value="ALL">İşlem: Tümü</option>
+          <option value="ADD">İşlem: Eklendi ↑</option>
+          <option value="REMOVE">İşlem: Çıkarıldı ↓</option>
+        </S.FilterSelect>
+
+        <S.FilterSelect
+          value={filterPeriod}
+          onChange={e => setFilterPeriod(e.target.value)}
+        >
+          <option value="ALL">Periyot: Tümü</option>
+          <option value="daily">Günlük (Daily)</option>
+          <option value="weekly">Haftalık (Weekly)</option>
+          <option value="monthly">Aylık (Monthly)</option>
+        </S.FilterSelect>
+
+        <S.FilterSelect
+          value={filterProfit}
+          onChange={e => setFilterProfit(e.target.value as any)}
+        >
+          <option value="ALL">Durum: Tümü</option>
+          <option value="PROFIT">Durum: Kârda ✓</option>
+          <option value="LOSS">Durum: Zararda ✗</option>
+          <option value="NEUTRAL">Durum: Nötr</option>
+        </S.FilterSelect>
+
+        <S.FilterSelect
+          value={filterIndex}
+          onChange={e => setFilterIndex(e.target.value)}
+        >
+          <option value="ALL">Endeks: Tümü</option>
+          <option value="BIST30">Endeks: BIST 30</option>
+          <option value="BIST50">Endeks: BIST 50</option>
+          <option value="BIST100">Endeks: BIST 100</option>
+        </S.FilterSelect>
+      </S.FilterWrapper>
+
+      <S.TableWrapper>
+        {logs.length === 0 ? (
+          <EmptyState>Henüz bir hareket kaydı bulunmuyor. AI analizleri başladığında burada görünecektir.</EmptyState>
+        ) : filteredLogs.length === 0 ? (
+          <EmptyState>Seçilen filtrelere uygun hareket kaydı bulunmuyor.</EmptyState>
+        ) : (
+          <>
+            <LogTable>
+              <thead>
+                <tr>
+                  <Th style={{ cursor: 'pointer' }} onClick={() => requestSort('createdAt')}>
+                    İşlem Tarihi {sortConfig.key === 'createdAt' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                  </Th>
+                  <Th style={{ cursor: 'pointer' }} onClick={() => requestSort('symbol')}>
+                    Varlık / Periyot {sortConfig.key === 'symbol' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                  </Th>
+                  <Th style={{ cursor: 'pointer' }} onClick={() => requestSort('action')}>
+                    İşlem Tipi {sortConfig.key === 'action' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                  </Th>
+                  <Th>Birim Fiyatlar</Th>
+                  <Th style={{ cursor: 'pointer' }} onClick={() => requestSort('profit')}>
+                    Performans {sortConfig.key === 'profit' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                  </Th>
+                  <Th>Analiz Notu</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredLogs.map((log) => {
+                  const isAdd = log.action === 'ADD';
+                  const isInfo = log.action === 'INFO';
+                  const profitValue = isInfo ? null : (isAdd ? log.liveProfit : log.profit);
+                  const isPositive = (profitValue || 0) >= 0;
+
+                  return (
+                    <Tr key={log.id}>
+                      <Td>
+                        <VStack $gap="4px">
+                          <S.DateColumn as={HStack} $gap="6px" $align="center">
+                            <Clock size={14} color="#1A73E8" />
+                            {new Date(log.createdAt).toLocaleDateString('tr-TR')}
+                          </S.DateColumn>
+                          <S.TimeText>
+                            {new Date(log.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                          </S.TimeText>
+                        </VStack>
+                      </Td>
+                      <Td>
+                        <VStack $gap="4px">
+                          <HStack $gap="6px" $align="center">
+                            <S.SymbolText>{log.symbol.replace('.IS', '')}</S.SymbolText>
+                          </HStack>
+                          <S.PeriodBadge>
+                            <span className="full-text">{log.period?.toUpperCase()} TARAMASI</span>
+                            <span className="short-text">{log.period?.toUpperCase()}</span>
+                          </S.PeriodBadge>
+                        </VStack>
+                      </Td>
+                      <Td>
+                        <ActionBadge $action={log.action}>
+                          {log.action === 'ADD' ? <TrendingUp size={14} /> :
+                            log.action === 'REMOVE' ? <TrendingDown size={14} /> :
+                              <Activity size={14} />}
+                          <span className="btn-text">
+                            {log.action === 'ADD' ? 'EKLENDİ' :
+                              log.action === 'REMOVE' ? 'ÇIKARILDI' :
+                                log.action === 'INFO' ? 'BİLGİ' : 'GÜNCELLENDİ'}
+                          </span>
+                        </ActionBadge>
+                      </Td>
+                      <Td>
+                        {isInfo ? (
+                          <S.CalculatingText>---</S.CalculatingText>
+                        ) : (
+                          <HStack $gap="20px">
+                            <VStack>
+                              <Label>{isAdd ? 'Giriş' : 'Alış'}</Label>
+                              <PriceText>₺{log.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</PriceText>
+                            </VStack>
+
+                            <VStack>
+                              <Label>{isAdd ? (log.displayLabel || 'Anlık') : 'Çıkış'}</Label>
+                              <S.PriceWithColor $entryPrice={isAdd} style={{ color: log.isClosed ? '#5F6368' : undefined }}>
+                                ₺{(isAdd ? log.currentPrice : log.exitPrice)?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || '---'}
+                              </S.PriceWithColor>
+                            </VStack>
+                          </HStack>
+                        )}
+                      </Td>
+                      <Td>
+                        {isInfo ? (
+                          <S.CalculatingText>---</S.CalculatingText>
+                        ) : (
+                          <VStack $gap="4px">
+                            <Label>{isAdd ? (log.isClosed ? 'Net Sonuç' : 'Kar/Zarar') : 'Net K/Z'}</Label>
+                            {profitValue !== null && profitValue !== undefined ? (
+                              <S.ProfitBadgeWithSize $positive={isPositive}>
+                                {isPositive ? '+' : ''}{profitValue.toFixed(2)}%
+                              </S.ProfitBadgeWithSize>
+                            ) : (
+                              <S.CalculatingText>Hesaplanıyor...</S.CalculatingText>
+                            )}
+                          </VStack>
+                        )}
+                      </Td>
+                      <Td>
+                        <S.TooltipContainer>
+                          <S.NotesIcon as="div">
+                            <Info size={22} color="#1A73E8" />
+                          </S.NotesIcon>
+                          <S.TooltipBox>
+                            <div className="tooltip-header">Analiz Notu</div>
+                            {log.description}
+                          </S.TooltipBox>
+                        </S.TooltipContainer>
+                      </Td>
+                    </Tr>
+                  );
+                })}
+              </tbody>
+            </LogTable>
+
+            {hasMore && (
+              <S.LoadMoreContainer>
+                <S.LoadMoreButton onClick={handleLoadMore} disabled={loadingMore}>
+                  {loadingMore ? 'Yükleniyor...' : (
+                    <>
+                      <ArrowRightLeft size={16} />
+                      Daha Fazla Kayıt Göster
+                    </>
+                  )}
+                </S.LoadMoreButton>
+              </S.LoadMoreContainer>
+            )}
+          </>
+        )}
+      </S.TableWrapper>
+    </PageContainer>
+  );
+};
+
+export default StockActivityPage;

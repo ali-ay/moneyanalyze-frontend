@@ -1,0 +1,144 @@
+import { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from 'styled-components';
+import { theme } from './app/styles/theme';
+import { GlobalStyles } from './app/styles/GlobalStyles';
+import { AdminRoute } from './routes/AdminRoute';
+import { ProtectedRoute } from './routes/ProtectedRoute';
+import { AuthProvider } from './app/providers/AuthContext';
+import { SettingsProvider, useSettings } from './app/providers/SettingsContext';
+import { NotificationProvider } from './app/providers/NotificationContext';
+import { MarketModeProvider } from './context/MarketModeContext';
+import { HelmetProvider, Helmet } from 'react-helmet-async';
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import { ErrorBoundary } from './components/ErrorBoundary';
+
+// Layouts
+const MainLayout = lazy(() => import('./app/layouts/MainLayout'));
+
+// Public Pages
+const Home = lazy(() => import('main/Home'));
+const Login = lazy(() => import('auth/Login'));
+const Register = lazy(() => import('auth/Register'));
+const ForgotPassword = lazy(() => import('auth/ForgotPassword'));
+const ResetPassword = lazy(() => import('auth/ResetPassword'));
+
+// Protected Pages
+const Dashboard = lazy(() => import('main/Dashboard'));
+const WalletPortfolio = lazy(() => import('main/WalletPortfolio'));
+const WalletBalance = lazy(() => import('main/WalletBalance'));
+const WalletHistory = lazy(() => import('main/WalletHistory'));
+const TrackingLog = lazy(() => import('main/TrackingLog'));
+const Watchlist = lazy(() => import('main/Watchlist'));
+const Profile = lazy(() => import('main/Profile'));
+const Bots = lazy(() => import('main/Bots'));
+const CoinDetail = lazy(() => import('main/CoinDetail'));
+const StockDetail = lazy(() => import('main/StockDetail'));
+const StockList = lazy(() => import('main/StockList'));
+const AIAnalysis = lazy(() => import('main/AIAnalysis'));
+const StockActivity = lazy(() => import('main/StockActivity'));
+
+// Admin Pages
+const UserList = lazy(() => import('admin/UserList'));
+const GlobalSettings = lazy(() => import('admin/GlobalSettings'));
+const BotSettings = lazy(() => import('admin/BotSettings'));
+const StockManagement = lazy(() => import('admin/StockManagement'));
+const MediaLibrary = lazy(() => import('admin/MediaLibrary'));
+
+const AppContent = () => {
+  const { settings, loading } = useSettings();
+
+  // Use a stable fallback key to prevent reCAPTCHA initialization errors
+  const reCaptchaKey = settings?.recaptchaSiteKey || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
+
+  // Settings hâlâ yükleniyor VE elimizde hiç settings yoksa bekleyelim.
+  // (SettingsContext error halinde DEFAULT_SETTINGS atadığı için bu durumda
+  // settings dolu gelir ve uygulama açılır.)
+  if (loading && !settings) {
+    return (
+      <div style={{
+        background: '#080c14',
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#FFFFFF',
+        fontFamily: 'sans-serif'
+      }}>
+        MoneyAnalyze Yükleniyor...
+      </div>
+    );
+  }
+
+  return (
+      <ThemeProvider theme={theme}>
+        <GlobalStyles />
+        <Helmet>
+          <title>{settings?.siteTitle || 'MoneyAnalyze'}</title>
+          <meta name="description" content={settings?.siteDescription || 'Crypto Analysis Platform'} />
+        </Helmet>
+
+        <Router>
+          <Suspense fallback={<div style={{ padding: '20px', textAlign: 'center', color: '#9AA0A6' }}>Yükleniyor...</div>}>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+
+              {/* Unified Protected Routes (User & Admin) */}
+              <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/dashboard/wallet" element={<WalletPortfolio />} />
+                <Route path="/dashboard/wallet/balance" element={<WalletBalance />} />
+                <Route path="/dashboard/history" element={<WalletHistory />} />
+                <Route path="/dashboard/tracking" element={<TrackingLog />} />
+                <Route path="/dashboard/ai-analysis" element={<AIAnalysis />} />
+                <Route path="/dashboard/coin/:symbol" element={<CoinDetail />} />
+                <Route path="/dashboard/stock/:symbol" element={<StockDetail />} />
+                <Route path="/dashboard/stock-activity" element={<StockActivity />} />
+                <Route path="/dashboard/stock-activity/:symbol" element={<StockActivity />} />
+                <Route path="/stocks" element={<StockList />} />
+                <Route path="/watchlist" element={<Watchlist />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/bots" element={<Bots />} />
+
+                {/* Admin Nested Routes inside MainLayout */}
+                <Route path="/admin">
+                  <Route path="userlist" element={<AdminRoute><UserList /></AdminRoute>} />
+                  <Route path="settings" element={<AdminRoute><GlobalSettings /></AdminRoute>} />
+                  <Route path="bot-settings" element={<AdminRoute><BotSettings /></AdminRoute>} />
+                  <Route path="stocks" element={<AdminRoute><StockManagement /></AdminRoute>} />
+                  <Route path="media" element={<AdminRoute><MediaLibrary /></AdminRoute>} />
+                </Route>
+              </Route>
+
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </Router>
+      </ThemeProvider>
+  );
+};
+
+const App = () => {
+  return (
+    <ErrorBoundary>
+      <HelmetProvider>
+        <SettingsProvider>
+          <AuthProvider>
+            <NotificationProvider>
+              <MarketModeProvider>
+                <AppContent />
+              </MarketModeProvider>
+            </NotificationProvider>
+          </AuthProvider>
+        </SettingsProvider>
+      </HelmetProvider>
+    </ErrorBoundary>
+  );
+};
+
+export default App;

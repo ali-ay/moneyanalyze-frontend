@@ -1,0 +1,52 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "es2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "esnext",
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "auth/Login": ["../auth/src/pages/Auth/Login"],
+      "auth/Register": ["../auth/src/pages/Auth/Register"],
+      "auth/ForgotPassword": ["../auth/src/pages/Auth/ForgotPassword"],
+      "auth/ResetPassword": ["../auth/src/pages/Auth/ResetPassword"],
+      "main/Dashboard": ["../main/src/pages/Dashboard"],
+      "main/Home": ["../main/src/pages/Home"],
+      "main/Watchlist": ["../main/src/pages/Watchlist"],
+      "main/CoinDetail": ["../main/src/pages/CoinDetail"],
+      "main/StockDetail": ["../main/src/pages/StockDetail"],
+      "main/StockList": ["../main/src/pages/StockList"],
+      "main/StockActivity": ["../main/src/pages/StockActivity"],
+      "main/AIAnalysis": ["../main/src/pages/AIAnalysis"],
+      "main/Bots": ["../main/src/pages/Bots"],
+      "main/WalletPortfolio": ["../main/src/pages/Wallet/Portfolio"],
+      "main/WalletBalance": ["../main/src/pages/Wallet/Balance"],
+      "main/WalletHistory": ["../main/src/pages/Wallet/TradeHistory"],
+      "main/TrackingLog": ["../main/src/pages/Wallet/TrackingLog"],
+      "main/Profile": ["../main/src/pages/Settings/Profile"],
+      "admin/UserList": ["../admin/src/pages/Admin/UserList/UserList"],
+      "admin/GlobalSettings": ["../admin/src/pages/Admin/Settings/GlobalSettings"],
+      "admin/BotSettings": ["../admin/src/pages/Admin/BotSettings"],
+      "admin/StockManagement": ["../admin/src/pages/Admin/StockManagement"],
+      "admin/MediaLibrary": ["../admin/src/pages/Admin/Media/MediaLibrary"]
+    }
+  },
+  "include": ["src"]
+}
