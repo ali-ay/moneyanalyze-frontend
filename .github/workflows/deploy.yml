@@ -23,6 +23,7 @@ jobs:
             # Backend deployment
             echo "🚀 Deploying Backend..."
             cd ~/moneyanalyze/backend
+            git pull origin main || git pull origin master
             npm install
             npm run build
             pm2 restart moneyanalyze-backend || pm2 start ecosystem.config.js --only moneyanalyze-backend
@@ -30,6 +31,7 @@ jobs:
             # Frontend deployment
             echo "🚀 Deploying Frontend..."
             cd ~/moneyanalyze/frontend
+            git pull origin main || git pull origin master
             npm install
             npm run build
             # Nginx will serve from ~/moneyanalyze/frontend/dist
