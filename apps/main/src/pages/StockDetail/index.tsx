@@ -81,6 +81,7 @@ const StockDetail: React.FC = () => {
     price,
     changePercent,
     change,
+    lastUpdated,
     timeframe,
     setTimeframe,
     technicalSummary,
@@ -131,7 +132,24 @@ const StockDetail: React.FC = () => {
             <HStack $gap="sm" $align="center">
               <PageTitle>{fundamentals?.name || symbol}</PageTitle>
             </HStack>
-            <PageSubtitle>{symbol} • BIST</PageSubtitle>
+            <PageSubtitle style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
+              <span>{symbol} • BIST</span>
+              {lastUpdated && (
+                <>
+                  <span>•</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: '#5F6368' }}>
+                    <Clock size={12} /> Son Güncelleme: {new Date(lastUpdated).toLocaleString('tr-TR', {
+                      day: '2-digit',
+                      month: 'long',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit'
+                    })}
+                  </span>
+                </>
+              )}
+            </PageSubtitle>
             <S.PriceDisplayWrapper>
                 <PriceDisplay>
                   <PriceText>₺{price.toFixed(2)}</PriceText>

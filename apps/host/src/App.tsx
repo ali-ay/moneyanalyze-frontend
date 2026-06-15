@@ -44,6 +44,7 @@ const GlobalSettings = lazy(() => import('admin/GlobalSettings'));
 const BotSettings = lazy(() => import('admin/BotSettings'));
 const StockManagement = lazy(() => import('admin/StockManagement'));
 const MediaLibrary = lazy(() => import('admin/MediaLibrary'));
+const SystemStatus = lazy(() => import('admin/SystemStatus'));
 
 const AppContent = () => {
   const { settings, loading } = useSettings();
@@ -112,6 +113,7 @@ const AppContent = () => {
                   <Route path="bot-settings" element={<AdminRoute><BotSettings /></AdminRoute>} />
                   <Route path="stocks" element={<AdminRoute><StockManagement /></AdminRoute>} />
                   <Route path="media" element={<AdminRoute><MediaLibrary /></AdminRoute>} />
+                  <Route path="status" element={<AdminRoute><SystemStatus /></AdminRoute>} />
                 </Route>
               </Route>
 

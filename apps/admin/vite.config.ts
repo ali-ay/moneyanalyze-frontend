@@ -35,6 +35,7 @@ export default defineConfig(({ mode }) => {
         './BotSettings': './src/pages/Admin/BotSettings',
         './StockManagement': './src/pages/Admin/StockManagement',
         './MediaLibrary': './src/pages/Admin/Media/MediaLibrary',
+        './SystemStatus': './src/pages/Admin/SystemStatus/SystemStatus',
       },
       shared: {
         react: { singleton: true },

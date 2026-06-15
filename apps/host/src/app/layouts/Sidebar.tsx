@@ -15,7 +15,8 @@ import {
   Eye,
   Briefcase,
   Zap,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Activity
 } from 'lucide-react';
 import { useAuth } from '../../app/providers/AuthContext';
 
@@ -285,6 +286,9 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, o
                 </NavItem>
                 <NavItem $active={location.pathname.startsWith('/admin/media')} onClick={() => handleNav('/admin/media')}>
                   <ImageIcon size={18} /> Medya Kütüphanesi
+                </NavItem>
+                <NavItem $active={location.pathname.startsWith('/admin/status')} onClick={() => handleNav('/admin/status')}>
+                  <Activity size={18} /> Sistem Durumu
                 </NavItem>
               </>
             )}
