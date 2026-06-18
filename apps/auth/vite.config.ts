@@ -57,7 +57,10 @@ export default defineConfig(({ mode }) => {
   preview: {
     port: 3001,
     strictPort: true,
-    cors: true
+    cors: true,
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+    }
   }
   };
 });

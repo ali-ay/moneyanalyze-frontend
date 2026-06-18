@@ -81,6 +81,9 @@ export default defineConfig(({ mode }) => {
     port: 3000,
     strictPort: true,
     cors: true,
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:5001',

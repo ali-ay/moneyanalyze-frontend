@@ -42,6 +42,13 @@ export const SymbolText = styled.span`
   font-weight: 900;
   color: ${props => props.theme?.colors?.primary || '#1A73E8'};
   font-size: 1rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:hover {
+    text-decoration: underline;
+    opacity: 0.8;
+  }
 `;
 
 export const PeriodBadge = styled.div`

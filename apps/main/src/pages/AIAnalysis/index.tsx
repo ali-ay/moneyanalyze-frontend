@@ -368,7 +368,11 @@ const AIAnalysis: React.FC = () => {
                 
                 const targetPrice = opp.data?.aiPredictions?.targetPrice || 0;
                 let progressPercent = 0;
-                
+                const rawPotential = opp.data?.aiPredictions?.potentialProfit;
+                const potentialProfit = typeof rawPotential === 'number'
+                  ? rawPotential.toFixed(2)
+                  : (targetPrice > 0 && currentPrice > 0 ? ((targetPrice - currentPrice) / currentPrice * 100).toFixed(2) : '0.00');
+
                 if (entryPrice > 0 && targetPrice > entryPrice) {
                   const totalExpectedProfit = targetPrice - entryPrice;
                   const currentProfit = currentPrice - entryPrice;
@@ -421,10 +425,16 @@ const AIAnalysis: React.FC = () => {
                       </span>
                     </Metric>
                     <Metric>
-                      <span className="label">Potansiyel Getiri:</span>
+                      <span className="label">Kâr/Zarar:</span>
                       <S.ProfitValue className="value" $positive={isPositive}>
                         {isPositive ? '+' : ''}{profit}%
                       </S.ProfitValue>
+                    </Metric>
+                    <Metric>
+                      <span className="label">Potansiyel Getiri:</span>
+                      <span className="value" style={{ color: '#0F9D58', fontWeight: 800 }}>
+                        {parseFloat(potentialProfit) >= 0 ? '+' : ''}{potentialProfit}%
+                      </span>
                     </Metric>
 
                     {targetPrice > 0 && (

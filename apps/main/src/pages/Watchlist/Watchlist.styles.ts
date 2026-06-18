@@ -154,7 +154,7 @@ export const SummaryValue = styled.span<SummaryValueProps>`
       case 'red':
         return props.theme.colors.danger;
       default:
-        return props.theme.colors.text;
+        return props.theme.colors.textMain;
     }
   }};
 `;

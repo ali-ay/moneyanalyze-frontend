@@ -539,7 +539,16 @@ const StockActivityPage: React.FC = () => {
                       <Td>
                         <VStack $gap="4px">
                           <HStack $gap="6px" $align="center">
-                            <S.SymbolText>{log.symbol.replace('.IS', '')}</S.SymbolText>
+                            <S.SymbolText onClick={() => {
+                              const isCrypto = log.symbol.toUpperCase().endsWith('USDT');
+                              if (isCrypto) {
+                                navigate(`/dashboard/coin/${log.symbol}`);
+                              } else {
+                                navigate(`/dashboard/stock-activity/${log.symbol.replace('.IS', '')}`);
+                              }
+                            }}>
+                              {log.symbol.replace('.IS', '')}
+                            </S.SymbolText>
                           </HStack>
                           <S.PeriodBadge>
                             <span className="full-text">{log.period?.toUpperCase()} TARAMASI</span>

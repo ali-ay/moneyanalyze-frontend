@@ -6,9 +6,9 @@ import Header from './Header';
 
 const LayoutRoot = styled.div`
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
-  overflow-x: hidden;
+  overflow: hidden;
   background: ${props => props.theme?.colors?.surfaceHover || '#F8F9FA'};
 `;
 
@@ -16,6 +16,8 @@ const MainContent = styled.main`
   flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
   min-width: 0;
 `;
 
