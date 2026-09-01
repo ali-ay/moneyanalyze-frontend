@@ -18,7 +18,10 @@ const fixFederationCssBug = () => ({
 });
 
 export default defineConfig(({ mode }) => {
-  const isProd = mode === 'production';
+  const isProd = mode === 'production' && !process.env.VITE_LOCAL_DEV;
+  const hostRemoteEntry = isProd
+    ? '/assets/remoteEntry.js'
+    : 'http://localhost:3000/assets/remoteEntry.js';
   return {
   plugins: [
     fixFederationCssBug(),
@@ -26,9 +29,10 @@ export default defineConfig(({ mode }) => {
     federation({
       name: 'main',
       filename: 'remoteEntry.js',
+      // @ts-expect-error css option exists at runtime but is missing from type definitions
       css: false,
       remotes: {
-        host: isProd ? '/assets/remoteEntry.js' : 'http://localhost:3000/assets/remoteEntry.js',
+        host: hostRemoteEntry,
       },
       exposes: {
         './Dashboard': './src/pages/Dashboard',

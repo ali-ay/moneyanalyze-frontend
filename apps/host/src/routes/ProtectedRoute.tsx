@@ -1,5 +1,5 @@
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import type { JSX } from 'react/jsx-dev-runtime';
 import { useAuth } from '../app/providers/AuthContext';
 
 /**
@@ -7,7 +7,7 @@ import { useAuth } from '../app/providers/AuthContext';
  * AuthContext'i tek doğruluk kaynağı olarak kullanır — localStorage ve context
  * arasında race condition olmasın diye.
  */
-export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+export const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
 

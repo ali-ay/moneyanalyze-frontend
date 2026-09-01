@@ -1,12 +1,12 @@
+import React from 'react';
 import { Navigate } from 'react-router-dom';
-import type { JSX } from 'react/jsx-dev-runtime';
 import { useAuth } from '../app/providers/AuthContext';
 
 /**
  * Sadece ADMIN yetkisine sahip kullanıcıların erişebileceği rota bekçisi.
  * Kullanımı: <AdminRoute><UserList /></AdminRoute>
  */
-export const AdminRoute = ({ children }: { children: JSX.Element }) => {
+export const AdminRoute = ({ children }: { children: React.ReactElement }) => {
   const { user, isAuthenticated, loading } = useAuth();
 
   if (loading) return null;

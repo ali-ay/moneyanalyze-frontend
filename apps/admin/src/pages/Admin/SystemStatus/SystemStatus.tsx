@@ -21,6 +21,8 @@ interface SystemStatusData {
       free: number;
       used: number;
       percent: number;
+      processRss?: number;
+      processHeap?: number;
     };
     nodeVersion: string;
   };
@@ -34,6 +36,7 @@ interface SystemStatusData {
   };
   macbookAir: {
     status: string;
+    url?: string;
     latency: number;
     lastSync: string | null;
   };
@@ -167,7 +170,7 @@ const SystemStatus = () => {
             </S.DetailRow>
             <S.DetailRow>
               <span className="label"><Terminal size={16} /> Yerel Adres</span>
-              <span className="value" style={{ fontFamily: 'monospace' }}>http://100.119.7.109:8000</span>
+              <span className="value" style={{ fontFamily: 'monospace' }}>{data?.macbookAir?.url || 'http://192.168.1.75:8000'}</span>
             </S.DetailRow>
             <S.DetailRow>
               <span className="label"><Activity size={16} /> Yanıt Süresi</span>
@@ -264,13 +267,13 @@ const SystemStatus = () => {
 
               <S.MetricItem>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8125rem', color: '#5F6368', fontWeight: 600 }}>
-                  <HardDrive size={16} /> Sunucu Bellek Kullanımı
+                  <HardDrive size={16} /> Uygulama RAM Tüketimi (Process)
                 </div>
                 <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '4px', color: '#202124' }}>
-                  %{data.server.memory.percent}
+                  {data.server.memory.processRss ? `${data.server.memory.processRss} MB` : `%{data.server.memory.percent}`}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#9AA0A6' }}>
-                  {data.server.memory.used} MB / {data.server.memory.total} MB
+                  Sistem Toplamı: %{data.server.memory.percent} ({data.server.memory.used} MB / {data.server.memory.total} MB)
                 </div>
               </S.MetricItem>
 

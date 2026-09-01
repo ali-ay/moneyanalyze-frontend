@@ -45,7 +45,8 @@
       "admin/GlobalSettings": ["../admin/src/pages/Admin/Settings/GlobalSettings"],
       "admin/BotSettings": ["../admin/src/pages/Admin/BotSettings"],
       "admin/StockManagement": ["../admin/src/pages/Admin/StockManagement"],
-      "admin/MediaLibrary": ["../admin/src/pages/Admin/Media/MediaLibrary"]
+      "admin/MediaLibrary": ["../admin/src/pages/Admin/Media/MediaLibrary"],
+      "admin/SystemStatus": ["../admin/src/pages/Admin/SystemStatus/SystemStatus"]
     }
   },
   "include": ["src"]
