@@ -5,7 +5,7 @@ import {
   PageContainer, PageHeader, PageTitle, PageSubtitle, LoadingState
 } from '../../../components/ui/Layout.styles';
 import {
-  Server, Laptop, Database, Activity, RefreshCw, Cpu, HardDrive, Clock, Terminal
+  Server, Laptop, Database, Activity, RefreshCw, Cpu, HardDrive, Clock, Terminal, Pencil, Check, X
 } from 'lucide-react';
 
 interface SystemStatusData {
@@ -48,6 +48,12 @@ const SystemStatus = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [countdown, setCountdown] = useState(10);
 
+  // URL düzenleme state'leri
+  const [editingUrl, setEditingUrl] = useState(false);
+  const [urlInput, setUrlInput] = useState('');
+  const [savingUrl, setSavingUrl] = useState(false);
+  const [urlError, setUrlError] = useState('');
+
   const fetchStatus = useCallback(async (isManual = false) => {
     if (isManual) setRefreshing(true);
     try {
@@ -85,6 +91,43 @@ const SystemStatus = () => {
 
     return () => clearInterval(timer);
   }, [loading, fetchStatus]);
+
+  const handleStartEdit = () => {
+    setUrlInput(data?.macbookAir?.url || 'http://100.86.92.14:8000');
+    setUrlError('');
+    setEditingUrl(true);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingUrl(false);
+    setUrlError('');
+  };
+
+  const handleSaveUrl = async () => {
+    const trimmed = urlInput.trim();
+    if (!trimmed) {
+      setUrlError('URL boş olamaz.');
+      return;
+    }
+    try {
+      new URL(trimmed);
+    } catch {
+      setUrlError('Geçerli bir URL girin. (örn: http://192.168.1.75:8000)');
+      return;
+    }
+
+    setSavingUrl(true);
+    setUrlError('');
+    try {
+      await api.put('/admin/settings', { priceServerUrl: trimmed });
+      setEditingUrl(false);
+      await fetchStatus(true);
+    } catch (err: any) {
+      setUrlError(err?.response?.data?.message || 'Kaydetme başarısız.');
+    } finally {
+      setSavingUrl(false);
+    }
+  };
 
   const formatUptime = (seconds: number) => {
     const d = Math.floor(seconds / (3600 * 24));
@@ -168,10 +211,51 @@ const SystemStatus = () => {
               <span className="label"><Clock size={16} /> Son Fiyat Güncellemesi</span>
               <span className="value">{formatDateTime(data?.macbookAir?.lastSync || null)}</span>
             </S.DetailRow>
+
+            {/* Yerel Adres — inline edit */}
             <S.DetailRow>
               <span className="label"><Terminal size={16} /> Yerel Adres</span>
-              <span className="value" style={{ fontFamily: 'monospace' }}>{data?.macbookAir?.url || 'http://192.168.1.75:8000'}</span>
+              <span className="value" style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+                {editingUrl ? (
+                  <S.UrlEditRow>
+                    <S.UrlInput
+                      autoFocus
+                      value={urlInput}
+                      onChange={e => setUrlInput(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') handleSaveUrl();
+                        if (e.key === 'Escape') handleCancelEdit();
+                      }}
+                      placeholder="http://192.168.1.75:8000"
+                    />
+                    <S.UrlEditActions>
+                      <S.SaveUrlButton onClick={handleSaveUrl} disabled={savingUrl}>
+                        <Check size={14} />
+                        {savingUrl ? 'Kaydediliyor…' : 'Kaydet'}
+                      </S.SaveUrlButton>
+                      <S.CancelUrlButton onClick={handleCancelEdit}>
+                        <X size={14} />
+                      </S.CancelUrlButton>
+                    </S.UrlEditActions>
+                  </S.UrlEditRow>
+                ) : (
+                  <>
+                    <span style={{ fontFamily: 'monospace' }}>
+                      {data?.macbookAir?.url || 'http://192.168.1.75:8000'}
+                    </span>
+                    <S.EditUrlTrigger onClick={handleStartEdit} title="Adresi düzenle">
+                      <Pencil size={13} />
+                    </S.EditUrlTrigger>
+                  </>
+                )}
+              </span>
             </S.DetailRow>
+            {urlError && (
+              <div style={{ fontSize: '0.75rem', color: '#DB4437', textAlign: 'right', marginTop: '-8px' }}>
+                {urlError}
+              </div>
+            )}
+
             <S.DetailRow>
               <span className="label"><Activity size={16} /> Yanıt Süresi</span>
               <span className="value">
@@ -270,7 +354,7 @@ const SystemStatus = () => {
                   <HardDrive size={16} /> Uygulama RAM Tüketimi (Process)
                 </div>
                 <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '4px', color: '#202124' }}>
-                  {data.server.memory.processRss ? `${data.server.memory.processRss} MB` : `%{data.server.memory.percent}`}
+                  {data.server.memory.processRss ? `${data.server.memory.processRss} MB` : `%${data.server.memory.percent}`}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#9AA0A6' }}>
                   Sistem Toplamı: %{data.server.memory.percent} ({data.server.memory.used} MB / {data.server.memory.total} MB)

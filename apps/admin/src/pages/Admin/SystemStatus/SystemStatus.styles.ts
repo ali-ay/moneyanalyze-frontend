@@ -258,3 +258,89 @@ export const MetricItem = styled.div`
   flex-direction: column;
   gap: 8px;
 `;
+
+export const UrlEditRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+`;
+
+export const UrlInput = styled.input`
+  font-family: monospace;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1.5px solid ${props => props.theme?.colors?.primary || '#1A73E8'};
+  background: ${props => props.theme?.colors?.background || '#F8F9FA'};
+  color: ${props => props.theme?.colors?.textMain || '#202124'};
+  width: 220px;
+  outline: none;
+  transition: box-shadow 0.2s ease;
+
+  &:focus {
+    box-shadow: 0 0 0 3px ${props => props.theme?.colors?.primary || '#1A73E8'}25;
+  }
+`;
+
+export const UrlEditActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
+
+export const SaveUrlButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: ${props => props.theme?.colors?.primary || '#1A73E8'};
+  color: #fff;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 7px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, opacity 0.2s ease;
+
+  &:hover { opacity: 0.88; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+`;
+
+export const CancelUrlButton = styled.button`
+  display: flex;
+  align-items: center;
+  background: transparent;
+  color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
+  border: 1px solid ${props => props.theme?.colors?.border || '#DADCE0'};
+  padding: 5px 10px;
+  border-radius: 7px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: ${props => props.theme?.colors?.textSecondary || '#5F6368'};
+    background: ${props => props.theme?.colors?.background || '#F8F9FA'};
+  }
+`;
+
+export const EditUrlTrigger = styled.button`
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: ${props => props.theme?.colors?.textSecondary || '#9AA0A6'};
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease, background 0.2s ease;
+  margin-left: 6px;
+
+  &:hover {
+    color: ${props => props.theme?.colors?.primary || '#1A73E8'};
+    background: ${props => props.theme?.colors?.primary || '#1A73E8'}10;
+  }
+`;
