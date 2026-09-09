@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { AxiosError, AxiosRequestConfig } from 'axios';
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const API_URL = isLocalhost ? 'http://localhost:5001/api' : '/api';
+const API_URL = isLocalhost ? 'http://localhost:5002/api' : '/api';
 
 /**
  * Auth event bus — interceptor'ın React state'e dolaylı haber vermesi için.

@@ -72,7 +72,7 @@ export default defineConfig(({ mode }) => {
     strictPort: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:5001',
+        target: 'http://localhost:5002',
         changeOrigin: true,
       }
     }
@@ -86,7 +86,7 @@ export default defineConfig(({ mode }) => {
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:5001',
+        target: 'http://localhost:5002',
         changeOrigin: true,
       }
     }
