@@ -20,7 +20,7 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Bağımlılıkları kur
-        run: npm ci
+        run: npm install
 
       - name: 🔨 Production build al
         run: npm run build
